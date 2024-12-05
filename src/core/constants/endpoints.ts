@@ -1,0 +1,18 @@
+export const endpoints = {
+  users: "users",
+  me: "users/me",
+  login: "users/login",
+  create: "users/create",
+  edit: "users/edit",
+  saveWallet: "users/saveWallet",
+  activeBoost: "users/activeBoost",
+  increaseBoosts: "users/increaseBoosts",
+  restoreEnergy: "users/restoreEnergy",
+  friends: "friends",
+  addReferer: "addReferer",
+  tasks: "tasks",
+  upgrades: "upgrades",
+  leaders: "leaders",
+  sendBoops: "users/send/boops",
+  screen: "users/screen",
+};

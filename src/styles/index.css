@@ -1,0 +1,14 @@
+@import "./normalize.css";
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Lilita+One&display=swap");
+@import "swiper/css";
+
+html {
+  touch-action: none;
+}
+
+body {
+  background-color: #ecf2f7;
+  overflow: hidden;
+  font-family: "Inter", sans-serif;
+}
