@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useLaunchParams } from "@telegram-apps/sdk-react";
+// import { useLaunchParams } from "@telegram-apps/sdk-react";
 import { loginByTgInitData } from "../services/login.service";
 import { IUser } from "../types";
 import { getUser } from "../services/user.service";
