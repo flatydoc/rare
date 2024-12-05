@@ -8,7 +8,7 @@ import {
 import { TonConnectUIProvider } from "@tonconnect/ui-react";
 import { config } from "./core/configs";
 import { theme } from "./core/theme/theme";
-import { useAuth } from "./core/hooks/useAuth";
+// import { useAuth } from "./core/hooks/useAuth";
 import { useUserStore } from "./core/store/useUserStore";
 
 export const Root = () => {
