@@ -15,7 +15,7 @@ export const Root = () => {
   const miniApp = useMiniApp();
   const viewport = useViewport();
   const swipeBehavior = useSwipeBehavior();
-  const { isLoading, user } = useAuth();
+  // const { isLoading, user } = useAuth();
   const setUser = useUserStore((state) => state.setUser);
 
   miniApp.ready();
@@ -25,12 +25,20 @@ export const Root = () => {
     swipeBehavior.disableVerticalSwipe();
   }
 
+  const user = {
+    id: 1,
+    telegramId: 123,
+    username: "user",
+    balance: 123,
+    energy: 123123132,
+  };
+
   if (user) {
     setUser(user);
   }
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  // if (isLoading) {
+  //   return <div>Loading...</div>;
+  // }
   if (!user) return null;
 
   return (
