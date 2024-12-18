@@ -1,19 +1,20 @@
+import { ContentTypes, HttpHeaders, HttpMethods } from "../enums";
 import { api } from "../services";
 
-type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-
 interface FetchOptions {
-  method?: HttpMethod;
+  method?: HttpMethods;
   endpoint: string;
-  data?: Record<string, unknown>;
+  data?: Record<string, unknown> | FormData;
   params?: Record<string, unknown>;
+  headers?: Record<string, string>;
 }
 
 export const fetchData = async <T>({
-  method = "GET",
+  method = HttpMethods.GET,
   endpoint,
   data,
   params,
+  headers = { [HttpHeaders.CONTENT_TYPE]: ContentTypes.JSON },
 }: FetchOptions): Promise<T> => {
   try {
     const response = await api.request({
@@ -21,6 +22,7 @@ export const fetchData = async <T>({
       method,
       params,
       data,
+      headers,
     });
     return response.data as T;
   } catch (error: unknown) {

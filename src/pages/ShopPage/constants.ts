@@ -9,7 +9,7 @@ export const cases: ICase[] = [
     priceCurrency: "ton",
     name: "Elite Case",
     description: "Only available for premium members.",
-    cardIds: [1, 2, 3, 4, 5], // Пример карточек, которые могут выпасть из этого кейса
+    cardIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
   },
   {
     id: 22,

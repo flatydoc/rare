@@ -1,6 +1,6 @@
+import { NavLink, useMatch } from "react-router-dom";
 import { Typography } from "@mui/material";
-import { NavLink } from "react-router-dom";
-import { useHapticFeedback } from "@telegram-apps/sdk-react";
+import { colors } from "../../core/theme/colors";
 
 export const Link = ({
   to,
@@ -11,17 +11,15 @@ export const Link = ({
   label: string;
   img: string;
 }) => {
-  const hapticFeedback = useHapticFeedback();
-
-  const handleClick = () => {
-    hapticFeedback.impactOccurred("light");
-  };
+  const match = useMatch({
+    path: `${to}/*`,
+    end: false,
+  });
 
   return (
     <NavLink
       to={to}
-      onClick={handleClick}
-      style={({ isActive }) => ({
+      style={{
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -31,17 +29,20 @@ export const Link = ({
         width: "62px",
         minWidth: "62px",
         flexGrow: "1",
-        backgroundColor: isActive ? "#fff" : "transparent",
+        backgroundColor: match ? "rgb(25, 25, 25)" : "transparent",
         borderRadius: "17px",
-        boxShadow: isActive ? "0px 1px 1px 0px #739BBF40" : "none",
-        color: isActive ? "yellow" : "red",
-        transition: "all ease 0.2s",
-      })}
+        border: match ? "1px solid rgb(15, 15, 15)" : "none",
+        boxShadow: match
+          ? `0px 1px 1px 0px inset rgba(250, 129, 9, 0.1)`
+          : "none",
+      }}
     >
       <img src={img} width={24} height={24} alt={label} />
       <Typography
         sx={{
+          color: match ? colors.primary : "black",
           fontSize: "12px",
+          transition: "all ease 0.2s",
         }}
       >
         {label}

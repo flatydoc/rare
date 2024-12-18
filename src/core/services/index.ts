@@ -5,9 +5,6 @@ import { config } from "../configs";
 export const api = axios.create({
   baseURL: `${config.baseURL}/api/v1/`,
   withCredentials: true,
-  headers: {
-    "Content-type": "application/json",
-  },
 });
 
 api.interceptors.request.use((config) => {

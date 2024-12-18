@@ -1,4 +1,4 @@
-import { endpoints } from "../constants/endpoints";
+import { Endpoints } from "../enums";
 import { IUser } from "../types";
 import { fetchData } from "../utils/fetchData";
 
@@ -9,7 +9,7 @@ interface IUserRes {
 export const getUser = async () => {
   try {
     const response = await fetchData<IUserRes>({
-      endpoint: endpoints.me,
+      endpoint: Endpoints.ME,
     });
 
     if (!response) {

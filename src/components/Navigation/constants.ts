@@ -1,5 +1,5 @@
 import { config } from "../../core/configs";
-import { RouteList } from "../../core/router/routes";
+import { RouteList } from "../../core/enums";
 
 export const navLinks = [
   {

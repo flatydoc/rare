@@ -25,7 +25,13 @@ export const CasePage = () => {
     .filter((card): card is ICard => card !== undefined);
 
   return (
-    <Box>
+    <Box
+      sx={{
+        height: "100vh",
+        overflowY: "auto",
+        p: "12px 12px 104px 12px",
+      }}
+    >
       <Roulette caseCards={caseCards} />
       <CaseDetails selectedCase={selectedCase} />
       <CardsList caseCards={caseCards} />

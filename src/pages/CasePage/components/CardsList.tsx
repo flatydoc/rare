@@ -2,6 +2,8 @@ import { Box, Typography } from "@mui/material";
 import { centerContentStyles } from "../../../core/theme/common.style";
 import { ICard } from "../../../core/types";
 import { getRarityColor } from "../../../core/utils/getRarityColor";
+import { NavLink } from "react-router-dom";
+import { RouteList } from "../../../core/enums";
 
 export const CardsList = ({ caseCards }: { caseCards: ICard[] }) => {
   return (
@@ -16,9 +18,10 @@ export const CardsList = ({ caseCards }: { caseCards: ICard[] }) => {
     >
       {caseCards.length > 0 ? (
         caseCards.map((card) => (
-          <Box
+          <NavLink
+            to={`/${RouteList.Cards}/${card.id}`}
             key={card.id}
-            sx={{
+            style={{
               ...centerContentStyles,
               overflow: "hidden",
               flexDirection: "column",
@@ -59,7 +62,7 @@ export const CardsList = ({ caseCards }: { caseCards: ICard[] }) => {
               Цена: {card.price}{" "}
               {card.priceCurrency === "inGame" ? "игровых" : "TON"}
             </Typography>
-          </Box>
+          </NavLink>
         ))
       ) : (
         <Typography sx={{ gridColumn: "1 / -1", textAlign: "center" }}>

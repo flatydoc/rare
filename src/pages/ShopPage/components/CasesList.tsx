@@ -2,8 +2,8 @@ import { Box, Typography } from "@mui/material";
 import { centerContentStyles } from "../../../core/theme/common.style";
 import { ICase } from "../../../core/types";
 import { NavLink } from "react-router-dom";
-import { RouteList } from "../../../core/router/routes";
 import { getRarityColor } from "../../../core/utils/getRarityColor";
+import { RouteList } from "../../../core/enums";
 
 export const CasesList = ({ filteredCases }: { filteredCases: ICase[] }) => {
   return (

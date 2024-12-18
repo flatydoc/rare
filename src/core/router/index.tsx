@@ -1,5 +1,4 @@
 import { createBrowserRouter } from "react-router-dom";
-import { RouteList } from "./routes";
 
 import { Layout } from "../../Layout";
 import { Root } from "../../Root";
@@ -12,6 +11,7 @@ import { LeadersPage } from "../../pages/LeadersPage/LeadersPage";
 import { CasePage } from "../../pages/CasePage/CasePage";
 import { CardsPage } from "../../pages/CardsPage/CardsPage";
 import { SingleCardPage } from "../../pages/SingleCardPage/SingleCardPage";
+import { RouteList } from "../enums";
 
 export const router = createBrowserRouter([
   {

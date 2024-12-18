@@ -1,6 +1,7 @@
 import { Box } from "@mui/material";
 import { navLinks } from "./constants";
 import { Link } from "../ui/Link";
+import { colors } from "../../core/theme/colors";
 
 export const Navigation = () => {
   const links = navLinks.map(({ to, label, img }) => (
@@ -9,27 +10,40 @@ export const Navigation = () => {
 
   return (
     <Box
+      component={"footer"}
       sx={{
-        borderRadius: "20px",
-        background: "#eff3f6",
-        backdropFilter: "blur(7px)",
-        boxShadow: "0px 50px 50px 20px rgba(255, 255, 255, 0.8)",
-        border: "1px #F9FAFB",
-        position: "relative",
+        position: "fixed",
+        bottom: "26px",
+        left: "12px",
+        zIndex: "999",
+        width: "calc(100% - 24px)",
+        padding: "1px",
+        borderRadius: "21px",
+        background: `linear-gradient(0deg, #000 0%, rgba(250, 129, 9, 0.3) 100%)`,
       }}
     >
       <Box
-        component={"nav"}
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          height: "64px",
-          minWidth: "fit-content",
-          padding: "3px",
+          borderRadius: "20px",
+          background: colors.secondaryBackground,
+          backdropFilter: "blur(7px)",
+          boxShadow: `0px 50px 50px 20px ${colors.background}`,
+          position: "relative",
         }}
       >
-        {links}
+        <Box
+          component={"nav"}
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            height: "64px",
+            minWidth: "fit-content",
+            padding: "3px",
+          }}
+        >
+          {links}
+        </Box>
       </Box>
     </Box>
   );
