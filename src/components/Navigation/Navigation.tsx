@@ -15,7 +15,7 @@ export const Navigation = () => {
         position: "fixed",
         bottom: "26px",
         left: "12px",
-        zIndex: "999",
+        zIndex: "100",
         width: "calc(100% - 24px)",
         padding: "1px",
         borderRadius: "21px",

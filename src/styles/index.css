@@ -9,6 +9,7 @@ html {
 
 body {
   background-color: rgb(25, 25, 25);
+  color: #fff;
   overflow: hidden;
   font-family: "Inter", sans-serif;
 }

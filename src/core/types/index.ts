@@ -4,6 +4,10 @@ export interface IUser {
   username: string | null;
   balance: number;
   energy: number;
+  exp: number;
+  level: number;
+  cards: number[];
+  cases: number[];
 }
 
 export interface ICase {
@@ -37,3 +41,15 @@ export interface ICard {
   name: string;
   description: string;
 }
+
+export interface IReward {
+  id: number;
+  league: string;
+  reward: string;
+  rewardColor: string;
+  rewardValue?: number;
+  rewardType: RewardType;
+  isClaimed: boolean;
+}
+
+export type RewardType = "inGame" | "pack" | "not" | "ton";

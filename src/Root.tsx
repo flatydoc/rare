@@ -29,8 +29,12 @@ export const Root = () => {
     id: 1,
     telegramId: 123,
     username: "user",
-    balance: 123,
-    energy: 123123132,
+    balance: 1100,
+    energy: 81,
+    exp: 50,
+    level: 2,
+    cards: [1, 2],
+    cases: [],
   };
 
   if (user) {

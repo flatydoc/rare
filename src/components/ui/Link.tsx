@@ -40,7 +40,7 @@ export const Link = ({
       <img src={img} width={24} height={24} alt={label} />
       <Typography
         sx={{
-          color: match ? colors.primary : "black",
+          color: match ? colors.primary : colors.secondaryTextColor,
           fontSize: "12px",
           transition: "all ease 0.2s",
         }}

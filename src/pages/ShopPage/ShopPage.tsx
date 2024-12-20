@@ -17,7 +17,7 @@ export const ShopPage = () => {
       sx={{
         height: "100vh",
         overflowY: "auto",
-        p: "12px 12px 104px 12px",
+        p: "12px 0 104px 0",
       }}
     >
       <Typography variant="h4" textAlign="center" mb={2}>
@@ -28,6 +28,7 @@ export const ShopPage = () => {
         sx={{
           width: "100%",
           overflowX: "auto",
+          p: "0 12px 0 12px",
         }}
       >
         <Tabs
