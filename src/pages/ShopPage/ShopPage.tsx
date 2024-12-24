@@ -55,7 +55,7 @@ export const ShopPage = () => {
         </Tabs>
       </Box>
 
-      <CasesList filteredCases={filteredCases} />
+      <CasesList cases={filteredCases} />
     </Box>
   );
 };

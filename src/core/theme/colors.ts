@@ -13,4 +13,12 @@ export const colors = {
   ancient: "#795548",
   background: "rgb(25, 25, 25)",
   secondaryBackground: "rgb(20, 20, 20)",
+  flame: "#f44336",
+  frost: "#03a9f4",
+  shock: "#ffeb3b",
+  simple: "#000",
+  earth: "#8bc34a",
+  light: "#ff9800",
+  darkness: "#9e9e9e",
+  poison: "#39FF14",
 } as const;

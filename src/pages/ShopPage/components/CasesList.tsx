@@ -5,7 +5,7 @@ import { NavLink } from "react-router-dom";
 import { getRarityColor } from "../../../core/utils/getRarityColor";
 import { RouteList } from "../../../core/enums";
 
-export const CasesList = ({ filteredCases }: { filteredCases: ICase[] }) => {
+export const CasesList = ({ cases }: { cases: ICase[] }) => {
   return (
     <Box
       sx={{
@@ -13,11 +13,10 @@ export const CasesList = ({ filteredCases }: { filteredCases: ICase[] }) => {
         gridTemplateColumns: "repeat(2, 1fr)",
         gap: "12px",
         width: "100%",
-        mt: 3,
       }}
     >
-      {filteredCases.length > 0 ? (
-        filteredCases.map((item) => (
+      {cases.length > 0 ? (
+        cases.map((item) => (
           <NavLink
             to={`/${RouteList.Shop}/${item.id}`}
             key={item.id}

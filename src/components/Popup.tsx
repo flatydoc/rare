@@ -1,4 +1,5 @@
 import { Box, SwipeableDrawer } from "@mui/material";
+import { colors } from "../core/theme/colors";
 
 export const Popup = ({
   isShow,
@@ -48,6 +49,7 @@ export const Popup = ({
           display: "flex",
           justifyContent: "center",
           width: "100%",
+          color: colors.textColor,
           paddingTop: "12px",
           "&:hover .drawer": {
             backgroundColor: "#ffffffaa",

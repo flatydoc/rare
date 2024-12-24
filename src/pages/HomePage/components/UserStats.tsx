@@ -6,6 +6,8 @@ import gum from "../../../assets/gum.png";
 import { formatNumber } from "../../../core/utils/formatNumber";
 import { EnergyProgressBar } from "./EnergyProgressBar";
 import cap from "../../../assets/cap.png";
+import { RouteList } from "../../../core/enums";
+import { useNavigate } from "react-router-dom";
 
 export const UserStats = ({
   energy,
@@ -14,12 +16,15 @@ export const UserStats = ({
   energy: number;
   balance: number;
 }) => {
+  const navigate = useNavigate();
+
   const userStatsCards = [
     {
       id: 1,
       label: "caps",
       value: 123,
       icon: cap,
+      onClick: () => navigate(`/${RouteList.Cards}`),
     },
     {
       id: 2,
@@ -43,13 +48,14 @@ export const UserStats = ({
         width: "100%",
       }}
     >
-      {userStatsCards.map(({ id, value, icon, label }) => {
+      {userStatsCards.map(({ id, value, icon, label, onClick }) => {
         const isEnergy = id === 3;
-
+        const isCaps = id === 1;
         const progress = isEnergy ? (Number(value) / MAX_ENERGY) * 100 : 0;
 
         return (
           <Box
+            onClick={isCaps ? onClick : undefined}
             key={id}
             sx={{
               display: "flex",

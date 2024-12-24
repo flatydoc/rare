@@ -10,6 +10,7 @@ import { config } from "./core/configs";
 import { theme } from "./core/theme/theme";
 // import { useAuth } from "./core/hooks/useAuth";
 import { useUserStore } from "./core/store/useUserStore";
+import { useEffect } from "react";
 
 export const Root = () => {
   const miniApp = useMiniApp();
@@ -33,13 +34,17 @@ export const Root = () => {
     energy: 81,
     exp: 50,
     level: 2,
-    cards: [1, 2],
-    cases: [],
+    cards: [101, 102],
+    cases: [5],
+    gems: [4, 5],
   };
 
-  if (user) {
-    setUser(user);
-  }
+  useEffect(() => {
+    if (user) {
+      setUser(user);
+    }
+  }, []);
+
   // if (isLoading) {
   //   return <div>Loading...</div>;
   // }

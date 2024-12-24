@@ -57,17 +57,22 @@ export const HomePage = () => {
           alignItems: "center",
         }}
       >
-        <Typography
+        <Box
           sx={{
-            whiteSpace: "nowrap",
-            fontSize: "32px",
-            fontWeight: "700",
             position: "relative",
             display: "inline-block",
             margin: "0 auto",
           }}
         >
-          PLAY TO EARN
+          <Typography
+            sx={{
+              whiteSpace: "nowrap",
+              fontSize: "32px",
+              fontWeight: "700",
+            }}
+          >
+            PLAY TO EARN
+          </Typography>
           <Box
             onClick={() => setIsShowPopup(true)}
             sx={{
@@ -112,7 +117,7 @@ export const HomePage = () => {
               </Typography>
             </Box>
           </Box>
-        </Typography>
+        </Box>
       </Box>
       <Popup isShow={isShowPopup} setIsShow={setIsShowPopup}>
         <Box

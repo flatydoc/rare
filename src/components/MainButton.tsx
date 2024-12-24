@@ -36,6 +36,14 @@ export const MainButton = forwardRef<HTMLButtonElement, ButtonProp>(
         }`,
         cursor: disabled ? "not-allowed" : "pointer",
       },
+      ton: {
+        borderRadius: "16px",
+        padding: "14px",
+        minHeight: "48px",
+        background: "#31A6F5",
+        border: `none`,
+        cursor: "pointer",
+      },
     };
 
     return (

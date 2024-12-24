@@ -1,5 +1,6 @@
 export enum RouteList {
   Root = "/",
+  User = "/user",
   Shop = "shop",
   Tasks = "tasks",
   Friends = "friends",

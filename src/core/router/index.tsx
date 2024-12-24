@@ -26,6 +26,7 @@ export const router = createBrowserRouter([
             path: RouteList.Root,
             element: <HomePage />,
           },
+
           {
             path: RouteList.Profile,
             element: <ProfilePage />,

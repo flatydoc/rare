@@ -7,7 +7,7 @@ export const Header = ({ user }: { user: IUser }) => {
   return (
     <Box
       sx={{
-        p: "26px 12px 12px 12px",
+        p: "24px 12px 12px 12px",
       }}
     >
       <LevelProgressBar level={user.level} exp={user.exp} />

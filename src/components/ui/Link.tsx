@@ -29,7 +29,7 @@ export const Link = ({
         width: "62px",
         minWidth: "62px",
         flexGrow: "1",
-        backgroundColor: match ? "rgb(25, 25, 25)" : "transparent",
+        backgroundColor: match ? "rgb(35, 35, 35)" : "transparent",
         borderRadius: "17px",
         border: match ? "1px solid rgb(15, 15, 15)" : "none",
         boxShadow: match

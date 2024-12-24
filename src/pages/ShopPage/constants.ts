@@ -1,4 +1,6 @@
 import { ICase } from "../../core/types";
+import gold from "../../assets/gold.webp";
+import silver from "../../assets/silver.webp";
 
 export const cases: ICase[] = [
   {
@@ -176,10 +178,10 @@ export const cases: ICase[] = [
     category: "hit",
     rarity: "uncommon",
     price: 5,
-    priceCurrency: "ton",
+    priceCurrency: "inGame",
     name: "Beginner's Fortune",
     description: "A popular choice for new players.",
-    cardIds: [4, 7, 9], // Пример карточек
+    cardIds: [4, 7, 9],
   },
   {
     id: 4,
@@ -200,6 +202,7 @@ export const cases: ICase[] = [
     name: "Mythic Box",
     description: "A chance to win mythical items.",
     cardIds: [10, 12], // Пример карточек
+    img: gold,
   },
   {
     id: 6,
@@ -210,6 +213,7 @@ export const cases: ICase[] = [
     name: "Legend's Chest",
     description: "Only for the bold and daring.",
     cardIds: [13, 15], // Пример карточек
+    img: silver,
   },
   {
     id: 7,
