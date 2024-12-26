@@ -1,5 +1,7 @@
-import { Box, Tooltip, Typography } from "@mui/material";
+import { Box, Typography, Popover, IconButton } from "@mui/material";
 import { formatTextWithElements } from "./formatTextWithElements";
+import { useState } from "react";
+import InfoIcon from "@mui/icons-material/Info"; // Пример иконки для клика
 
 export const CustomTooltip = ({
   title,
@@ -10,9 +12,14 @@ export const CustomTooltip = ({
   text?: string;
   children: React.ReactElement;
 }) => {
-  if (!title) {
-    return children;
-  }
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(anchorEl ? null : event.currentTarget); // Показать или скрыть Popover
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? "custom-tooltip-popover" : undefined;
 
   const renderWithLineBreaks = (formattedText: string | undefined) => {
     if (!formattedText) return null;
@@ -25,15 +32,36 @@ export const CustomTooltip = ({
     ));
   };
 
+  if (!title) {
+    return children;
+  }
+
   return (
-    <Tooltip
-      title={
+    <>
+      <IconButton onClick={handleClick}>
+        <InfoIcon />
+      </IconButton>
+      <Popover
+        id={id}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClick}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      >
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
             gap: "4px",
             maxWidth: "300px",
+            padding: "8px",
           }}
         >
           <Typography
@@ -58,10 +86,8 @@ export const CustomTooltip = ({
             </Typography>
           )}
         </Box>
-      }
-      placement="top-start"
-    >
+      </Popover>
       {children}
-    </Tooltip>
+    </>
   );
 };
