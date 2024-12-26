@@ -25,16 +25,22 @@ export interface ICase {
 
 export interface IGem {
   id: number;
+  number: number;
+  inserted: boolean;
   rarity: Rarity;
   price: number;
   priceCurrency: "inGame" | "ton";
   name: string;
   description: string;
+  tooltipTitle: string;
   img: string;
   powerModifier: number;
+  armorModifier: number;
   healthModifier: number;
+  element?: Element;
   gradeModifier: number;
   removable: boolean;
+  kitId?: number;
 }
 
 export type CaseCategory = "free" | "hit" | "exclusive" | "event" | "promo";
@@ -55,10 +61,13 @@ export interface ICard {
   rarity: Rarity;
   price: number;
   power: number;
+  bonusPower: number;
   powerCoef: number;
   health: number;
+  bonusHealth: number;
   healthCoef: number;
   armor: number;
+  bonusArmor: number;
   armorCoef: number;
   exp: number;
   level: number;
@@ -68,26 +77,10 @@ export interface ICard {
   name: string;
   description: string;
   img: string;
-  gemIds: number[];
+  gemIds: (number | null)[];
   sockets: number;
   element: Element;
   class: CardClass;
-}
-
-export interface IInventoryItem {
-  id: number;
-  rarity: Rarity;
-  name: string;
-  price?: number;
-  priceCurrency?: string;
-  description?: string;
-  img?: string;
-  type: "case" | "card";
-  element?: Element;
-  fraction?: Fraction;
-  stars?: number;
-  level?: number;
-  class?: CardClass;
 }
 
 export interface IReward {
@@ -108,9 +101,19 @@ export type Element =
   | "frost"
   | "shock"
   | "earth"
-  | "light"
+  | "holy"
   | "darkness"
   | "simple"
   | "poison";
 
 export type CardClass = "defender" | "support" | "dd";
+
+export interface GemKit {
+  id: number;
+  name: string;
+  description: string;
+  gemIds: number[];
+  powerModifier: number;
+  armorModifier: number;
+  healthModifier: number;
+}

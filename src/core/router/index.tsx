@@ -12,6 +12,8 @@ import { CasePage } from "../../pages/CasePage/CasePage";
 import { CardsPage } from "../../pages/CardsPage/CardsPage";
 import { SingleCardPage } from "../../pages/SingleCardPage/SingleCardPage";
 import { RouteList } from "../enums";
+import { GemsPage } from "../../pages/GemsPage/GemsPage";
+import { SingleGemPage } from "../../pages/SingleGemPage/SingleGemPage";
 
 export const router = createBrowserRouter([
   {
@@ -46,6 +48,14 @@ export const router = createBrowserRouter([
           {
             path: `${RouteList.Cards}/:cardId`,
             element: <SingleCardPage />,
+          },
+          {
+            path: RouteList.Gems,
+            element: <GemsPage />,
+          },
+          {
+            path: `${RouteList.Gems}/:gemId`,
+            element: <SingleGemPage />,
           },
           {
             path: RouteList.Tasks,

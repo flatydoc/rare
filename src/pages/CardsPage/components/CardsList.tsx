@@ -3,29 +3,34 @@ import { centerContentStyles } from "../../../core/theme/common.style";
 import { getRarityColor } from "../../../core/utils/getRarityColor";
 import { ICard } from "../../../core/types";
 import { Ambient } from "../../../components/ui/Ambient";
-import { elementEmojis, fractionEmojis } from "../../SingleCardPage/constants";
+import { elementEmojis } from "../../SingleCardPage/constants";
 import { colors } from "../../../core/theme/colors";
 import { getIconByCardClass } from "../../../core/utils/geIconByCardClass";
 import { getCardImage } from "../../../core/utils/getCardImage";
+import { getBgByCardFraction } from "../../../core/utils/getBgByFraction";
 
 export const CardsList = ({
   cards,
   event,
+  selectedCardId,
 }: {
   cards: ICard[];
   event: (id: number) => void;
+  selectedCardId?: number | null;
 }) => {
   return (
     <Box
       sx={{
         display: "grid",
-        gridTemplateColumns: "repeat(2, 1fr)",
+        gridTemplateColumns: "repeat(3, 1fr)",
         gap: "12px",
         width: "100%",
       }}
     >
       {cards.length > 0 ? (
         cards.map((card) => {
+          const isSelected = selectedCardId === card.id;
+
           return (
             <Box
               onClick={() => event(card.id)}
@@ -40,7 +45,15 @@ export const CardsList = ({
                 position: "relative",
                 padding: "10px",
                 aspectRatio: "1",
-                boxShadow: `0 1px 2px 0 inset ${getRarityColor(card.rarity)}`,
+                boxShadow: isSelected
+                  ? `0 0 5px 1px ${
+                      colors.primary
+                    }, 0 1px 2px 0 inset ${getRarityColor(card.rarity)}`
+                  : `0 1px 2px 0 inset ${getRarityColor(card.rarity)}`,
+                background: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.8)), url(${getBgByCardFraction(
+                  card.fraction
+                )})`,
+                backgroundSize: "cover",
               }}
             >
               <Ambient rarity={card.rarity}>
@@ -58,7 +71,7 @@ export const CardsList = ({
                 sx={{
                   position: "absolute",
                   left: "50%",
-                  bottom: "12px",
+                  bottom: "6px",
                   transform: "translateX(-50%)",
                   display: "flex",
                   flexDirection: "column",
@@ -66,6 +79,27 @@ export const CardsList = ({
                   gap: "4px",
                 }}
               >
+                <Box
+                  sx={{
+                    backgroundColor: "rgba(60, 60, 60, 0.5)",
+                    borderRadius: "40px",
+                    padding: "4px 8px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      color: colors.textColor,
+                      fontSize: "12px",
+                      fontWeight: "600",
+                    }}
+                  >
+                    {`Lvl. ${card.level}`}
+                  </Typography>
+                </Box>
                 <Box
                   sx={{
                     display: "flex",
@@ -85,39 +119,7 @@ export const CardsList = ({
                     }}
                   />
                 </Box>
-
-                <Box
-                  sx={{
-                    backgroundColor: "rgba(60, 60, 60, 0.5)",
-                    borderRadius: "40px",
-                    padding: "6px 12px",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      color: colors.textColor,
-                      fontSize: "12px",
-                      fontWeight: "600",
-                    }}
-                  >
-                    {card.name}
-                  </Typography>
-                </Box>
               </Box>
-              <Typography
-                sx={{
-                  position: "absolute",
-                  left: "12px",
-                  top: "12px",
-                  fontSize: "16px",
-                }}
-              >
-                {fractionEmojis[card.fraction]}
-              </Typography>
               <Typography
                 sx={{
                   position: "absolute",
@@ -132,36 +134,12 @@ export const CardsList = ({
                 style={{
                   position: "absolute",
                   left: "12px",
-                  bottom: "12px",
+                  top: "12px",
                 }}
                 width={24}
                 height={24}
                 src={getIconByCardClass(card.class)}
               />
-              <Box
-                sx={{
-                  position: "absolute",
-                  right: "12px",
-                  bottom: "12px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: "50%",
-                  width: "24px",
-                  height: "24px",
-                  backgroundColor: "rgba(60, 60, 60, 0.5)",
-                }}
-              >
-                <Typography
-                  sx={{
-                    fontSize: "12px",
-                    fontWeight: "600",
-                    color: colors.textColor,
-                  }}
-                >
-                  {card.level}
-                </Typography>
-              </Box>
             </Box>
           );
         })

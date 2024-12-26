@@ -9,7 +9,6 @@ export const getNextRarity = (currentRarity: Rarity): Rarity | null => {
     "legendary",
     "epic",
     "immortal",
-    "ancient",
   ];
 
   const currentIndex = rarities.indexOf(currentRarity);

@@ -1,16 +1,22 @@
-import { Box, SwipeableDrawer } from "@mui/material";
+import { Box, IconButton, SwipeableDrawer } from "@mui/material";
 import { colors } from "../core/theme/colors";
-
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 export const Popup = ({
   isShow,
   setIsShow,
   children,
+  eventOnClose,
 }: {
   isShow: boolean;
   setIsShow: (isShow: boolean) => void;
   children: React.ReactNode;
+  eventOnClose?: () => void;
 }) => {
   const DRAWER_BLEEDING = 26;
+
+  const handleClose = () => {
+    if (eventOnClose) eventOnClose();
+  };
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setIsShow(newOpen);
@@ -29,7 +35,6 @@ export const Popup = ({
       }}
       sx={{
         "& .MuiDrawer-paper": {
-          minHeight: `calc(50% - ${DRAWER_BLEEDING}px)`,
           overflow: "visible",
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
@@ -75,8 +80,23 @@ export const Popup = ({
           flexDirection: "column",
           alignItems: "center",
           gap: "24px",
+          position: "relative",
         }}
       >
+        {eventOnClose && (
+          <Box
+            sx={{ position: "absolute", top: "-10px", right: "16px" }}
+            onClick={handleClose}
+          >
+            <IconButton
+              sx={{
+                color: colors.secondaryTextColor,
+              }}
+            >
+              <CloseRoundedIcon />
+            </IconButton>
+          </Box>
+        )}
         {children}
       </Box>
     </SwipeableDrawer>
