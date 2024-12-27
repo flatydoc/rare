@@ -31,7 +31,7 @@ import { getCardImage } from "../../core/utils/getCardImage";
 import { useMemo, useState } from "react";
 import { Popup } from "../../components/Popup";
 import { CardsList } from "../CardsPage/components/CardsList";
-import { canMerge, getRequiredLevelText } from "../../core/utils/canMerge";
+import { canMerge } from "../../core/utils/canMerge";
 import { GemsList } from "../GemsPage/components/GemsList";
 import { useGemStore } from "../../core/store/useGemStore";
 import { useUserStore } from "../../core/store/useUserStore";
