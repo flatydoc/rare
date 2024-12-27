@@ -19,7 +19,7 @@ export const GemsList = ({
     <Box
       sx={{
         display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
+        gridTemplateColumns: "repeat(4, 1fr)",
         gap: "12px",
         width: "100%",
       }}
@@ -58,41 +58,6 @@ export const GemsList = ({
                   }}
                 />
               </Ambient>
-
-              <Box
-                sx={{
-                  position: "absolute",
-                  left: "50%",
-                  bottom: "12px",
-                  transform: "translateX(-50%)",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: "4px",
-                }}
-              >
-                <Box
-                  sx={{
-                    backgroundColor: "rgba(60, 60, 60, 0.5)",
-                    borderRadius: "40px",
-                    padding: "6px 12px",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      color: colors.textColor,
-                      fontSize: "12px",
-                      fontWeight: "600",
-                    }}
-                  >
-                    {gem.name}
-                  </Typography>
-                </Box>
-              </Box>
               {gem.element && (
                 <Typography
                   sx={{

@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import { colors } from "../../../core/theme/colors";
 import { getRangeValue } from "../../../core/utils/getRangeValue";
 import { CustomTooltip } from "../../../components/ui/CustomTooltip";
@@ -6,6 +6,7 @@ import { CardStatProgress } from "./CardStatProgress";
 import { getLevelExperience } from "../../../core/utils/getLevelExperience";
 import KeyboardArrowUpRoundedIcon from "@mui/icons-material/KeyboardArrowUpRounded";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 export const CardStat = ({
   label,
@@ -75,24 +76,49 @@ export const CardStat = ({
           width: "100%",
         }}
       >
-        <CustomTooltip title={tooltipText} text={tooltipSubtitle}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            height: "24px",
+          }}
+        >
           <Box
             sx={{
               display: "flex",
               alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-              height: "24px",
-              cursor: "help",
+              gap: "4px",
             }}
           >
             <Box
               sx={{
                 display: "flex",
                 alignItems: "center",
-                gap: "6px",
+                gap: "0",
               }}
             >
+              <CustomTooltip
+                openOnClick
+                title={tooltipText}
+                text={tooltipSubtitle}
+              >
+                <IconButton
+                  sx={{
+                    color: colors.secondaryTextColor,
+                    padding: "4px",
+                  }}
+                >
+                  <InfoOutlinedIcon
+                    sx={{
+                      width: "12px",
+                      height: "12px",
+                      cursor: "help",
+                    }}
+                  />
+                </IconButton>
+              </CustomTooltip>
               <Typography
                 sx={{
                   fontSize: "14px",
@@ -102,59 +128,57 @@ export const CardStat = ({
               >
                 {label}:
               </Typography>
-              <Typography
+            </Box>
+            <Typography
+              sx={{
+                fontSize: "14px",
+                fontWeight: "500",
+                color: value < 0 ? "red" : colors.textColor,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {isPower && !isGem ? getRangeValue(value) : value.toFixed(0)}
+            </Typography>
+            {bonusValue !== undefined && bonusValue !== 0 && (
+              <Box
                 sx={{
-                  fontSize: "14px",
-                  fontWeight: "500",
-                  color: value < 0 ? "red" : colors.textColor,
+                  display: "flex",
+                  gap: "2px",
                 }}
               >
-                {isPower && !isGem ? getRangeValue(value) : value.toFixed(0)}
-              </Typography>
-              {bonusValue !== undefined && bonusValue !== 0 && (
-                <CustomTooltip title="Bonus by gems">
-                  <Box
-                    sx={{
-                      display: "flex",
-                      gap: "2px",
-                    }}
-                  >
-                    <Typography
+                <Typography
+                  sx={{
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    color: bonusValue < 0 ? "rgb(190, 0, 0)" : "rgb(0, 190, 0)",
+                  }}
+                >
+                  {`(`}
+                  {bonusValue}
+                  {bonusValue > 0 ? (
+                    <KeyboardArrowUpRoundedIcon
                       sx={{
-                        fontSize: "14px",
-                        fontWeight: "500",
-                        color:
-                          bonusValue < 0 ? "rgb(190, 0, 0)" : "rgb(0, 190, 0)",
+                        fontSize: "inherit",
+                        verticalAlign: "middle",
+                        color: "rgb(0, 190, 0)",
                       }}
-                    >
-                      {`(`}
-                      {bonusValue}
-                      {bonusValue > 0 ? (
-                        <KeyboardArrowUpRoundedIcon
-                          sx={{
-                            fontSize: "inherit",
-                            verticalAlign: "middle",
-                            color: "rgb(0, 190, 0)",
-                          }}
-                        />
-                      ) : (
-                        <KeyboardArrowDownRoundedIcon
-                          sx={{
-                            fontSize: "inherit",
-                            verticalAlign: "middle",
-                            color: "rgb(190, 0, 0)",
-                          }}
-                        />
-                      )}
-                      {`)`}
-                    </Typography>
-                  </Box>
-                </CustomTooltip>
-              )}
-            </Box>
-            {icon && <img src={icon} width={24} height={24} />}
+                    />
+                  ) : (
+                    <KeyboardArrowDownRoundedIcon
+                      sx={{
+                        fontSize: "inherit",
+                        verticalAlign: "middle",
+                        color: "rgb(190, 0, 0)",
+                      }}
+                    />
+                  )}
+                  {`)`}
+                </Typography>
+              </Box>
+            )}
           </Box>
-        </CustomTooltip>
+          {icon && <img src={icon} width={24} height={24} />}
+        </Box>
         {value > 0 && (
           <CardStatProgress
             isNegative={bonusValue !== undefined && bonusValue < 0}

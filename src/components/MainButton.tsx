@@ -44,6 +44,16 @@ export const MainButton = forwardRef<HTMLButtonElement, ButtonProp>(
         border: `none`,
         cursor: "pointer",
       },
+      small: {
+        borderRadius: "8px",
+        padding: "4px 12px",
+        minHeight: "24px",
+        background: disabled ? "rgba(225, 225, 225, 0.2)" : colors.secondary,
+        border: `1px solid ${
+          disabled ? colors.secondaryTextColor : "rgb(15,15,15)"
+        }`,
+        cursor: disabled ? "not-allowed" : "pointer",
+      },
     };
 
     return (

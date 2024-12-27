@@ -1,4 +1,4 @@
-import { Box, Rating, Typography } from "@mui/material";
+import { Box, IconButton, Rating, Typography } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { useBackBtn } from "../../core/hooks/useBackBtn";
 import { centerContentStyles } from "../../core/theme/common.style";
@@ -21,6 +21,7 @@ import {
 import damage from "../../assets/damage.png";
 import armor from "../../assets/armor.png";
 import hp from "../../assets/hp.png";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 import { CardStat } from "./components/CardStat";
 import { getIconByCardClass } from "../../core/utils/geIconByCardClass";
@@ -68,16 +69,15 @@ export const SingleCardPage = () => {
   const upgradeCardRarity = useCardStore((state) => state.upgradeCardRarity);
   const upgradeCardLevel = useCardStore((state) => state.upgradeCardLevel);
   const insertGem = useGemStore((state) => state.insertGem);
-  // const removeGem = useGemStore((state) => state.removeGem);
+  const removeGem = useGemStore((state) => state.removeGem);
 
   const addGemToCard = useCardStore((state) => state.addGemToCard);
-  // const removeGemFromCard = useCardStore((state) => state.removeGemFromCard);
+  const removeGemFromCard = useCardStore((state) => state.removeGemFromCard);
 
   const gems = useGemStore((state) => state.gems);
   const availableGems = gems.filter((gem) => !gem.inserted);
   const mergeCards = useCardStore((state) => state.mergeCards);
 
-  // const disableInsertGem = !selectedGem || user?.balance < INSERT_GEM_PRICE;
   const disableInsertGem =
     !selectedGem ||
     user?.balance === undefined ||
@@ -119,12 +119,12 @@ export const SingleCardPage = () => {
     setSelectedCardForMerge(id);
   };
 
-  // const handleRemoveGem = (gemId: number, slotIndex: number) => {
-  //   const gem = gems.find((g) => g.id === gemId);
-  //   if (!gem) return;
-  //   removeGem(gemId);
-  //   removeGemFromCard(card.id, gem, slotIndex);
-  // };
+  const handleRemoveGem = (gemId: number, slotIndex: number) => {
+    const gem = gems.find((g) => g.id === gemId);
+    if (!gem) return;
+    removeGem(gemId);
+    removeGemFromCard(card.id, gem, slotIndex);
+  };
 
   const handleSelectGem = (id: number) => {
     setSelectedGem(id);
@@ -252,20 +252,11 @@ export const SingleCardPage = () => {
                       <Box
                         key={index}
                         onClick={() => {
-                          // Клик возможен только если слот активен и либо пуст, либо содержит съёмный гем
-                          if (isSlotActive && (!gem || gem.removable)) {
+                          //Клик возможен только если слот активен и либо пуст, либо содержит съёмный гем
+                          if (isSlotActive && !gem) {
                             handleOpenGemsPopup(index);
                           }
                         }}
-                        // onClick={() => {
-                        //   if (isSlotActive && gem) {
-                        //     if (gem.removable) {
-                        //       handleRemoveGem(gem.id, index);
-                        //     }
-                        //   } else if (isSlotActive && !gem) {
-                        //     handleOpenGemsPopup(index);
-                        //   }
-                        // }}
                         sx={{
                           position: "absolute",
                           width: "36px",
@@ -299,8 +290,17 @@ export const SingleCardPage = () => {
                           gem ? (
                             // Если слот активен и содержит гем, отображаем его
                             <CustomTooltip
+                              timeout={5}
+                              titleColor={getRarityColor(gem.rarity)}
                               title={gem.name}
                               text={gem.tooltipTitle}
+                              openOnClick
+                              btnText="Remove"
+                              event={
+                                gem.removable
+                                  ? () => handleRemoveGem(gem.id, index)
+                                  : undefined
+                              }
                             >
                               <Box
                                 sx={{
@@ -377,29 +377,51 @@ export const SingleCardPage = () => {
                   fontWeight: "600",
                 }}
               >{`${card.name} #${card.id}`}</Typography>
-              <CustomTooltip title="Merge with duplicate heroes to increase your rating">
-                <Box
-                  sx={{
-                    borderRadius: "40px",
-                    padding: "6px 12px",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    whiteSpace: "nowrap",
-                    cursor: "help",
-                  }}
+              <Box
+                sx={{
+                  borderRadius: "40px",
+                  padding: "6px 12px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  whiteSpace: "nowrap",
+                  position: "relative",
+                }}
+              >
+                <CustomTooltip
+                  openOnClick
+                  title="Merge with duplicate heroes to increase your rating"
                 >
-                  <Rating
-                    value={card.stars}
-                    readOnly
+                  <IconButton
                     sx={{
-                      "& .MuiRating-iconEmpty": {
-                        color: "#fff",
-                      },
+                      color: colors.secondaryTextColor,
+                      zIndex: 1,
+                      position: "absolute",
+                      left: "-24px",
+                      padding: "4px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
                     }}
-                  />
-                </Box>
-              </CustomTooltip>
+                  >
+                    <InfoOutlinedIcon
+                      sx={{
+                        width: "12px",
+                        height: "12px",
+                        cursor: "help",
+                      }}
+                    />
+                  </IconButton>
+                </CustomTooltip>
+                <Rating
+                  value={card.stars}
+                  readOnly
+                  sx={{
+                    "& .MuiRating-iconEmpty": {
+                      color: "#fff",
+                    },
+                  }}
+                />
+              </Box>
               <Typography
                 sx={{
                   fontSize: "16px",
@@ -431,31 +453,58 @@ export const SingleCardPage = () => {
                   justifyContent: "space-between",
                 }}
               >
-                <CustomTooltip
-                  title={capitalize(card.fraction)}
-                  text={descriptionByFraction[card.fraction]}
+                <Box
+                  sx={{
+                    flex: 1,
+                    textAlign: "center",
+                    alignItems: "center",
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "12px",
+                  }}
                 >
                   <Box
                     sx={{
-                      flex: 1,
-                      textAlign: "center",
+                      borderRight: "1px solid rgba(255, 255, 255, 0.3)",
+                      position: "absolute",
+                      top: "20%",
+                      bottom: "20%",
+                      right: 0,
+                    }}
+                  />
+                  <Box
+                    sx={{
+                      display: "flex",
                       alignItems: "center",
                       position: "relative",
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "12px",
-                      cursor: "help",
                     }}
                   >
-                    <Box
-                      sx={{
-                        borderRight: "1px solid rgba(255, 255, 255, 0.3)",
-                        position: "absolute",
-                        top: "20%",
-                        bottom: "20%",
-                        right: 0,
-                      }}
-                    />
+                    <CustomTooltip
+                      openOnClick
+                      title={capitalize(card.fraction)}
+                      text={descriptionByFraction[card.fraction]}
+                    >
+                      <IconButton
+                        sx={{
+                          color: colors.secondaryTextColor,
+                          zIndex: 1,
+                          position: "absolute",
+                          left: "-20px",
+                          padding: "4px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                        }}
+                      >
+                        <InfoOutlinedIcon
+                          sx={{
+                            width: "12px",
+                            height: "12px",
+                            cursor: "help",
+                          }}
+                        />
+                      </IconButton>
+                    </CustomTooltip>
                     <Typography
                       sx={{
                         fontSize: "12px",
@@ -465,40 +514,68 @@ export const SingleCardPage = () => {
                     >
                       Fraction
                     </Typography>
-                    <Typography
-                      sx={{
-                        fontSize: "48px",
-                      }}
-                    >
-                      {fractionEmojis[card.fraction]}
-                    </Typography>
                   </Box>
-                </CustomTooltip>
-                <CustomTooltip
-                  title={capitalize(card.class)}
-                  text={descriptionByClass[card.class]}
+
+                  <Typography
+                    sx={{
+                      fontSize: "48px",
+                    }}
+                  >
+                    {fractionEmojis[card.fraction]}
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    flex: 1,
+                    textAlign: "center",
+                    alignItems: "center",
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "12px",
+                  }}
                 >
                   <Box
                     sx={{
-                      flex: 1,
-                      textAlign: "center",
+                      borderRight: "1px solid rgba(255, 255, 255, 0.3)",
+                      position: "absolute",
+                      top: "20%",
+                      bottom: "20%",
+                      right: 0,
+                    }}
+                  />
+                  <Box
+                    sx={{
+                      display: "flex",
                       alignItems: "center",
                       position: "relative",
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "12px",
-                      cursor: "help",
                     }}
                   >
-                    <Box
-                      sx={{
-                        borderRight: "1px solid rgba(255, 255, 255, 0.3)",
-                        position: "absolute",
-                        top: "20%",
-                        bottom: "20%",
-                        right: 0,
-                      }}
-                    />
+                    <CustomTooltip
+                      openOnClick
+                      title={capitalize(card.class)}
+                      text={descriptionByClass[card.class]}
+                    >
+                      <IconButton
+                        sx={{
+                          color: colors.secondaryTextColor,
+                          zIndex: 1,
+                          position: "absolute",
+                          left: "-20px",
+                          padding: "4px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                        }}
+                      >
+                        <InfoOutlinedIcon
+                          sx={{
+                            width: "12px",
+                            height: "12px",
+                            cursor: "help",
+                          }}
+                        />
+                      </IconButton>
+                    </CustomTooltip>
                     <Typography
                       sx={{
                         fontSize: "12px",
@@ -508,32 +585,60 @@ export const SingleCardPage = () => {
                     >
                       Class
                     </Typography>
-                    <img
-                      src={getIconByCardClass(card.class)}
-                      width={48}
-                      height={48}
-                      style={{
-                        display: "block",
-                      }}
-                    />
                   </Box>
-                </CustomTooltip>
-                <CustomTooltip
-                  title={capitalize(card.element)}
-                  text={descriptionByElement[card.element]}
+                  <img
+                    src={getIconByCardClass(card.class)}
+                    width={48}
+                    height={48}
+                    style={{
+                      display: "block",
+                    }}
+                  />
+                </Box>
+
+                <Box
+                  sx={{
+                    flex: 1,
+                    textAlign: "center",
+                    alignItems: "center",
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "12px",
+                  }}
                 >
                   <Box
                     sx={{
-                      flex: 1,
-                      textAlign: "center",
+                      display: "flex",
                       alignItems: "center",
                       position: "relative",
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "12px",
-                      cursor: "help",
                     }}
                   >
+                    <CustomTooltip
+                      openOnClick
+                      title={capitalize(card.element)}
+                      text={descriptionByElement[card.element]}
+                    >
+                      <IconButton
+                        sx={{
+                          color: colors.secondaryTextColor,
+                          zIndex: 1,
+                          position: "absolute",
+                          left: "-20px",
+                          padding: "4px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                        }}
+                      >
+                        <InfoOutlinedIcon
+                          sx={{
+                            width: "12px",
+                            height: "12px",
+                            cursor: "help",
+                          }}
+                        />
+                      </IconButton>
+                    </CustomTooltip>
                     <Typography
                       sx={{
                         fontSize: "12px",
@@ -541,17 +646,18 @@ export const SingleCardPage = () => {
                         color: colors.secondaryTextColor,
                       }}
                     >
-                      Damage type
-                    </Typography>
-                    <Typography
-                      sx={{
-                        fontSize: "48px",
-                      }}
-                    >
-                      {elementEmojis[card.element]}
+                      Damage
                     </Typography>
                   </Box>
-                </CustomTooltip>
+
+                  <Typography
+                    sx={{
+                      fontSize: "48px",
+                    }}
+                  >
+                    {elementEmojis[card.element]}
+                  </Typography>
+                </Box>
               </Box>
             </Box>
           </Box>
@@ -566,18 +672,18 @@ export const SingleCardPage = () => {
           }}
         >
           {card.stars < 5 && (
-            <CustomTooltip
-              title={
-                !canMerge(card.level, card.stars)
-                  ? getRequiredLevelText(card.stars, card.level)
-                  : null
-              }
-            >
-              <Box sx={{ width: "100%" }}>
-                <MainButton
-                  fullWidth
-                  onClick={handleOpenMergePopup}
-                  disabled={!canMerge(card.level, card.stars)}
+            <Box sx={{ width: "100%" }}>
+              <MainButton
+                fullWidth
+                onClick={handleOpenMergePopup}
+                disabled={!canMerge(card.level, card.stars)}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "canter",
+                    gap: "4px",
+                  }}
                 >
                   <Typography
                     sx={{
@@ -590,9 +696,9 @@ export const SingleCardPage = () => {
                   >
                     MERGE
                   </Typography>
-                </MainButton>
-              </Box>
-            </CustomTooltip>
+                </Box>
+              </MainButton>
+            </Box>
           )}
           {getNextRarity(card.rarity) && (
             <MainButton fullWidth onClick={handleUpgradeRarity}>

@@ -1,19 +1,37 @@
 import { Box, Tooltip, Typography } from "@mui/material";
 import { formatTextWithElements } from "./formatTextWithElements";
-import { useState } from "react";
+import { colors } from "../../core/theme/colors";
+import { useEffect, useState } from "react";
+import { MainButton } from "../MainButton";
 
 export const CustomTooltip = ({
   title,
+  titleColor,
   text,
   children,
+  openOnClick,
+  btnText,
+  event,
+  timeout = 2,
 }: {
   title: string | null;
+  titleColor?: string;
   text?: string;
   children: React.ReactElement;
+  openOnClick?: boolean;
+  btnText?: string;
+  event?: () => void;
+  timeout?: number;
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
   if (!title) {
     return children;
   }
+
+  const handleClick = () => {
+    if (event) event();
+  };
 
   const renderWithLineBreaks = (formattedText: string | undefined) => {
     if (!formattedText) return null;
@@ -26,20 +44,31 @@ export const CustomTooltip = ({
     ));
   };
 
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(anchorEl ? null : event.currentTarget);
+  const handleTooltipToggle = () => {
+    if (openOnClick) {
+      setIsOpen((prev) => !prev);
+    }
   };
 
-  const open = Boolean(anchorEl);
-  const id = open ? "custom-tooltip-popover" : undefined;
+  useEffect(() => {
+    let timer: NodeJS.Timeout | undefined;
+
+    if (isOpen) {
+      timer = setTimeout(() => {
+        setIsOpen(false);
+      }, 1000 * timeout);
+    }
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [isOpen]);
 
   return (
     <Tooltip
+      open={openOnClick ? isOpen : undefined}
       title={
         <Box
-          id={id}
           sx={{
             display: "flex",
             flexDirection: "column",
@@ -52,6 +81,7 @@ export const CustomTooltip = ({
               fontSize: "14px",
               fontWeight: "600",
               lineHeight: "18px !important",
+              color: titleColor || colors.textColor,
             }}
           >
             {title}
@@ -68,11 +98,32 @@ export const CustomTooltip = ({
               {renderWithLineBreaks(text)}
             </Typography>
           )}
+          {event && (
+            <MainButton variant="small" fullWidth onClick={handleClick}>
+              <Typography
+                sx={{
+                  fontSize: "14px",
+                  fontWeight: "700",
+                  color: "#000",
+                }}
+              >
+                {btnText}
+              </Typography>
+            </MainButton>
+          )}
         </Box>
       }
       placement="top-start"
     >
-      <Box onClick={handleClick}>{children}</Box>
+      <Box
+        onClick={handleTooltipToggle}
+        sx={{
+          cursor: openOnClick ? "pointer" : "inherit",
+          position: "relative",
+        }}
+      >
+        {children}
+      </Box>
     </Tooltip>
   );
 };

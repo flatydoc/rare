@@ -1,4 +1,4 @@
-import { Box, capitalize, Typography } from "@mui/material";
+import { Box, capitalize, IconButton, Typography } from "@mui/material";
 
 import damage from "../../../assets/damage.png";
 import armor from "../../../assets/armor.png";
@@ -19,6 +19,7 @@ import { booleanToString } from "../../../core/utils/booleanToString";
 import { CardStat } from "../../SingleCardPage/components/CardStat";
 import { centerContentStyles } from "../../../core/theme/common.style";
 import { Ambient } from "../../../components/ui/Ambient";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 export const GemInfo = ({ gemId }: { gemId: number }) => {
   const gem = useGemStore((state) => state.getGemById(gemId));
@@ -113,8 +114,8 @@ export const GemInfo = ({ gemId }: { gemId: number }) => {
             ...centerContentStyles,
             flexDirection: "column",
             width: "100%",
-            maxWidth: "288px",
-            padding: "40px",
+            maxWidth: "160px",
+            padding: "20px",
             borderRadius: "50%",
             position: "relative",
             aspectRatio: "1",
@@ -163,16 +164,41 @@ export const GemInfo = ({ gemId }: { gemId: number }) => {
           >
             {highlightElements(gem.description)}
           </Typography>
-          <CustomTooltip title="If the gem is not removable, then if you insert it into the hero slot, you will not be able to get it">
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              width: "100%",
+              gap: "6px",
+            }}
+          >
             <Box
               sx={{
                 display: "flex",
-                alignItems: "flex-start",
-                gap: "6px",
-                width: "100%",
-                cursor: "help",
+                alignItems: "center",
+                gap: "0",
               }}
             >
+              <CustomTooltip
+                openOnClick
+                title="If the gem is not removable, then if you insert it into the hero slot, you will not be able to get it"
+              >
+                <IconButton
+                  sx={{
+                    color: colors.secondaryTextColor,
+                    padding: "4px",
+                  }}
+                >
+                  <InfoOutlinedIcon
+                    sx={{
+                      width: "12px",
+                      height: "12px",
+                      cursor: "help",
+                    }}
+                  />
+                </IconButton>
+              </CustomTooltip>
               <Typography
                 sx={{
                   fontSize: "14px",
@@ -182,17 +208,17 @@ export const GemInfo = ({ gemId }: { gemId: number }) => {
               >
                 Removable:
               </Typography>
-              <Typography
-                sx={{
-                  fontSize: "14px",
-                  fontWeight: "500",
-                  color: colors.textColor,
-                }}
-              >
-                {booleanToString(gem.removable)}
-              </Typography>
             </Box>
-          </CustomTooltip>
+            <Typography
+              sx={{
+                fontSize: "14px",
+                fontWeight: "500",
+                color: colors.textColor,
+              }}
+            >
+              {booleanToString(gem.removable)}
+            </Typography>
+          </Box>
           {gemStats.map((stat, index) => (
             <CardStat
               key={index}
