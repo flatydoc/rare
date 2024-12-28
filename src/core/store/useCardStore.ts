@@ -264,11 +264,7 @@ export const useCardStore = create<CardState>((set, get) => ({
           if (gemId === gem.id) {
             updatedGemIds[slotIndex] = null;
 
-            // Находим набор, к которому принадлежит данный гем
-            const kit = gem.kitId
-              ? gemKits.find((kit) => kit.id === gem.kitId)
-              : null;
-
+            // Сначала отнимаем бонусы от этого гема
             let updatedCard = {
               ...card,
               gemIds: updatedGemIds,
@@ -277,21 +273,25 @@ export const useCardStore = create<CardState>((set, get) => ({
               bonusHealth: card.bonusHealth - gem.healthModifier,
             };
 
+            // Находим набор, к которому принадлежит данный гем
+            const kit = gem.kitId
+              ? gemKits.find((kit) => kit.id === gem.kitId)
+              : null;
+
             // Если гем принадлежит набору
             if (kit) {
-              // Проверяем, был ли удалён хотя бы один гем из набора
-              const anyGemFromKitRemoved = kit.gemIds.some(
-                (kitGemId) =>
-                  card.gemIds.includes(kitGemId) &&
-                  !updatedGemIds.includes(kitGemId)
+              // Проверяем, вставлены ли все гема из набора в карточку
+              const allGemsFromKitInserted = kit.gemIds.every((kitGemId) =>
+                updatedGemIds.includes(kitGemId)
               );
 
-              if (anyGemFromKitRemoved) {
+              // Если все гема из набора вставлены, отнимаем бонусы набора
+              if (allGemsFromKitInserted) {
                 updatedCard = {
                   ...updatedCard,
-                  bonusPower: card.bonusPower - kit.powerModifier,
-                  bonusArmor: card.bonusArmor - kit.armorModifier,
-                  bonusHealth: card.bonusHealth - kit.healthModifier,
+                  bonusPower: updatedCard.bonusPower - kit.powerModifier,
+                  bonusArmor: updatedCard.bonusArmor - kit.armorModifier,
+                  bonusHealth: updatedCard.bonusHealth - kit.healthModifier,
                 };
               }
             }
