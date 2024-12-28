@@ -1,6 +1,7 @@
 import { Box, IconButton, SwipeableDrawer } from "@mui/material";
 import { colors } from "../core/theme/colors";
-import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import NavigateBeforeOutlinedIcon from "@mui/icons-material/NavigateBeforeOutlined";
+
 export const Popup = ({
   isShow,
   setIsShow,
@@ -86,7 +87,7 @@ export const Popup = ({
       >
         {eventOnClose && (
           <Box
-            sx={{ position: "absolute", top: "-10px", right: "16px" }}
+            sx={{ position: "absolute", top: "-10px", left: "16px" }}
             onClick={handleClose}
           >
             <IconButton
@@ -94,7 +95,7 @@ export const Popup = ({
                 color: colors.secondaryTextColor,
               }}
             >
-              <CloseRoundedIcon />
+              <NavigateBeforeOutlinedIcon />
             </IconButton>
           </Box>
         )}
