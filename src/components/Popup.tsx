@@ -87,7 +87,7 @@ export const Popup = ({
       >
         {eventOnClose && (
           <Box
-            sx={{ position: "absolute", top: "-10px", left: "16px" }}
+            sx={{ position: "absolute", top: "0", left: "16px" }}
             onClick={handleClose}
           >
             <IconButton

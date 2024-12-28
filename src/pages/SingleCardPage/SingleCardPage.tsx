@@ -278,12 +278,12 @@ export const SingleCardPage = () => {
                           border: isSlotActive
                             ? gem
                               ? gem.removable
-                                ? `1px dashed ${
+                                ? `1px solid ${
                                     allGemsFromKitInserted
                                       ? colors.blue
                                       : "gray"
                                   }` // Граница съёмного гема
-                                : `1px solid ${
+                                : `1px dashed ${
                                     allGemsFromKitInserted
                                       ? colors.blue
                                       : "gray"
