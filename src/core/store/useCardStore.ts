@@ -136,6 +136,51 @@ export const useCardStore = create<CardState>((set, get) => ({
   //     return { cards: updatedCards };
   //   }),
 
+  // addGemToCard: (cardId, gem, slotIndex) =>
+  //   set((state) => {
+  //     const updatedCards = state.cards.map((card) => {
+  //       if (card.id === cardId) {
+  //         const updatedGemIds = [...card.gemIds];
+  //         updatedGemIds[slotIndex] = gem.id;
+
+  //         const kit = gem.kitId
+  //           ? gemKits.find((kit) => kit.id === gem.kitId)
+  //           : null;
+
+  //         let updatedCard = {
+  //           ...card,
+  //           gemIds: updatedGemIds,
+  //           bonusPower: card.bonusPower + gem.powerModifier,
+  //           bonusArmor: card.bonusArmor + gem.armorModifier,
+  //           bonusHealth: card.bonusHealth + gem.healthModifier,
+  //           element: gem.element || card.element,
+  //         };
+
+  //         // Если гем принадлежит набору
+  //         if (kit) {
+  //           // Проверяем, вставлены ли все геми из набора в карточку
+  //           const allGemsFromKit = kit.gemIds.every((kitGemId) =>
+  //             updatedGemIds.includes(kitGemId)
+  //           );
+
+  //           if (allGemsFromKit) {
+  //             updatedCard = {
+  //               ...updatedCard,
+  //               bonusPower: card.bonusPower + kit.powerModifier,
+  //               bonusArmor: card.bonusArmor + kit.armorModifier,
+  //               bonusHealth: card.bonusHealth + kit.healthModifier,
+  //             };
+  //           }
+  //         }
+
+  //         return updatedCard;
+  //       }
+  //       return card;
+  //     });
+
+  //     return { cards: updatedCards };
+  //   }),
+
   addGemToCard: (cardId, gem, slotIndex) =>
     set((state) => {
       const updatedCards = state.cards.map((card) => {
@@ -164,11 +209,12 @@ export const useCardStore = create<CardState>((set, get) => ({
             );
 
             if (allGemsFromKit) {
+              // Увеличиваем характеристики на модификаторы набора
               updatedCard = {
                 ...updatedCard,
-                bonusPower: card.bonusPower + kit.powerModifier,
-                bonusArmor: card.bonusArmor + kit.armorModifier,
-                bonusHealth: card.bonusHealth + kit.healthModifier,
+                bonusPower: updatedCard.bonusPower + kit.powerModifier,
+                bonusArmor: updatedCard.bonusArmor + kit.armorModifier,
+                bonusHealth: updatedCard.bonusHealth + kit.healthModifier,
               };
             }
           }
