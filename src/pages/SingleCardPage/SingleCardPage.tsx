@@ -35,7 +35,7 @@ import { canMerge } from "../../core/utils/canMerge";
 import { GemsList } from "../GemsPage/components/GemsList";
 import { useGemStore } from "../../core/store/useGemStore";
 import { useUserStore } from "../../core/store/useUserStore";
-import { INSERT_GEM_PRICE } from "../../core/constants";
+import { gemKits, INSERT_GEM_PRICE } from "../../core/constants";
 import { getBgByCardFraction } from "../../core/utils/getBgByFraction";
 import { getRarityColor } from "../../core/utils/getRarityColor";
 import { GemInfo } from "../SingleGemPage/components/GemInfo";
@@ -247,6 +247,14 @@ export const SingleCardPage = () => {
                     const isSlotActive = index < card.sockets; // Проверяем, активен ли слот
                     const gemId = card.gemIds[index]; // Получаем ID гема для слота
                     const gem = gemId ? gems.find((g) => g.id === gemId) : null; // Получаем объект гема, если он существует
+                    const gemKit = gem?.kitId
+                      ? gemKits.find((kit) => kit.id === gem.kitId)
+                      : null;
+                    const allGemsFromKitInserted = gemKit
+                      ? gemKit.gemIds.every((kitGemId) =>
+                          card.gemIds.includes(kitGemId)
+                        )
+                      : false;
 
                     return (
                       <Box
@@ -270,8 +278,16 @@ export const SingleCardPage = () => {
                           border: isSlotActive
                             ? gem
                               ? gem.removable
-                                ? "1px dashed gray" // Граница съёмного гема
-                                : "1px solid gray" // Граница несъёмного гема
+                                ? `1px dashed ${
+                                    allGemsFromKitInserted
+                                      ? colors.blue
+                                      : "gray"
+                                  }` // Граница съёмного гема
+                                : `1px solid ${
+                                    allGemsFromKitInserted
+                                      ? colors.blue
+                                      : "gray"
+                                  }` // Граница несъёмного гема
                               : `1px dashed ${colors.secondaryTextColor}` // Граница пустого слота
                             : "1px solid rgba(100, 100, 100, 0.4)", // Граница заблокированного слота
                           display: "flex",
