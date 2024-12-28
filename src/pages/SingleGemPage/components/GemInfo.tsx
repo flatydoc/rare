@@ -9,7 +9,6 @@ import { useGemStore } from "../../../core/store/useGemStore";
 import { Element } from "../../../core/types";
 import { CustomTooltip } from "../../../components/ui/CustomTooltip";
 import {
-  descriptionByElement,
   elementEmojis,
   MAX_GEM_CHAR_VALUE,
 } from "../../SingleCardPage/constants";
@@ -20,8 +19,15 @@ import { CardStat } from "../../SingleCardPage/components/CardStat";
 import { centerContentStyles } from "../../../core/theme/common.style";
 import { Ambient } from "../../../components/ui/Ambient";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import { gemKits } from "../../../core/constants";
 
-export const GemInfo = ({ gemId }: { gemId: number }) => {
+export const GemInfo = ({
+  gemId,
+  gemIds,
+}: {
+  gemId: number;
+  gemIds?: number[] | null;
+}) => {
   const gem = useGemStore((state) => state.getGemById(gemId));
 
   if (!gem) return null;
@@ -68,21 +74,14 @@ export const GemInfo = ({ gemId }: { gemId: number }) => {
         const coloredWord =
           matchingElement[0].toUpperCase() + matchingElement.slice(1);
         return (
-          <CustomTooltip
-            key={index}
-            title={capitalize(matchingElement)}
-            text={descriptionByElement[matchingElement]}
+          <span
+            style={{
+              color: getElementColor(matchingElement),
+              fontWeight: "bold",
+            }}
           >
-            <span
-              style={{
-                color: getElementColor(matchingElement),
-                fontWeight: "bold",
-                cursor: "help",
-              }}
-            >
-              {coloredWord + (word.endsWith(",") ? "," : "")}
-            </span>
-          </CustomTooltip>
+            {coloredWord + (word.endsWith(",") ? "," : "")}
+          </span>
         );
       }
 
@@ -114,7 +113,7 @@ export const GemInfo = ({ gemId }: { gemId: number }) => {
             ...centerContentStyles,
             flexDirection: "column",
             width: "100%",
-            maxWidth: "160px",
+            maxWidth: "100px",
             padding: "20px",
             borderRadius: "50%",
             position: "relative",
@@ -160,6 +159,9 @@ export const GemInfo = ({ gemId }: { gemId: number }) => {
               color: colors.secondaryTextColor,
               lineHeight: "20px !important",
               mb: "12px",
+              width: "100%",
+              wordBreak: "normal",
+              overflowWrap: "normal",
             }}
           >
             {highlightElements(gem.description)}
@@ -232,6 +234,126 @@ export const GemInfo = ({ gemId }: { gemId: number }) => {
             />
           ))}
 
+          {gemKits
+            .filter((kit) => kit.gemIds.includes(gem.id))
+            .map((kit, index) => (
+              <Box
+                key={index}
+                sx={{
+                  backgroundColor: "rgba(60, 60, 60, 0.5)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "8px",
+                  width: "100%",
+                  borderRadius: "20px",
+                  padding: "16px",
+                  m: "12px 0",
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: "18px",
+                    fontWeight: "600",
+                    color: colors.textColor,
+                  }}
+                >
+                  {kit.name}
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    color: colors.secondaryTextColor,
+                  }}
+                >
+                  {kit.description}
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    m: "6px 0",
+                    flexDirection: "column",
+                    gap: "8px",
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      color: colors.textColor,
+                    }}
+                  >
+                    Bonuses:
+                  </Typography>
+                  {[
+                    { label: "Power", value: kit.powerModifier },
+                    { label: "Armor", value: kit.armorModifier },
+                    { label: "Health", value: kit.healthModifier },
+                  ]
+                    .filter((stat) => stat.value > 0)
+                    .map((stat) => (
+                      <Typography
+                        key={stat.label}
+                        sx={{
+                          fontSize: "14px",
+                          color: colors.green,
+                        }}
+                      >
+                        <span
+                          style={{
+                            color: colors.secondaryTextColor,
+                            fontWeight: "600",
+                          }}
+                        >
+                          {stat.label}:
+                        </span>{" "}
+                        +{stat.value}
+                      </Typography>
+                    ))}
+                </Box>
+                <Typography
+                  sx={{
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    color: colors.textColor,
+                  }}
+                >
+                  Gems in the kit:
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "4px",
+                  }}
+                >
+                  {kit.gemIds.map((kitGemId) => {
+                    const kitGem = useGemStore((state) =>
+                      state.getGemById(kitGemId)
+                    );
+                    const isHighlighted = gemIds?.includes(kitGemId);
+                    const isCurrentGem = kitGemId === gemId;
+                    return (
+                      <Typography
+                        key={kitGemId}
+                        sx={{
+                          fontSize: "14px",
+                          color: isCurrentGem
+                            ? colors.textColor
+                            : isHighlighted
+                            ? colors.blue
+                            : colors.secondaryTextColor,
+                          fontWeight:
+                            isCurrentGem || isHighlighted ? "600" : "normal",
+                        }}
+                      >
+                        {`• ${kitGem?.name}`}
+                      </Typography>
+                    );
+                  })}
+                </Box>
+              </Box>
+            ))}
           {gem.element && (
             <Box
               sx={{
@@ -241,22 +363,49 @@ export const GemInfo = ({ gemId }: { gemId: number }) => {
                 justifyContent: "center",
               }}
             >
-              <CustomTooltip
-                title={capitalize(gem.element)}
-                text={descriptionByElement[gem.element]}
+              <Box
+                sx={{
+                  flex: 1,
+                  textAlign: "center",
+                  alignItems: "center",
+                  position: "relative",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "12px",
+                }}
               >
                 <Box
                   sx={{
-                    flex: 1,
-                    textAlign: "center",
+                    display: "flex",
                     alignItems: "center",
                     position: "relative",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "12px",
-                    cursor: "help",
                   }}
                 >
+                  <CustomTooltip
+                    openOnClick
+                    title={capitalize(gem.element)}
+                    text={"Changes damage type to flame"}
+                  >
+                    <IconButton
+                      sx={{
+                        color: colors.secondaryTextColor,
+                        zIndex: 1,
+                        position: "absolute",
+                        left: "-20px",
+                        padding: "4px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                      }}
+                    >
+                      <InfoOutlinedIcon
+                        sx={{
+                          width: "12px",
+                          height: "12px",
+                          cursor: "help",
+                        }}
+                      />
+                    </IconButton>
+                  </CustomTooltip>
                   <Typography
                     sx={{
                       fontSize: "12px",
@@ -266,15 +415,15 @@ export const GemInfo = ({ gemId }: { gemId: number }) => {
                   >
                     Damage type
                   </Typography>
-                  <Typography
-                    sx={{
-                      fontSize: "48px",
-                    }}
-                  >
-                    {elementEmojis[gem.element]}
-                  </Typography>
                 </Box>
-              </CustomTooltip>
+                <Typography
+                  sx={{
+                    fontSize: "48px",
+                  }}
+                >
+                  {elementEmojis[gem.element]}
+                </Typography>
+              </Box>
             </Box>
           )}
         </Box>

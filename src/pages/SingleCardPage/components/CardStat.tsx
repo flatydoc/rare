@@ -154,7 +154,7 @@ export const CardStat = ({
                   }}
                 >
                   {`(`}
-                  {bonusValue}
+                  {bonusValue.toFixed(0)}
                   {bonusValue > 0 ? (
                     <KeyboardArrowUpRoundedIcon
                       sx={{

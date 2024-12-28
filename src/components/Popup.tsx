@@ -81,6 +81,7 @@ export const Popup = ({
           alignItems: "center",
           gap: "24px",
           position: "relative",
+          overflowY: "auto",
         }}
       >
         {eventOnClose && (

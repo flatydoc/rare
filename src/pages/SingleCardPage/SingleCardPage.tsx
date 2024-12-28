@@ -283,13 +283,16 @@ export const SingleCardPage = () => {
                           cursor:
                             isSlotActive && (gem?.removable || !gem)
                               ? "pointer"
-                              : "not-allowed", // Курсор меняется в зависимости от активности
+                              : "not-allowed",
                         }}
                       >
                         {isSlotActive ? (
                           gem ? (
-                            // Если слот активен и содержит гем, отображаем его
                             <CustomTooltip
+                              gemId={gem.id}
+                              gemIds={card.gemIds?.filter(
+                                (id): id is number => id !== null
+                              )}
                               timeout={5}
                               titleColor={getRarityColor(gem.rarity)}
                               title={gem.name}
@@ -515,7 +518,6 @@ export const SingleCardPage = () => {
                       Fraction
                     </Typography>
                   </Box>
-
                   <Typography
                     sx={{
                       fontSize: "48px",
@@ -844,13 +846,12 @@ export const SingleCardPage = () => {
               </Typography>
             )}
             {selectedGem ? (
-              <GemInfo gemId={selectedGem} />
-            ) : (
-              <GemsList
-                selectedGemId={selectedGem}
-                event={handleSelectGem}
-                gems={availableGems}
+              <GemInfo
+                gemId={selectedGem}
+                gemIds={card.gemIds?.filter((id): id is number => id !== null)}
               />
+            ) : (
+              <GemsList event={handleSelectGem} gems={availableGems} />
             )}
           </Box>
           {selectedGem && (

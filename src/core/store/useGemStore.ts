@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { IGem } from "../types";
+import { MAX_LEVELS } from "../constants";
 
 interface GemState {
   gems: IGem[];
@@ -8,6 +9,7 @@ interface GemState {
   addGem: (gem: IGem) => void;
   insertGem: (gemId: number) => void;
   removeGem: (gemId: number) => void;
+  upgradeGemLevel: (gemId: number) => void;
 }
 
 export const useGemStore = create<GemState>((set, get) => ({
@@ -37,5 +39,34 @@ export const useGemStore = create<GemState>((set, get) => ({
       gems: state.gems.map((gem) =>
         gem.id === gemId ? { ...gem, inserted: false } : gem
       ),
+    })),
+
+  upgradeGemLevel: (gemId: number) =>
+    set((state) => ({
+      gems: state.gems.map((gem) => {
+        if (gem.id === gemId) {
+          const maxLevel = MAX_LEVELS[gem.rarity];
+          if (gem.level >= maxLevel) {
+            return gem;
+          }
+          return {
+            ...gem,
+            level: gem.level + 1,
+            powerModifier:
+              gem.powerModifier > 0
+                ? +(gem.powerModifier * 1.1).toFixed(2)
+                : gem.powerModifier,
+            armorModifier:
+              gem.armorModifier > 0
+                ? +(gem.armorModifier * 1.1).toFixed(2)
+                : gem.armorModifier,
+            healthModifier:
+              gem.healthModifier > 0
+                ? +(gem.healthModifier * 1.1).toFixed(2)
+                : gem.healthModifier,
+          };
+        }
+        return gem;
+      }),
     })),
 }));

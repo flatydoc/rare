@@ -25,6 +25,7 @@ export interface ICase {
 
 export interface IGem {
   id: number;
+  level: number;
   number: number;
   inserted: boolean;
   rarity: Rarity;

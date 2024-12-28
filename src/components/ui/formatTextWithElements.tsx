@@ -1,6 +1,7 @@
 import React from "react";
 import { getElementColor } from "../../core/utils/getElementColor";
 import { Element } from "../../core/types";
+import { colors } from "../../core/theme/colors";
 
 export const formatTextWithElements = (text: string): React.ReactNode => {
   const elements: Element[] = [
@@ -46,9 +47,9 @@ export const formatTextWithElements = (text: string): React.ReactNode => {
     if (match.type === "hash") {
       let color = "#fff";
       if (match.content.includes("+")) {
-        color = "rgb(0, 190, 0)";
+        color = colors.green;
       } else if (match.content.includes("-")) {
-        color = "rgb(190, 0, 0)";
+        color = colors.red;
       }
 
       result.push(

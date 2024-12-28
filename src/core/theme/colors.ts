@@ -22,4 +22,7 @@ export const colors = {
   holy: "#ff9800",
   darkness: "#9e9e9e",
   poison: "#39FF14",
+  green: "rgb(0, 190, 0)",
+  red: "rgb(190, 0, 0)",
+  blue: "rgb(6, 155, 248)",
 } as const;
