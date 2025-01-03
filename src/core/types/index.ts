@@ -44,7 +44,7 @@ export interface IGem {
   kitId?: number;
 }
 
-export type CaseCategory = "free" | "hit" | "exclusive" | "event" | "promo";
+export type CaseCategory = "free" | "exclusive";
 
 export type Rarity =
   | "common"
@@ -60,6 +60,7 @@ export interface ICard {
   id: number;
   number: number;
   rarity: Rarity;
+  tier: Tier;
   price: number;
   power: number;
   bonusPower: number;
@@ -79,6 +80,27 @@ export interface ICard {
   description: string;
   img: string;
   gemIds: (number | null)[];
+  sockets: number;
+  element: Element;
+  class: CardClass;
+}
+
+export interface ICardPrototype {
+  id: number;
+  rarity: Rarity;
+  tier: Tier;
+  price: number;
+  power: number;
+  powerCoef: number;
+  health: number;
+  healthCoef: number;
+  armor: number;
+  armorCoef: number;
+  fraction: Fraction;
+  priceCurrency: "inGame" | "ton";
+  name: string;
+  description: string;
+  img: string;
   sockets: number;
   element: Element;
   class: CardClass;
@@ -108,6 +130,7 @@ export type Element =
   | "poison";
 
 export type CardClass = "defender" | "support" | "dd";
+export type Tier = "B" | "A" | "S" | "S+";
 
 export interface GemKit {
   id: number;

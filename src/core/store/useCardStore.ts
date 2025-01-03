@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { ICard, IGem } from "../types";
+import { ICard, ICardPrototype, IGem } from "../types";
 import { getNextRarity } from "../utils/getNextRarity";
 import { gemKits, MAX_CARD_LEVEL } from "../constants";
 
@@ -13,6 +13,7 @@ interface CardState {
   getCardById: (cardId: number) => ICard | undefined;
   getCardsByStars: (id: number, stars: number) => ICard[];
   mergeCards: (cardId: number, cardToMergeId: number) => void;
+  generateNewCard: (prototype: ICardPrototype) => ICard;
 }
 
 export const useCardStore = create<CardState>((set, get) => ({
@@ -27,7 +28,51 @@ export const useCardStore = create<CardState>((set, get) => ({
 
   getCardsByStars: (id, stars) => {
     const state = get();
-    return state.cards.filter((card) => card.id !== id && card.stars >= stars);
+    return state.cards.filter((card) => card.id !== id && card.stars === stars);
+  },
+
+  generateNewCard: (prototype) => {
+    const state = get();
+    const lastId =
+      state.cards.length > 0
+        ? Math.max(...state.cards.map((card) => card.id))
+        : 0;
+    const newId = lastId + 1;
+
+    const newCard: ICard = {
+      id: newId,
+      number: prototype.id,
+      rarity: prototype.rarity,
+      tier: prototype.tier,
+      price: prototype.price,
+      power: prototype.power,
+      bonusPower: 0,
+      powerCoef: prototype.powerCoef,
+      health: prototype.health,
+      bonusHealth: 0,
+      healthCoef: prototype.healthCoef,
+      armor: prototype.armor,
+      bonusArmor: 0,
+      armorCoef: prototype.armorCoef,
+      exp: 0,
+      level: 1,
+      stars: 0,
+      fraction: prototype.fraction,
+      priceCurrency: prototype.priceCurrency,
+      name: prototype.name,
+      description: prototype.description,
+      img: prototype.img,
+      gemIds: [],
+      sockets: prototype.sockets,
+      element: prototype.element,
+      class: prototype.class,
+    };
+
+    set((state) => ({
+      cards: [...state.cards, newCard],
+    }));
+
+    return newCard;
   },
 
   mergeCards: (cardId: number, cardToMergeId: number) =>
@@ -114,73 +159,6 @@ export const useCardStore = create<CardState>((set, get) => ({
       return { cards: updatedCards };
     }),
 
-  // addGemToCard: (cardId, gem, slotIndex) =>
-  //   set((state) => {
-  //     const updatedCards = state.cards.map((card) => {
-  //       if (card.id === cardId) {
-  //         const updatedGemIds = [...card.gemIds];
-  //         updatedGemIds[slotIndex] = gem.id;
-
-  //         return {
-  //           ...card,
-  //           gemIds: updatedGemIds,
-  //           bonusPower: card.bonusPower + gem.powerModifier,
-  //           bonusArmor: card.bonusArmor + gem.armorModifier,
-  //           bonusHealth: card.bonusHealth + gem.healthModifier,
-  //           element: gem.element ? gem.element : card.element,
-  //         };
-  //       }
-  //       return card;
-  //     });
-
-  //     return { cards: updatedCards };
-  //   }),
-
-  // addGemToCard: (cardId, gem, slotIndex) =>
-  //   set((state) => {
-  //     const updatedCards = state.cards.map((card) => {
-  //       if (card.id === cardId) {
-  //         const updatedGemIds = [...card.gemIds];
-  //         updatedGemIds[slotIndex] = gem.id;
-
-  //         const kit = gem.kitId
-  //           ? gemKits.find((kit) => kit.id === gem.kitId)
-  //           : null;
-
-  //         let updatedCard = {
-  //           ...card,
-  //           gemIds: updatedGemIds,
-  //           bonusPower: card.bonusPower + gem.powerModifier,
-  //           bonusArmor: card.bonusArmor + gem.armorModifier,
-  //           bonusHealth: card.bonusHealth + gem.healthModifier,
-  //           element: gem.element || card.element,
-  //         };
-
-  //         // Если гем принадлежит набору
-  //         if (kit) {
-  //           // Проверяем, вставлены ли все геми из набора в карточку
-  //           const allGemsFromKit = kit.gemIds.every((kitGemId) =>
-  //             updatedGemIds.includes(kitGemId)
-  //           );
-
-  //           if (allGemsFromKit) {
-  //             updatedCard = {
-  //               ...updatedCard,
-  //               bonusPower: card.bonusPower + kit.powerModifier,
-  //               bonusArmor: card.bonusArmor + kit.armorModifier,
-  //               bonusHealth: card.bonusHealth + kit.healthModifier,
-  //             };
-  //           }
-  //         }
-
-  //         return updatedCard;
-  //       }
-  //       return card;
-  //     });
-
-  //     return { cards: updatedCards };
-  //   }),
-
   addGemToCard: (cardId, gem, slotIndex) =>
     set((state) => {
       const updatedCards = state.cards.map((card) => {
@@ -201,15 +179,12 @@ export const useCardStore = create<CardState>((set, get) => ({
             element: gem.element || card.element,
           };
 
-          // Если гем принадлежит набору
           if (kit) {
-            // Проверяем, вставлены ли все геми из набора в карточку
             const allGemsFromKit = kit.gemIds.every((kitGemId) =>
               updatedGemIds.includes(kitGemId)
             );
 
             if (allGemsFromKit) {
-              // Увеличиваем характеристики на модификаторы набора
               updatedCard = {
                 ...updatedCard,
                 bonusPower: updatedCard.bonusPower + kit.powerModifier,
@@ -227,32 +202,6 @@ export const useCardStore = create<CardState>((set, get) => ({
       return { cards: updatedCards };
     }),
 
-  // removeGemFromCard: (cardId: number, gem: IGem, slotIndex: number) =>
-  //   set((state) => {
-  //     const updatedCards = state.cards.map((card) => {
-  //       if (card.id === cardId) {
-  //         const updatedGemIds = [...card.gemIds];
-
-  //         const gemId = updatedGemIds[slotIndex];
-
-  //         if (gemId === gem.id) {
-  //           updatedGemIds[slotIndex] = null;
-
-  //           return {
-  //             ...card,
-  //             gemIds: updatedGemIds,
-  //             bonusPower: card.bonusPower - gem.powerModifier,
-  //             bonusArmor: card.bonusArmor - gem.armorModifier,
-  //             bonusHealth: card.bonusHealth - gem.healthModifier,
-  //           };
-  //         }
-  //       }
-  //       return card;
-  //     });
-
-  //     return { cards: updatedCards };
-  //   }),
-
   removeGemFromCard: (cardId: number, gem: IGem, slotIndex: number) =>
     set((state) => {
       const updatedCards = state.cards.map((card) => {
@@ -262,9 +211,19 @@ export const useCardStore = create<CardState>((set, get) => ({
           const gemId = updatedGemIds[slotIndex];
 
           if (gemId === gem.id) {
+            const kit = gem.kitId
+              ? gemKits.find((kit) => kit.id === gem.kitId)
+              : null;
+
+            let gemsFromKitInCard = 0;
+            if (kit) {
+              gemsFromKitInCard = updatedGemIds.filter(
+                (id) => id !== null && kit.gemIds.includes(id as number)
+              ).length;
+            }
+
             updatedGemIds[slotIndex] = null;
 
-            // Сначала отнимаем бонусы от этого гема
             let updatedCard = {
               ...card,
               gemIds: updatedGemIds,
@@ -273,20 +232,8 @@ export const useCardStore = create<CardState>((set, get) => ({
               bonusHealth: card.bonusHealth - gem.healthModifier,
             };
 
-            // Находим набор, к которому принадлежит данный гем
-            const kit = gem.kitId
-              ? gemKits.find((kit) => kit.id === gem.kitId)
-              : null;
-
-            // Если гем принадлежит набору
             if (kit) {
-              // Проверяем, вставлены ли все гема из набора в карточку
-              const allGemsFromKitInserted = kit.gemIds.every((kitGemId) =>
-                updatedGemIds.includes(kitGemId)
-              );
-
-              // Если все гема из набора вставлены, отнимаем бонусы набора
-              if (allGemsFromKitInserted) {
+              if (gemsFromKitInCard === 3) {
                 updatedCard = {
                   ...updatedCard,
                   bonusPower: updatedCard.bonusPower - kit.powerModifier,

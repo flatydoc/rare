@@ -1,16 +1,23 @@
-import { Box, Tab, Tabs, Typography } from "@mui/material";
-import { useState } from "react";
+import { Box, Tab, Tabs } from "@mui/material";
+import { useMemo, useState } from "react";
 
 import { CasesList } from "./components/CasesList";
-import { cases } from "./constants";
+import { useCaseStore } from "../../core/store/useCaseStore";
+import { CaseCategory } from "../../core/types";
 
 export const ShopPage = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedCategory, setSelectedCategory] = useState<
+    CaseCategory | "all"
+  >("all");
 
-  const filteredCases =
-    selectedCategory === "all"
+  const cases = useCaseStore((state) => state.cases);
+  const getCasesByCategory = useCaseStore((state) => state.getCasesByCategory);
+
+  const filteredCases = useMemo(() => {
+    return selectedCategory === "all"
       ? cases
-      : cases.filter((item) => item.category === selectedCategory);
+      : getCasesByCategory(selectedCategory);
+  }, [cases, selectedCategory, getCasesByCategory]);
 
   return (
     <Box
@@ -20,10 +27,6 @@ export const ShopPage = () => {
         p: "12px 0 104px 0",
       }}
     >
-      <Typography variant="h4" textAlign="center" mb={2}>
-        Магазин кейсов
-      </Typography>
-
       <Box
         sx={{
           width: "100%",
@@ -46,15 +49,11 @@ export const ShopPage = () => {
             minWidth: "max-content",
           }}
         >
-          <Tab label="Все" value="all" />
-          <Tab label="Бесплатные" value="free" />
-          <Tab label="Хитовые" value="hit" />
-          <Tab label="Эксклюзивные" value="exclusive" />
-          <Tab label="Событийные" value="event" />
-          <Tab label="Промо" value="promo" />
+          <Tab label="All" value="all" />
+          <Tab label="Free" value="free" />
+          <Tab label="Exclusive" value="exclusive" />
         </Tabs>
       </Box>
-
       <CasesList cases={filteredCases} />
     </Box>
   );

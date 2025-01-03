@@ -1,6 +1,6 @@
-import { ICard } from "../types";
+import { ICardPrototype } from "../types";
 
-export const generateAwardsArray = (cardSlides: ICard[]) => {
+export const generateAwardsArray = (cardSlides: ICardPrototype[]) => {
   const result = [];
   const cardSlidesCount = cardSlides.length;
 

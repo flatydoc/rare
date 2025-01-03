@@ -10,10 +10,6 @@ export const CaseDetails = ({ selectedCase }: { selectedCase: ICase }) => {
       <Typography variant="body1" textAlign="center" mb={2}>
         {selectedCase.description}
       </Typography>
-
-      <Typography variant="h6" mb={2}>
-        Карточки, которые могут выпасть:
-      </Typography>
     </Box>
   );
 };

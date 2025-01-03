@@ -8,12 +8,12 @@ import { ShopPage } from "../../pages/ShopPage/ShopPage";
 import { TasksPage } from "../../pages/TasksPage/TasksPage";
 import { FriendsPage } from "../../pages/FriendsPage/FriendsPage";
 import { LeadersPage } from "../../pages/LeadersPage/LeadersPage";
-import { CasePage } from "../../pages/CasePage/CasePage";
 import { CardsPage } from "../../pages/CardsPage/CardsPage";
-import { SingleCardPage } from "../../pages/SingleCardPage/SingleCardPage";
 import { RouteList } from "../enums";
 import { GemsPage } from "../../pages/GemsPage/GemsPage";
 import { SingleGemPage } from "../../pages/SingleGemPage/SingleGemPage";
+import { SingleCardPage } from "../../pages/SingleCardPage/SingleCardPage";
+import { SingleCasePage } from "../../pages/SingleCasePage/SingleCasePage";
 
 export const router = createBrowserRouter([
   {
@@ -39,7 +39,7 @@ export const router = createBrowserRouter([
           },
           {
             path: `${RouteList.Shop}/:caseId`,
-            element: <CasePage />,
+            element: <SingleCasePage />,
           },
           {
             path: RouteList.Cards,

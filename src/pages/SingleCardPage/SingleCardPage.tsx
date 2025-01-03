@@ -28,7 +28,7 @@ import { getIconByCardClass } from "../../core/utils/geIconByCardClass";
 import { CustomTooltip } from "../../components/ui/CustomTooltip";
 import { useCardStore } from "../../core/store/useCardStore";
 import { getCardImage } from "../../core/utils/getCardImage";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Popup } from "../../components/Popup";
 import { CardsList } from "../CardsPage/components/CardsList";
 import { canMerge } from "../../core/utils/canMerge";
@@ -51,7 +51,7 @@ export const SingleCardPage = () => {
   const [selectedCardForMerge, setSelectedCardForMerge] = useState<
     null | number
   >(null);
-
+  const [isUpgradetRarity, setIsUpgradetRarity] = useState(false);
   const [selectedGem, setSelectedGem] = useState<null | number>(null);
   const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(
     null
@@ -94,6 +94,7 @@ export const SingleCardPage = () => {
 
   const handleUpgradeRarity = () => {
     upgradeCardRarity(card.id);
+    setIsUpgradetRarity(true);
   };
 
   const handleUpgradeLevel = () => {
@@ -135,6 +136,16 @@ export const SingleCardPage = () => {
     setIsOpenMergePopup(false);
     setSelectedCardForMerge(null);
   };
+
+  useEffect(() => {
+    if (isUpgradetRarity) {
+      const timer = setTimeout(() => {
+        setIsUpgradetRarity(false);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isUpgradetRarity]);
 
   const cardStats = [
     {
@@ -178,6 +189,34 @@ export const SingleCardPage = () => {
         backgroundSize: "cover",
       }}
     >
+      {isUpgradetRarity && (
+        <Box
+          sx={{
+            width: "100%",
+            height: "100%",
+            zIndex: "101",
+            position: "absolute",
+            top: 0,
+            left: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backdropFilter: `blur(8px)`,
+            backgroundColor: "rgba(25, 25, 25, 0.5)",
+          }}
+        >
+          <Ambient isAnimated rarity={card.rarity}>
+            <img
+              src={getCardImage(card.number, card.rarity)}
+              style={{
+                objectFit: "contain",
+                width: "288px",
+                height: "288px",
+              }}
+            />
+          </Ambient>
+        </Box>
+      )}
       <Box
         sx={{
           height: "100%",
@@ -396,6 +435,21 @@ export const SingleCardPage = () => {
                   fontWeight: "600",
                 }}
               >{`${card.name} #${card.id}`}</Typography>
+              <Typography
+                sx={{
+                  fontSize: "16px",
+                }}
+              >
+                <Box component="span" sx={{ color: colors.secondaryTextColor }}>
+                  Tier
+                </Box>{" "}
+                <Box
+                  component="span"
+                  sx={{ color: colors.textColor, fontWeight: "600" }}
+                >
+                  {card.tier}
+                </Box>
+              </Typography>
               <Box
                 sx={{
                   borderRadius: "40px",

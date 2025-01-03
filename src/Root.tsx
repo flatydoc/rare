@@ -35,7 +35,7 @@ export const Root = () => {
     exp: 50,
     level: 2,
     cards: [101, 102],
-    cases: [5],
+    cases: [21],
     gems: [4, 5],
   };
 

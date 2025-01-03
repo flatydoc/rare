@@ -1,37 +1,39 @@
-import { Box, Rating, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { centerContentStyles } from "../../../core/theme/common.style";
+import { ICardPrototype } from "../../../core/types";
 import { getRarityColor } from "../../../core/utils/getRarityColor";
-import { ICard } from "../../../core/types";
+import { getBgByCardFraction } from "../../../core/utils/getBgByFraction";
 import { Ambient } from "../../../components/ui/Ambient";
 import { colors } from "../../../core/theme/colors";
-import { getCardImage } from "../../../core/utils/getCardImage";
-import { getBgByCardFraction } from "../../../core/utils/getBgByFraction";
 
-export const CardsList = ({
-  cards,
-  event,
-  selectedCardId,
+export const CaseCardsList = ({
+  caseCards,
 }: {
-  cards: ICard[];
-  event: (id: number) => void;
-  selectedCardId?: number | null;
+  caseCards: ICardPrototype[];
 }) => {
   return (
-    <Box
-      sx={{
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gap: "12px",
-        width: "100%",
-      }}
-    >
-      {cards.length > 0 ? (
-        cards.map((card) => {
-          const isSelected = selectedCardId === card.id;
-
-          return (
+    <Box>
+      <Typography
+        sx={{
+          fontSize: "18px",
+          fontWeight: "700",
+          textAlign: "center",
+        }}
+      >
+        Сontent
+      </Typography>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "repeat(3, 1fr)",
+          gap: "12px",
+          width: "100%",
+          mt: 3,
+        }}
+      >
+        {caseCards.length > 0 ? (
+          caseCards.map((card) => (
             <Box
-              onClick={() => event(card.id)}
               key={card.id}
               sx={{
                 ...centerContentStyles,
@@ -43,11 +45,7 @@ export const CardsList = ({
                 position: "relative",
                 padding: "10px",
                 aspectRatio: "1",
-                boxShadow: isSelected
-                  ? `0 0 5px 1px ${
-                      colors.primary
-                    }, 0 1px 2px 0 inset ${getRarityColor(card.rarity)}`
-                  : `0 1px 2px 0 inset ${getRarityColor(card.rarity)}`,
+                boxShadow: `0 1px 2px 0 inset ${getRarityColor(card.rarity)}`,
                 background: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.8)), url(${getBgByCardFraction(
                   card.fraction
                 )})`,
@@ -56,7 +54,7 @@ export const CardsList = ({
             >
               <Ambient rarity={card.rarity}>
                 <img
-                  src={getCardImage(card.number, card.rarity)}
+                  src={card.img}
                   style={{
                     objectFit: "contain",
                     width: "100%",
@@ -81,7 +79,7 @@ export const CardsList = ({
                   sx={{
                     backgroundColor: "rgba(60, 60, 60, 0.5)",
                     borderRadius: "40px",
-                    padding: "4px 8px",
+                    padding: "6px 12px",
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
@@ -95,27 +93,8 @@ export const CardsList = ({
                       fontWeight: "600",
                     }}
                   >
-                    {`Lvl. ${card.level}`}
+                    {card.name}
                   </Typography>
-                </Box>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  <Rating
-                    size="small"
-                    value={card.stars}
-                    readOnly
-                    sx={{
-                      "& .MuiRating-iconEmpty": {
-                        color: "#fff",
-                      },
-                    }}
-                  />
                 </Box>
               </Box>
               <Typography
@@ -124,19 +103,18 @@ export const CardsList = ({
                   left: "12px",
                   top: "12px",
                   fontSize: "16px",
-                  color: colors.textColor,
                 }}
               >
                 {card.tier}
               </Typography>
             </Box>
-          );
-        })
-      ) : (
-        <Typography sx={{ gridColumn: "1 / -1", textAlign: "center" }}>
-          Предметы не найдены
-        </Typography>
-      )}
+          ))
+        ) : (
+          <Typography sx={{ gridColumn: "1 / -1", textAlign: "center" }}>
+            Карточки не найдены
+          </Typography>
+        )}
+      </Box>
     </Box>
   );
 };

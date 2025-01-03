@@ -7,9 +7,14 @@ import { Rarity } from "../../core/types";
 type LightProps = {
   rarity: Rarity;
   children: ReactNode;
+  isAnimated?: boolean;
 };
 
-export const Ambient = ({ rarity, children }: LightProps) => {
+export const Ambient = ({
+  rarity,
+  children,
+  isAnimated = false,
+}: LightProps) => {
   const color = getRarityColor(rarity);
   return (
     <Box
@@ -20,9 +25,19 @@ export const Ambient = ({ rarity, children }: LightProps) => {
         borderRadius: "50%",
         width: "100%",
         height: "100%",
-      }}
-      style={{
-        filter: `drop-shadow(0 0 40px ${color}`,
+        filter: `drop-shadow(0 0 40px ${color})`,
+        animation: isAnimated ? `flicker 2s infinite alternate` : "none",
+        "@keyframes flicker": {
+          "0%": {
+            filter: `drop-shadow(0 0 30px ${color})`,
+          },
+          "50%": {
+            filter: `drop-shadow(0 0 50px ${color})`,
+          },
+          "100%": {
+            filter: `drop-shadow(0 0 40px ${color})`,
+          },
+        },
       }}
     >
       {children}

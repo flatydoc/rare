@@ -6,9 +6,10 @@ interface UserState {
   setUser: (user: IUser) => void;
   updateBalance: (newBalance: number) => void;
   updateEnergy: (newEnergy: number) => void;
+  getCaseCountById: (caseId: number) => number;
 }
 
-export const useUserStore = create<UserState>((set) => ({
+export const useUserStore = create<UserState>((set, get) => ({
   user: null,
   setUser: (user) => set({ user }),
   updateBalance: (newBalance) =>
@@ -24,4 +25,12 @@ export const useUserStore = create<UserState>((set) => ({
           }
         : null,
     })),
+
+  getCaseCountById: (caseId) => {
+    const state = get();
+    if (state.user) {
+      return state.user.cases.filter((id) => id === caseId).length;
+    }
+    return 0;
+  },
 }));
