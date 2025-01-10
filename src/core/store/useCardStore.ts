@@ -45,9 +45,9 @@ export const useCardStore = create<CardState>((set, get) => ({
       rarity: prototype.rarity,
       tier: prototype.tier,
       price: prototype.price,
-      power: prototype.power,
-      bonusPower: 0,
-      powerCoef: prototype.powerCoef,
+      damage: prototype.damage,
+      bonusDamage: 0,
+      damageCoef: prototype.damageCoef,
       health: prototype.health,
       bonusHealth: 0,
       healthCoef: prototype.healthCoef,
@@ -68,9 +68,13 @@ export const useCardStore = create<CardState>((set, get) => ({
       class: prototype.class,
     };
 
-    set((state) => ({
-      cards: [...state.cards, newCard],
-    }));
+    console.log("New card created:", newCard);
+
+    set((state) => {
+      const updatedCards = [...state.cards, newCard];
+      console.log("Cards after update:", updatedCards);
+      return { cards: updatedCards };
+    });
 
     return newCard;
   },
@@ -80,7 +84,8 @@ export const useCardStore = create<CardState>((set, get) => ({
       const updatedCards = state.cards
         .map((card) => {
           if (card.id === cardId) {
-            const newPower = card.power + (card.power * card.powerCoef) / 15;
+            const newDamage =
+              card.damage + (card.damage * card.damageCoef) / 15;
             const newHealth =
               card.health + (card.health * card.healthCoef) / 15;
             const newArmor = card.armor + (card.armor * card.armorCoef) / 15;
@@ -88,7 +93,7 @@ export const useCardStore = create<CardState>((set, get) => ({
             return {
               ...card,
               stars: card.stars + 1,
-              power: newPower,
+              damage: newDamage,
               health: newHealth,
               armor: newArmor,
             };
@@ -107,7 +112,8 @@ export const useCardStore = create<CardState>((set, get) => ({
           const nextRarity = getNextRarity(card.rarity);
 
           if (nextRarity) {
-            const newPower = card.power + (card.power * card.powerCoef) / 10;
+            const newDamage =
+              card.damage + (card.damage * card.damageCoef) / 10;
             const newHealth =
               card.health + (card.health * card.healthCoef) / 10;
             const newArmor = card.armor + (card.armor * card.armorCoef) / 10;
@@ -115,7 +121,7 @@ export const useCardStore = create<CardState>((set, get) => ({
             return {
               ...card,
               rarity: nextRarity,
-              power: newPower,
+              damage: newDamage,
               health: newHealth,
               armor: newArmor,
               sockets: nextRarity === "immortal" ? 6 : card.sockets + 1,
@@ -140,7 +146,7 @@ export const useCardStore = create<CardState>((set, get) => ({
 
           const nextLevel = card.level + 1;
 
-          const newPower = card.power + (card.power * card.powerCoef) / 20;
+          const newDamage = card.damage + (card.damage * card.damageCoef) / 20;
           const newHealth = card.health + (card.health * card.healthCoef) / 20;
           const newArmor = card.armor + (card.armor * card.armorCoef) / 20;
 
@@ -148,7 +154,7 @@ export const useCardStore = create<CardState>((set, get) => ({
             ...card,
             level: nextLevel,
             exp: 0,
-            power: newPower,
+            damage: newDamage,
             health: newHealth,
             armor: newArmor,
           };
@@ -173,7 +179,7 @@ export const useCardStore = create<CardState>((set, get) => ({
           let updatedCard = {
             ...card,
             gemIds: updatedGemIds,
-            bonusPower: card.bonusPower + gem.powerModifier,
+            bonusDamage: card.bonusDamage + gem.damageModifier,
             bonusArmor: card.bonusArmor + gem.armorModifier,
             bonusHealth: card.bonusHealth + gem.healthModifier,
             element: gem.element || card.element,
@@ -187,7 +193,7 @@ export const useCardStore = create<CardState>((set, get) => ({
             if (allGemsFromKit) {
               updatedCard = {
                 ...updatedCard,
-                bonusPower: updatedCard.bonusPower + kit.powerModifier,
+                bonusDamage: updatedCard.bonusDamage + kit.damageModifier,
                 bonusArmor: updatedCard.bonusArmor + kit.armorModifier,
                 bonusHealth: updatedCard.bonusHealth + kit.healthModifier,
               };
@@ -227,7 +233,7 @@ export const useCardStore = create<CardState>((set, get) => ({
             let updatedCard = {
               ...card,
               gemIds: updatedGemIds,
-              bonusPower: card.bonusPower - gem.powerModifier,
+              bonusDamage: card.bonusDamage - gem.damageModifier,
               bonusArmor: card.bonusArmor - gem.armorModifier,
               bonusHealth: card.bonusHealth - gem.healthModifier,
             };
@@ -236,7 +242,7 @@ export const useCardStore = create<CardState>((set, get) => ({
               if (gemsFromKitInCard === 3) {
                 updatedCard = {
                   ...updatedCard,
-                  bonusPower: updatedCard.bonusPower - kit.powerModifier,
+                  bonusDamage: updatedCard.bonusDamage - kit.damageModifier,
                   bonusArmor: updatedCard.bonusArmor - kit.armorModifier,
                   bonusHealth: updatedCard.bonusHealth - kit.healthModifier,
                 };

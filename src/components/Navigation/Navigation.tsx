@@ -3,10 +3,12 @@ import { navLinks } from "./constants";
 import { Link } from "../ui/Link";
 import { colors } from "../../core/theme/colors";
 
-export const Navigation = () => {
+export const Navigation = ({ isHide }: { isHide: boolean }) => {
   const links = navLinks.map(({ to, label, img }) => (
     <Link key={to} to={to} label={label} img={img} />
   ));
+
+  if (isHide) return null;
 
   return (
     <Box

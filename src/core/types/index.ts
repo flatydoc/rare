@@ -35,7 +35,7 @@ export interface IGem {
   description: string;
   tooltipTitle: string;
   img: string;
-  powerModifier: number;
+  damageModifier: number;
   armorModifier: number;
   healthModifier: number;
   element?: Element;
@@ -62,9 +62,9 @@ export interface ICard {
   rarity: Rarity;
   tier: Tier;
   price: number;
-  power: number;
-  bonusPower: number;
-  powerCoef: number;
+  damage: number;
+  bonusDamage: number;
+  damageCoef: number;
   health: number;
   bonusHealth: number;
   healthCoef: number;
@@ -90,8 +90,8 @@ export interface ICardPrototype {
   rarity: Rarity;
   tier: Tier;
   price: number;
-  power: number;
-  powerCoef: number;
+  damage: number;
+  damageCoef: number;
   health: number;
   healthCoef: number;
   armor: number;
@@ -129,15 +129,15 @@ export type Element =
   | "simple"
   | "poison";
 
-export type CardClass = "defender" | "support" | "dd";
-export type Tier = "B" | "A" | "S" | "S+";
+export type CardClass = "defender" | "support" | "fighter";
+export type Tier = "D" | "C" | "B" | "A" | "A+" | "S" | "S+" | "SS";
 
 export interface GemKit {
   id: number;
   name: string;
   description: string;
   gemIds: number[];
-  powerModifier: number;
+  damageModifier: number;
   armorModifier: number;
   healthModifier: number;
 }

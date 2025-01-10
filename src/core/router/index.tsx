@@ -10,10 +10,11 @@ import { FriendsPage } from "../../pages/FriendsPage/FriendsPage";
 import { LeadersPage } from "../../pages/LeadersPage/LeadersPage";
 import { CardsPage } from "../../pages/CardsPage/CardsPage";
 import { RouteList } from "../enums";
-import { GemsPage } from "../../pages/GemsPage/GemsPage";
 import { SingleGemPage } from "../../pages/SingleGemPage/SingleGemPage";
 import { SingleCardPage } from "../../pages/SingleCardPage/SingleCardPage";
 import { SingleCasePage } from "../../pages/SingleCasePage/SingleCasePage";
+import { FightPage } from "../../pages/FightPage/FightPage";
+import { InventoryPage } from "../../pages/InventoryPage/InventoryPage";
 
 export const router = createBrowserRouter([
   {
@@ -28,7 +29,10 @@ export const router = createBrowserRouter([
             path: RouteList.Root,
             element: <HomePage />,
           },
-
+          {
+            path: RouteList.Fight,
+            element: <FightPage />,
+          },
           {
             path: RouteList.Profile,
             element: <ProfilePage />,
@@ -50,8 +54,8 @@ export const router = createBrowserRouter([
             element: <SingleCardPage />,
           },
           {
-            path: RouteList.Gems,
-            element: <GemsPage />,
+            path: RouteList.Inventory,
+            element: <InventoryPage />,
           },
           {
             path: `${RouteList.Gems}/:gemId`,

@@ -34,8 +34,8 @@ export const GemInfo = ({
 
   const gemStats = [
     {
-      label: "Power",
-      value: gem.powerModifier,
+      label: "Damage",
+      value: gem.damageModifier,
       icon: damage,
       tooltipText: "Damage a hero can do",
       tooltipSubtitle: "Damage may vary by 15%",
@@ -286,7 +286,7 @@ export const GemInfo = ({
                     Bonuses:
                   </Typography>
                   {[
-                    { label: "Power", value: kit.powerModifier },
+                    { label: "Damage", value: kit.damageModifier },
                     { label: "Armor", value: kit.armorModifier },
                     { label: "Health", value: kit.healthModifier },
                   ]

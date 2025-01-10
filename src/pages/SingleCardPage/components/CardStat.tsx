@@ -29,7 +29,7 @@ export const CardStat = ({
   maxValue: number;
   isGem?: boolean;
 }) => {
-  const isPower = label === "Power";
+  const isDamage = label === "Damage";
   const isLevel = label === "Level";
 
   let progress = 0;
@@ -137,7 +137,7 @@ export const CardStat = ({
                 whiteSpace: "nowrap",
               }}
             >
-              {isPower && !isGem ? getRangeValue(value) : value.toFixed(0)}
+              {isDamage && !isGem ? getRangeValue(value) : value.toFixed(0)}
             </Typography>
             {bonusValue !== undefined && bonusValue !== 0 && (
               <Box

@@ -10,9 +10,8 @@ import { useCaseStore } from "../../core/store/useCaseStore";
 import { useState } from "react";
 import { MainButton } from "../../components/MainButton";
 import animation from "../../assets/animations/gradient.json";
-import { Ambient } from "../../components/ui/Ambient";
-import { getCardImage } from "../../core/utils/getCardImage";
 import { useCardStore } from "../../core/store/useCardStore";
+import { SingleCard } from "../CardsPage/components/SingleCard";
 
 export const SingleCasePage = () => {
   useBackBtn();
@@ -149,16 +148,7 @@ export const SingleCasePage = () => {
             backgroundColor: "rgba(25, 25, 25, 0.5)",
           }}
         >
-          <Ambient isAnimated rarity={winCard.rarity}>
-            <img
-              src={getCardImage(winCard.number, winCard.rarity)}
-              style={{
-                objectFit: "contain",
-                width: "288px",
-                height: "288px",
-              }}
-            />
-          </Ambient>
+          <SingleCard card={winCard} />
         </Box>
       )}
     </Box>

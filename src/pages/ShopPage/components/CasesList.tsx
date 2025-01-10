@@ -27,7 +27,7 @@ export const CasesList = ({ cases }: { cases: ICase[] }) => {
               overflow: "hidden",
               flexDirection: "column",
               width: "100%",
-              maxWidth: "300px",
+              maxWidth: "240px",
               borderRadius: "20px",
               position: "relative",
               padding: "10px",

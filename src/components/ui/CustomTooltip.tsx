@@ -69,6 +69,7 @@ export const CustomTooltip = ({
             flexDirection: "column",
             gap: "4px",
             maxWidth: "300px",
+            p: event ? "6px 2px 12px 2px" : "6px 2px",
           }}
         >
           <Typography
@@ -142,7 +143,7 @@ export const CustomTooltip = ({
                         Bonuses:
                       </Typography>
                       {[
-                        { label: "Power", value: kit.powerModifier },
+                        { label: "Damage", value: kit.damageModifier },
                         { label: "Armor", value: kit.armorModifier },
                         { label: "Health", value: kit.healthModifier },
                       ]

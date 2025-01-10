@@ -7,6 +7,8 @@ interface UserState {
   updateBalance: (newBalance: number) => void;
   updateEnergy: (newEnergy: number) => void;
   getCaseCountById: (caseId: number) => number;
+  addCard: (cardId: number) => void;
+  removeCard: (cardId: number) => void;
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
@@ -33,4 +35,24 @@ export const useUserStore = create<UserState>((set, get) => ({
     }
     return 0;
   },
+
+  addCard: (cardId) =>
+    set((state) => ({
+      user: state.user
+        ? {
+            ...state.user,
+            cards: [...state.user.cards, cardId],
+          }
+        : null,
+    })),
+
+  removeCard: (cardId) =>
+    set((state) => ({
+      user: state.user
+        ? {
+            ...state.user,
+            cards: state.user.cards.filter((id) => id !== cardId),
+          }
+        : null,
+    })),
 }));

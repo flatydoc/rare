@@ -13,3 +13,24 @@ body {
   overflow: hidden;
   font-family: "Inter", sans-serif;
 }
+
+#card-[id] {
+  position: relative;
+  transition: transform 0.5s ease, box-shadow 0.3s ease;
+}
+
+#card-[id].attacking {
+  z-index: 10; /* Поднимаем элемент над другими */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes damagePopup {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -20px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50px);
+  }
+}

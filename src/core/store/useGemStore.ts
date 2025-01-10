@@ -52,10 +52,10 @@ export const useGemStore = create<GemState>((set, get) => ({
           return {
             ...gem,
             level: gem.level + 1,
-            powerModifier:
-              gem.powerModifier > 0
-                ? +(gem.powerModifier * 1.1).toFixed(2)
-                : gem.powerModifier,
+            damageModifier:
+              gem.damageModifier > 0
+                ? +(gem.damageModifier * 1.1).toFixed(2)
+                : gem.damageModifier,
             armorModifier:
               gem.armorModifier > 0
                 ? +(gem.armorModifier * 1.1).toFixed(2)

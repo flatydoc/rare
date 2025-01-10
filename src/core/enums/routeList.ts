@@ -7,5 +7,7 @@ export enum RouteList {
   Leaders = "leaders",
   Profile = "profile",
   Cards = "cards",
+  Inventory = "inventory",
+  Fight = "fight",
   Gems = "gems",
 }

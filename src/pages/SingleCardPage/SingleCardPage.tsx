@@ -7,10 +7,8 @@ import { colors } from "../../core/theme/colors";
 import { MainButton } from "../../components/MainButton";
 import { getNextRarity } from "../../core/utils/getNextRarity";
 import { capitalize } from "../../core/utils/capitalize";
-import BlockOutlinedIcon from "@mui/icons-material/BlockOutlined";
-import AddIcon from "@mui/icons-material/Add";
+
 import {
-  calculateSlotPositions,
   descriptionByClass,
   descriptionByElement,
   descriptionByFraction,
@@ -30,15 +28,20 @@ import { useCardStore } from "../../core/store/useCardStore";
 import { getCardImage } from "../../core/utils/getCardImage";
 import { useEffect, useMemo, useState } from "react";
 import { Popup } from "../../components/Popup";
-import { CardsList } from "../CardsPage/components/CardsList";
 import { canMerge } from "../../core/utils/canMerge";
-import { GemsList } from "../GemsPage/components/GemsList";
 import { useGemStore } from "../../core/store/useGemStore";
 import { useUserStore } from "../../core/store/useUserStore";
-import { gemKits, INSERT_GEM_PRICE } from "../../core/constants";
+import { INSERT_GEM_PRICE } from "../../core/constants";
 import { getBgByCardFraction } from "../../core/utils/getBgByFraction";
+
+import { SingleCard } from "../CardsPage/components/SingleCard";
+import { GemsPopup } from "./components/GemsPopup";
+import { GemSlots } from "./components/GemSlots";
+import { MergePopup } from "./components/MergePopup";
 import { getRarityColor } from "../../core/utils/getRarityColor";
-import { GemInfo } from "../SingleGemPage/components/GemInfo";
+import { rarityByTier } from "../../core/utils/rarityByTier";
+import { darkenColor } from "../../core/utils/darkenColor";
+import { calculateTotalPower } from "../../core/utils/calculateTotalPower";
 
 export const SingleCardPage = () => {
   useBackBtn();
@@ -48,7 +51,7 @@ export const SingleCardPage = () => {
 
   const [isOpenMergePopup, setIsOpenMergePopup] = useState(false);
   const [isOpenGemsPopup, setIsOpenGemsPopup] = useState(false);
-  const [selectedCardForMerge, setSelectedCardForMerge] = useState<
+  const [selectedCardIdForMerge, setSelectedCardIdForMerge] = useState<
     null | number
   >(null);
   const [isUpgradetRarity, setIsUpgradetRarity] = useState(false);
@@ -70,18 +73,11 @@ export const SingleCardPage = () => {
   const upgradeCardLevel = useCardStore((state) => state.upgradeCardLevel);
   const insertGem = useGemStore((state) => state.insertGem);
   const removeGem = useGemStore((state) => state.removeGem);
-
   const addGemToCard = useCardStore((state) => state.addGemToCard);
   const removeGemFromCard = useCardStore((state) => state.removeGemFromCard);
-
   const gems = useGemStore((state) => state.gems);
   const availableGems = gems.filter((gem) => !gem.inserted);
   const mergeCards = useCardStore((state) => state.mergeCards);
-
-  const disableInsertGem =
-    !selectedGem ||
-    user?.balance === undefined ||
-    user?.balance < INSERT_GEM_PRICE;
 
   const handleOpenMergePopup = () => {
     setIsOpenMergePopup(true);
@@ -117,7 +113,7 @@ export const SingleCardPage = () => {
   };
 
   const handleSelectCard = (id: number) => {
-    setSelectedCardForMerge(id);
+    setSelectedCardIdForMerge(id);
   };
 
   const handleRemoveGem = (gemId: number, slotIndex: number) => {
@@ -134,14 +130,14 @@ export const SingleCardPage = () => {
   const handleMerge = (cardId: number, cardToMergeId: number) => {
     mergeCards(cardId, cardToMergeId);
     setIsOpenMergePopup(false);
-    setSelectedCardForMerge(null);
+    setSelectedCardIdForMerge(null);
   };
 
   useEffect(() => {
     if (isUpgradetRarity) {
       const timer = setTimeout(() => {
         setIsUpgradetRarity(false);
-      }, 1000);
+      }, 2000);
 
       return () => clearTimeout(timer);
     }
@@ -155,9 +151,9 @@ export const SingleCardPage = () => {
       exp: card.exp,
     },
     {
-      label: "Power",
-      value: card.power + card.bonusPower,
-      bonusValue: card.bonusPower,
+      label: "Damage",
+      value: card.damage + card.bonusDamage,
+      bonusValue: card.bonusDamage,
       icon: damage,
       tooltipText: "Damage a hero can do",
       tooltipSubtitle: "Damage may vary by #15%#",
@@ -205,16 +201,7 @@ export const SingleCardPage = () => {
             backgroundColor: "rgba(25, 25, 25, 0.5)",
           }}
         >
-          <Ambient isAnimated rarity={card.rarity}>
-            <img
-              src={getCardImage(card.number, card.rarity)}
-              style={{
-                objectFit: "contain",
-                width: "288px",
-                height: "288px",
-              }}
-            />
-          </Ambient>
+          <SingleCard card={card} />
         </Box>
       )}
       <Box
@@ -250,210 +237,158 @@ export const SingleCardPage = () => {
           >
             <Box
               sx={{
-                position: "relative",
                 width: "100%",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <Box
-                sx={{
-                  ...centerContentStyles,
-                  position: "relative",
-                  zIndex: 2,
-                  flexDirection: "column",
-                  width: "100%",
-                  maxWidth: "288px",
-                  padding: "40px",
-                  borderRadius: "20px",
-                  aspectRatio: "1",
-                }}
-              >
-                <Box
-                  sx={{
-                    position: "absolute",
-                    width: "100%",
-                    height: "100%",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    margin: "16px 0",
-                    zIndex: "1",
-                  }}
-                >
-                  {calculateSlotPositions(6).map((pos, index) => {
-                    const isSlotActive = index < card.sockets; // Проверяем, активен ли слот
-                    const gemId = card.gemIds[index]; // Получаем ID гема для слота
-                    const gem = gemId ? gems.find((g) => g.id === gemId) : null; // Получаем объект гема, если он существует
-                    const gemKit = gem?.kitId
-                      ? gemKits.find((kit) => kit.id === gem.kitId)
-                      : null;
-                    const allGemsFromKitInserted = gemKit
-                      ? gemKit.gemIds.every((kitGemId) =>
-                          card.gemIds.includes(kitGemId)
-                        )
-                      : false;
-
-                    return (
-                      <Box
-                        key={index}
-                        onClick={() => {
-                          //Клик возможен только если слот активен и либо пуст, либо содержит съёмный гем
-                          if (isSlotActive && !gem) {
-                            handleOpenGemsPopup(index);
-                          }
-                        }}
-                        sx={{
-                          position: "absolute",
-                          width: "36px",
-                          height: "36px",
-                          borderRadius: "50%",
-                          backgroundColor: gem
-                            ? "transparent" // Если в слоте есть гем, фон становится прозрачным
-                            : isSlotActive
-                            ? "rgba(60, 60, 60, 0.7)" // Фон активного слота
-                            : "rgba(30, 30, 30, 0.1)", // Фон неактивного слота
-                          border: isSlotActive
-                            ? gem
-                              ? gem.removable
-                                ? `1px solid ${
-                                    allGemsFromKitInserted
-                                      ? colors.blue
-                                      : "gray"
-                                  }` // Граница съёмного гема
-                                : `1px dashed ${
-                                    allGemsFromKitInserted
-                                      ? colors.blue
-                                      : "gray"
-                                  }` // Граница несъёмного гема
-                              : `1px dashed ${colors.secondaryTextColor}` // Граница пустого слота
-                            : "1px solid rgba(100, 100, 100, 0.4)", // Граница заблокированного слота
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          left: `calc(50% + ${pos.x}px)`,
-                          top: `calc(50% + ${pos.y}px)`,
-                          transform: "translate(-50%, -50%)",
-                          cursor:
-                            isSlotActive && (gem?.removable || !gem)
-                              ? "pointer"
-                              : "not-allowed",
-                        }}
-                      >
-                        {isSlotActive ? (
-                          gem ? (
-                            <CustomTooltip
-                              gemId={gem.id}
-                              gemIds={card.gemIds?.filter(
-                                (id): id is number => id !== null
-                              )}
-                              timeout={5}
-                              titleColor={getRarityColor(gem.rarity)}
-                              title={gem.name}
-                              text={gem.tooltipTitle}
-                              openOnClick
-                              btnText="Remove"
-                              event={
-                                gem.removable
-                                  ? () => handleRemoveGem(gem.id, index)
-                                  : undefined
-                              }
-                            >
-                              <Box
-                                sx={{
-                                  padding: "4px",
-                                  borderRadius: "50%",
-                                  boxShadow: `0 1px 8px 0 inset ${getRarityColor(
-                                    gem.rarity
-                                  )}`,
-                                }}
-                              >
-                                <img
-                                  src={gem.img}
-                                  alt={`Gem ${gem.id}`}
-                                  style={{
-                                    width: "100%",
-                                    height: "100%",
-                                    borderRadius: "50%",
-                                  }}
-                                />
-                              </Box>
-                            </CustomTooltip>
-                          ) : (
-                            <AddIcon
-                              sx={{
-                                color: colors.textColor,
-                                opacity: 0.4,
-                                transition: "opacity 0.3s ease-in-out",
-                                "&:hover": {
-                                  opacity: 1,
-                                },
-                              }}
-                            />
-                          )
-                        ) : (
-                          <BlockOutlinedIcon
-                            sx={{
-                              color: "rgba(200, 200, 200, 0.4)",
-                            }}
-                          />
-                        )}
-                      </Box>
-                    );
-                  })}
-                </Box>
-
-                <Ambient rarity={card.rarity}>
-                  <img
-                    src={getCardImage(card.number, card.rarity)}
-                    style={{
-                      objectFit: "contain",
-                      width: "100%",
-                      height: "100%",
-                    }}
-                  />
-                </Ambient>
-              </Box>
-            </Box>
-
-            <Box
-              sx={{
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 gap: "12px",
-                width: "100%",
-                backgroundColor: "rgba(60, 60, 60, 0.5)",
-                borderRadius: "20px",
-                padding: "24px 12px",
+                position: "relative",
               }}
             >
-              <Typography
+              <Box
                 sx={{
-                  fontSize: "24px",
-                  fontWeight: "600",
-                }}
-              >{`${card.name} #${card.id}`}</Typography>
-              <Typography
-                sx={{
-                  fontSize: "16px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  position: "absolute",
+                  top: "-8px",
+                  right: "0",
+                  zIndex: "1",
+                  width: "48px",
+                  height: "48px",
                 }}
               >
-                <Box component="span" sx={{ color: colors.secondaryTextColor }}>
-                  Tier
-                </Box>{" "}
-                <Box
-                  component="span"
-                  sx={{ color: colors.textColor, fontWeight: "600" }}
+                <svg
+                  width="48"
+                  height="48"
+                  viewBox="0 0 48 48"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  style={{
+                    position: "absolute",
+                    top: "0",
+                    right: "0",
+                    zIndex: "-1",
+                    stroke: darkenColor(
+                      getRarityColor(rarityByTier[card.tier])
+                    ),
+                    strokeWidth: "2",
+                  }}
                 >
-                  {card.tier}
-                </Box>
-              </Typography>
+                  <path
+                    d="M26.2128 4.22672C24.8915 3.1188 23.1075 3.11885 21.7862 4.22683C20.7513 5.09465 19.3054 6.36934 17.3509 8.21346C14.7985 8.29103 12.9547 8.40768 11.6525 8.52173C9.93425 8.67221 8.67265 9.93393 8.52224 11.6522C8.40824 12.9543 8.29165 14.7981 8.21413 17.3501C6.3697 19.3049 5.09474 20.7511 4.22669 21.7862C3.11839 23.108 3.11846 24.8925 4.22682 26.2141C5.09487 27.2492 6.3698 28.6952 8.21413 30.6499C8.29165 33.2019 8.40823 35.0455 8.52222 36.3477C8.67264 38.0661 9.93434 39.3279 11.6527 39.4783C12.9549 39.5924 14.7987 39.7091 17.3509 39.7866C19.3049 41.6303 20.7506 42.9049 21.7854 43.7728C23.1072 44.8812 24.8919 44.8813 26.2136 43.7729C27.2485 42.905 28.6944 41.6304 30.6484 39.7867C33.202 39.7091 35.0465 39.5924 36.3489 39.4783C38.0669 39.3279 39.3282 38.0665 39.4788 36.3487C39.593 35.0461 39.7097 33.2014 39.7874 30.6477C41.6308 28.6939 42.9051 27.2483 43.7728 26.2136C44.8808 24.8923 44.8809 23.1082 43.7729 21.7867C42.9052 20.7519 41.6309 19.3063 39.7874 17.3523C39.7097 14.7984 39.5929 12.9538 39.4788 11.6513C39.3282 9.93348 38.067 8.67225 36.3491 8.52177C35.0467 8.40769 33.2022 8.29098 30.6485 8.2134C28.694 6.36924 27.2478 5.09454 26.2128 4.22672Z"
+                    fill={getRarityColor(rarityByTier[card.tier])}
+                  />
+                </svg>
+
+                <Typography
+                  sx={{
+                    width: "100%",
+                    fontSize: "20px",
+                    textAlign: "center",
+                    fontWeight: "700",
+                    position: "relative",
+                    textShadow: `
+                    -1px -1px 0 black,
+                    1px -1px 0 black,
+                    -1px 1px 0 black,
+                    1px 1px 0 black
+                  `,
+                  }}
+                >
+                  {card.tier === "SS" ? (
+                    <span
+                      style={{
+                        position: "relative",
+                        display: "inline-block",
+                      }}
+                    >
+                      <span
+                        style={{
+                          position: "relative",
+                          top: "-2px",
+                          left: "2px",
+                          zIndex: 0,
+                        }}
+                      >
+                        S
+                      </span>
+                      <span
+                        style={{
+                          position: "relative",
+                          top: "2px",
+                          left: "-2px", // немного наложить на первую букву
+                          zIndex: 1,
+                        }}
+                      >
+                        S
+                      </span>
+                    </span>
+                  ) : card.tier.includes("+") ? (
+                    <>
+                      {card.tier.replace("+", "")}
+                      <span
+                        style={{
+                          fontSize: "14px",
+                          position: "absolute",
+                          top: "-4px",
+                          right: "14px",
+                          zIndex: "2",
+                        }}
+                      >
+                        +
+                      </span>
+                    </>
+                  ) : (
+                    card.tier
+                  )}
+                </Typography>
+              </Box>
               <Box
                 sx={{
                   borderRadius: "40px",
-                  padding: "6px 12px",
+                  padding: "4px 12px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  whiteSpace: "nowrap",
+                  backgroundColor: getRarityColor(card.rarity),
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: "12px",
+                    fontWeight: "600",
+                    letterSpacing: "1px",
+                    textShadow: `
+                   -1px -1px 0 black,
+                   1px -1px 0 black,
+                   -1px 1px 0 black,
+                   1px 1px 0 black
+                 `,
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {card.rarity}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  fontSize: "24px",
+                  fontWeight: "600",
+                  position: "relative",
+                  textShadow: `
+                  -1px -1px 0 black,
+                  1px -1px 0 black,
+                  -1px 1px 0 black,
+                  1px 1px 0 black
+                `,
+                }}
+              >
+                <span>{`${card.name} #${card.id}`}</span>
+              </Box>
+              <Box
+                sx={{
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
@@ -489,12 +424,139 @@ export const SingleCardPage = () => {
                   value={card.stars}
                   readOnly
                   sx={{
+                    "& .MuiRating-icon": {
+                      marginLeft: "-2px", // Негативный отступ для перекрытия
+                    },
                     "& .MuiRating-iconEmpty": {
                       color: "#fff",
                     },
                   }}
                 />
               </Box>
+            </Box>
+            <Box
+              sx={{
+                position: "relative",
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <Box
+                sx={{
+                  ...centerContentStyles,
+                  position: "relative",
+                  zIndex: 2,
+                  flexDirection: "column",
+                  width: "100%",
+                  maxWidth: "288px",
+                  padding: "40px",
+                  borderRadius: "20px",
+                  aspectRatio: "1",
+                }}
+              >
+                <GemSlots
+                  gemIds={card.gemIds?.filter(
+                    (id): id is number => id !== null
+                  )}
+                  sockets={card.sockets}
+                  gems={gems}
+                  handleRemoveGem={handleRemoveGem}
+                  handleOpenGemsPopup={handleOpenGemsPopup}
+                />
+
+                <Ambient rarity={card.rarity}>
+                  <img
+                    src={getCardImage(card.number, card.rarity)}
+                    style={{
+                      objectFit: "contain",
+                      width: "100%",
+                      height: "100%",
+                    }}
+                  />
+                </Ambient>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  whiteSpace: "nowrap",
+                  position: "relative",
+                  mt: "20px",
+                }}
+              >
+                <CustomTooltip
+                  openOnClick
+                  title="Total power is the sum of all the characteristics of the hero"
+                >
+                  <IconButton
+                    sx={{
+                      color: colors.secondaryTextColor,
+                      zIndex: 1,
+                      position: "absolute",
+                      left: "-24px",
+                      padding: "4px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                    }}
+                  >
+                    <InfoOutlinedIcon
+                      sx={{
+                        width: "12px",
+                        height: "12px",
+                        cursor: "help",
+                      }}
+                    />
+                  </IconButton>
+                </CustomTooltip>
+                <Typography
+                  sx={{
+                    fontSize: "24px",
+                    mr: "4px",
+                    fontWeight: "600",
+                    color: colors.textColor,
+                    textShadow: `
+                    -1px -1px 0 black,
+                    1px -1px 0 black,
+                    -1px 1px 0 black,
+                    1px 1px 0 black
+                  `,
+                  }}
+                >
+                  {`Power:`}
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: "24px",
+                    fontWeight: "600",
+                    color: colors.primary,
+                    textShadow: `
+                    -1px -1px 0 black,
+                    1px -1px 0 black,
+                    -1px 1px 0 black,
+                    1px 1px 0 black
+                  `,
+                  }}
+                >
+                  {calculateTotalPower(card).toFixed(0)}
+                </Typography>
+              </Box>
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "12px",
+                width: "100%",
+                backgroundColor: "rgba(60, 60, 60, 0.5)",
+                borderRadius: "20px",
+                padding: "24px 12px",
+              }}
+            >
               <Typography
                 sx={{
                   fontSize: "16px",
@@ -802,183 +864,27 @@ export const SingleCardPage = () => {
       </Box>
 
       <Popup isShow={isOpenMergePopup} setIsShow={setIsOpenMergePopup}>
-        <Box
-          sx={{
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-            gap: "48px",
-            height: "100%",
-            justifyContent: "space-between",
-          }}
-        >
-          <Box
-            sx={{
-              width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              gap: "16px",
-            }}
-          >
-            <Typography
-              sx={{
-                whiteSpace: "nowrap",
-                width: "100%",
-                textAlign: "center",
-                fontSize: "32px",
-                fontWeight: "700",
-                color: colors.textColor,
-              }}
-            >
-              MERGER
-            </Typography>
-            <Typography
-              sx={{
-                textAlign: "center",
-                color: colors.secondaryTextColor,
-                mb: "24px",
-              }}
-            >
-              Select heroes to merge
-            </Typography>
-            <CardsList
-              selectedCardId={selectedCardForMerge}
-              event={handleSelectCard}
-              cards={cardsForMerge}
-            />
-          </Box>
-
-          <MainButton
-            disabled={!selectedCardForMerge}
-            fullWidth
-            onClick={() =>
-              selectedCardForMerge && handleMerge(+cardId, selectedCardForMerge)
-            }
-          >
-            <Typography
-              sx={{
-                fontSize: "14px",
-                fontWeight: "700",
-                color: selectedCardForMerge
-                  ? "#000"
-                  : colors.secondaryTextColor,
-              }}
-            >
-              {selectedCardForMerge ? "MERGE" : "SELECT CARD"}
-            </Typography>
-          </MainButton>
-        </Box>
+        <MergePopup
+          cards={cardsForMerge}
+          cardId={+cardId}
+          handleMerge={handleMerge}
+          selectedCardIdForMerge={selectedCardIdForMerge}
+          handleSelectCard={handleSelectCard}
+        />
       </Popup>
       <Popup
         isShow={isOpenGemsPopup}
         setIsShow={setIsOpenGemsPopup}
         eventOnClose={selectedGem ? () => setSelectedGem(null) : undefined}
       >
-        <Box
-          sx={{
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-            gap: "48px",
-            height: "100%",
-            justifyContent: "space-between",
-          }}
-        >
-          <Box
-            sx={{
-              width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              gap: "16px",
-            }}
-          >
-            <Typography
-              sx={{
-                whiteSpace: "nowrap",
-                width: "100%",
-                textAlign: "center",
-                fontSize: "32px",
-                fontWeight: "700",
-                color: colors.textColor,
-              }}
-            >
-              GEMS
-            </Typography>
-            {!selectedGem && (
-              <Typography
-                sx={{
-                  textAlign: "center",
-                  color: colors.secondaryTextColor,
-                  mb: "24px",
-                }}
-              >
-                Select gem
-              </Typography>
-            )}
-            {selectedGem ? (
-              <GemInfo
-                gemId={selectedGem}
-                gemIds={card.gemIds?.filter((id): id is number => id !== null)}
-              />
-            ) : (
-              <GemsList event={handleSelectGem} gems={availableGems} />
-            )}
-          </Box>
-          {selectedGem && (
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "24px",
-                width: "100%",
-              }}
-            >
-              <Box
-                sx={{
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Typography
-                  sx={{
-                    fontSize: "24px",
-                    fontWeight: "700",
-                    color: colors.secondaryTextColor,
-                  }}
-                >
-                  Your balance:
-                </Typography>
-                <Typography
-                  sx={{
-                    fontSize: "24px",
-                    fontWeight: "700",
-                    color: colors.textColor,
-                  }}
-                >
-                  {user?.balance}
-                </Typography>
-              </Box>
-              <MainButton
-                disabled={disableInsertGem}
-                fullWidth
-                onClick={() => selectedGem && handleInsertGem(selectedGem)}
-              >
-                <Typography
-                  sx={{
-                    fontSize: "14px",
-                    fontWeight: "700",
-                    color: disableInsertGem
-                      ? colors.secondaryTextColor
-                      : "#000",
-                  }}
-                >
-                  {`INSERT GEM FOR ${INSERT_GEM_PRICE}`}
-                </Typography>
-              </MainButton>
-            </Box>
-          )}
-        </Box>
+        <GemsPopup
+          gems={availableGems}
+          selectedGem={selectedGem}
+          userBalance={user?.balance}
+          gemIds={card.gemIds?.filter((id): id is number => id !== null)}
+          handleInsertGem={handleInsertGem}
+          handleSelectGem={handleSelectGem}
+        />
       </Popup>
     </Box>
   );

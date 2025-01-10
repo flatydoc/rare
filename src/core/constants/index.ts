@@ -12,7 +12,7 @@ export const gemKits: GemKit[] = [
     description:
       "Набор, усиливающий огненные способности и увеличивающий урон. Подходит для агрессивного стиля игры.",
     gemIds: [121, 122, 123],
-    powerModifier: 50,
+    damageModifier: 50,
     armorModifier: 0,
     healthModifier: 0,
   },

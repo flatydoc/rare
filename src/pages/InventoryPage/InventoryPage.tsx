@@ -4,7 +4,7 @@ import { RouteList } from "../../core/enums";
 import { useGemStore } from "../../core/store/useGemStore";
 import { GemsList } from "./components/GemsList";
 
-export const GemsPage = () => {
+export const InventoryPage = () => {
   const gems = useGemStore((state) => state.gems);
   const navigate = useNavigate();
 

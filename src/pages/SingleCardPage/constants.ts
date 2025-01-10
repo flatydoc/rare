@@ -16,7 +16,7 @@ export const elementEmojis: Record<Element, string | null> = {
 
 export const descriptionByClass: Record<CardClass, string> = {
   defender: "Defender description",
-  dd: "DD description",
+  fighter: "Fighter description",
   support: "support description",
 };
 

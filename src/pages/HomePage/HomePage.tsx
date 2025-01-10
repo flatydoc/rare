@@ -9,6 +9,8 @@ import notcoin from "../../assets/notcoin.png";
 import { MainButton } from "../../components/MainButton";
 import { getLeagueByLevel } from "../../core/utils/getLeagueByLevel";
 import { RewardType } from "../../core/types";
+import { useNavigate } from "react-router-dom";
+import { RouteList } from "../../core/enums";
 
 export const HomePage = () => {
   const [isShowPopup, setIsShowPopup] = useState<boolean>(false);
@@ -16,6 +18,12 @@ export const HomePage = () => {
   const [claimedRewards, setClaimedRewards] = useState<boolean[]>(
     rewardByLeague.map(() => false)
   );
+
+  const navigate = useNavigate();
+
+  const handleNav = () => {
+    navigate(`/${RouteList.Fight}`);
+  };
 
   if (!user) {
     return <div>Loading...</div>;
@@ -119,6 +127,8 @@ export const HomePage = () => {
           </Box>
         </Box>
       </Box>
+      <Box onClick={handleNav}>Fight</Box>
+
       <Popup isShow={isShowPopup} setIsShow={setIsShowPopup}>
         <Box
           sx={{

@@ -1,11 +1,11 @@
 import defender from "../../assets/defender.png";
-import dd from "../../assets/dd.png";
+import fighter from "../../assets/dd.png";
 import support from "../../assets/support.png";
 import { CardClass } from "../types";
 
-const ICONS_BY_CARD_CLASS: Record<CardClass, string> = {
+export const ICONS_BY_CARD_CLASS: Record<CardClass, string> = {
   defender,
-  dd,
+  fighter,
   support,
 };
 
