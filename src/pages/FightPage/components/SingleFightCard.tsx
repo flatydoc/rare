@@ -95,7 +95,7 @@ export const SingleFightCard = ({
             borderRadius: "20px",
             position: "relative",
             padding: "10px",
-            aspectRatio: "20",
+            aspectRatio: "1",
           }}
         >
           <img
@@ -105,7 +105,7 @@ export const SingleFightCard = ({
               width: "100%",
               height: "100%",
               position: "relative",
-              zIndex: "19",
+              zIndex: "20",
             }}
           />
           <Box
@@ -117,7 +117,7 @@ export const SingleFightCard = ({
               width: "50%",
               height: "10%",
               borderRadius: "20px",
-              zIndex: "1",
+              zIndex: "19",
               backgroundColor: `${getRarityColor(card.rarity)}99`,
               filter: "blur(12px)",
               boxShadow: `0px 0px 20px ${getRarityColor(card.rarity)}99`,
