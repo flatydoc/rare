@@ -95,7 +95,7 @@ export const SingleFightCard = ({
             borderRadius: "20px",
             position: "relative",
             padding: "10px",
-            aspectRatio: "1",
+            aspectRatio: "20",
           }}
         >
           <img
@@ -105,7 +105,7 @@ export const SingleFightCard = ({
               width: "100%",
               height: "100%",
               position: "relative",
-              zIndex: "2",
+              zIndex: "19",
             }}
           />
           <Box

@@ -20,7 +20,7 @@ body {
 }
 
 #card-[id].attacking {
-  z-index: 10; /* Поднимаем элемент над другими */
+  z-index: 10;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
