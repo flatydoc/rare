@@ -105,7 +105,6 @@ export const SingleFightCard = ({
               width: "100%",
               height: "100%",
               position: "relative",
-              zIndex: "20",
             }}
           />
           <Box
@@ -117,7 +116,6 @@ export const SingleFightCard = ({
               width: "50%",
               height: "10%",
               borderRadius: "20px",
-              zIndex: "19",
               backgroundColor: `${getRarityColor(card.rarity)}99`,
               filter: "blur(12px)",
               boxShadow: `0px 0px 20px ${getRarityColor(card.rarity)}99`,
