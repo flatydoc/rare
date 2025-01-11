@@ -37,3 +37,22 @@ body {
     transform: translateY(-50px);
   }
 }
+@keyframes floatZ {
+  0% {
+    transform: translate(-50%, -50%) translateY(0);
+    opacity: 0; /* Буквы начинают как прозрачные */
+  }
+  25% {
+    opacity: 0.5; /* Плавно становятся видимыми */
+  }
+  50% {
+    opacity: 1; /* Достигают полной видимости */
+  }
+  75% {
+    opacity: 0.8; /* Слегка теряют прозрачность */
+  }
+  100% {
+    transform: translate(-50%, -50%) translateY(-50px); /* Поднимаются вверх */
+    opacity: 0; /* Исчезают в конце */
+  }
+}

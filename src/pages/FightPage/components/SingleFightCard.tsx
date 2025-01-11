@@ -58,15 +58,50 @@ export const SingleFightCard = ({
           <Box
             sx={{
               position: "absolute",
-              top: "0",
-              left: "0",
+              top: "-100px",
+              right: "0px",
               width: "100%",
               height: "100%",
-              borderRadius: "20px",
               backdropFilter: `grayscale(1)`,
               zIndex: 1,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
             }}
-          />
+          >
+            <Box
+              sx={{
+                position: "relative",
+                height: "100%",
+                width: "100%",
+                overflow: "hidden",
+              }}
+            >
+              {[...Array(3)].map((_, index) => {
+                const fontSize = 14 + index * 6; // Увеличение разбежки в размерах букв
+
+                return (
+                  <Box
+                    key={index}
+                    sx={{
+                      position: "absolute",
+                      fontSize: `${fontSize}px`, // Увеличение разбежки в размере
+                      fontWeight: "bold",
+                      color: "rgba(255, 255, 255, 0.8)",
+                      animation: `floatZ 2s ease-in-out infinite`,
+                      animationDelay: `${0.5 + index * 0.5}s`, // Задержка начала анимации
+                      top: "50%",
+                      left: "50%",
+                      transform: `translate(-50%, -50%)`, // Начальная позиция
+                      opacity: 0, // Начальная прозрачность
+                    }}
+                  >
+                    Z
+                  </Box>
+                );
+              })}
+            </Box>
+          </Box>
         )}
         {damageInfo?.id === card.id && (
           <Typography

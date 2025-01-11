@@ -149,12 +149,12 @@ export const FightPage = () => {
   };
 
   const handleSelectEnemyCardId = (id: number) => {
-    if (!isFightAvailable || !isFight) return null;
+    if (!isFightAvailable || !isFight || !isPlayerTurn) return null;
     setSelectedEnemyCardId(id);
   };
 
   const handleSelectMyCardId = (id: number) => {
-    if (!isFightAvailable || !isFight) return null;
+    if (!isFightAvailable || !isFight || !isPlayerTurn) return null;
     setSelectedMyCardId(id);
   };
 
@@ -217,7 +217,11 @@ export const FightPage = () => {
           setSelectedMyCardId(null);
 
           // Если все карты атаковали, передаем ход противнику
-          if (reloadableCards.length + 1 === myCards.length) {
+          const aliveMyCards = myCards.filter(
+            (card) => typeof card !== "number" && card.health > 0
+          );
+
+          if (reloadableCards.length + 1 === aliveMyCards.length) {
             setIsPlayerTurn(false);
             setReloadableCards([]);
           }
