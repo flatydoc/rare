@@ -14,7 +14,7 @@ export const FightCardsList = ({
   selectedCardId,
   isMyCardList,
   onEmptySlotClick,
-  attackedCards,
+  reloadableCards,
   damageInfo,
 }: {
   cards: ICard[] | number[];
@@ -22,7 +22,7 @@ export const FightCardsList = ({
   selectedCardId: number | null;
   isMyCardList?: boolean;
   onEmptySlotClick?: (index: number) => void;
-  attackedCards: number[];
+  reloadableCards: number[];
   damageInfo: DamageInfo;
 }) => {
   return (
@@ -44,7 +44,7 @@ export const FightCardsList = ({
             isSelected={selectedCardId === card.id}
             onClick={event}
             isMyCard={isMyCardList}
-            attackedCards={attackedCards}
+            reloadableCards={reloadableCards}
             damageInfo={damageInfo}
           />
         )

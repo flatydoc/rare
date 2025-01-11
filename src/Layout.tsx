@@ -110,7 +110,7 @@ export const Layout = () => {
         gemIds: [],
         sockets: 0,
         element: "simple",
-        class: "fighter",
+        class: "support",
       },
     ]);
   }, []);

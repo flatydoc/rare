@@ -12,6 +12,7 @@ import { colors } from "../../core/theme/colors";
 import { useBackBtn } from "../../core/hooks/useBackBtn";
 import { getRandomDamage } from "../../core/utils/getRandomDamage";
 import { useEnemyAttack } from "../../core/hooks/useEnemyAttack";
+import { animateAttack } from "../../core/utils/animateAttack";
 
 export const FightPage = () => {
   useBackBtn();
@@ -107,7 +108,7 @@ export const FightPage = () => {
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
   const [myCards, setMyCards] = useState<ICard[] | number[]>([1, 2, 3]);
   const [isOpenSelectCardPopup, setIsOpenSelectCardPopup] = useState(false);
-  const [attackedCards, setAttackedCards] = useState<number[]>([]);
+  const [reloadableCards, setReloadableCards] = useState<number[]>([]);
   const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(
     null
   );
@@ -196,52 +197,31 @@ export const FightPage = () => {
       );
 
       if (attackingCardElement && targetCardElement) {
-        const attackingRect = attackingCardElement.getBoundingClientRect();
-        const targetRect = targetCardElement.getBoundingClientRect();
-
-        const deltaX = targetRect.left - attackingRect.left;
-        const deltaY = targetRect.top - attackingRect.top;
-
-        // Этап 1: Резкий рывок вперед
-        attackingCardElement.style.transition =
-          "transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)";
-        attackingCardElement.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-
-        setTimeout(() => {
-          // Этап 2: Быстрое возвращение с вибрацией
-          attackingCardElement.style.transition = "transform 0.3s ease";
-          attackingCardElement.style.transform = `translate(${
-            deltaX * 0.1
-          }px, ${deltaY * 0.1}px)`;
-
-          setTimeout(() => {
-            // Этап 3: Возврат в исходное положение
-            attackingCardElement.style.transition = "transform 0.2s ease";
-            attackingCardElement.style.transform = "translate(0, 0)";
-
-            // Обновление состояния врага
-            const updatedEnemyCards = enemyCards.map((card) => {
-              if (card.id === selectedEnemyCardId) {
-                const damage = getRandomDamage(myCard.damage);
-                const newHealth = Math.max(0, card.health - damage);
-                setDamageInfo({ id: selectedEnemyCardId, damage });
-                return { ...card, health: newHealth };
-              }
-              return card;
-            });
-
-            setEnemyCards(updatedEnemyCards);
-            setTimeout(() => setDamageInfo(null), 1000);
-            setAttackedCards((prev) => [...prev, selectedMyCardId]);
-            setSelectedEnemyCardId(null);
-            setSelectedMyCardId(null);
-
-            if (attackedCards.length + 1 === myCards.length) {
-              setIsPlayerTurn(false); // Передаем ход противнику
-              setAttackedCards([]);
+        // Используем функцию animateAttack
+        animateAttack(attackingCardElement, targetCardElement, () => {
+          // Обновление состояния врага после завершения анимации
+          const updatedEnemyCards = enemyCards.map((card) => {
+            if (card.id === selectedEnemyCardId) {
+              const damage = getRandomDamage(myCard.damage);
+              const newHealth = Math.max(0, card.health - damage);
+              setDamageInfo({ id: selectedEnemyCardId, damage });
+              return { ...card, health: newHealth };
             }
-          }, 100); // Длительность вибрации
-        }, 200); // Длительность рывка вперед
+            return card;
+          });
+
+          setEnemyCards(updatedEnemyCards);
+          setTimeout(() => setDamageInfo(null), 1000);
+          setReloadableCards((prev) => [...prev, selectedMyCardId]);
+          setSelectedEnemyCardId(null);
+          setSelectedMyCardId(null);
+
+          // Если все карты атаковали, передаем ход противнику
+          if (reloadableCards.length + 1 === myCards.length) {
+            setIsPlayerTurn(false);
+            setReloadableCards([]);
+          }
+        });
       }
     }
   };
@@ -257,8 +237,8 @@ export const FightPage = () => {
     enemyCards,
     myCards,
     setMyCards,
-    attackedCards,
-    setAttackedCards,
+    reloadableCards,
+    setReloadableCards,
     isFight,
     isPlayerTurn,
     setIsPlayerTurn,
@@ -285,7 +265,7 @@ export const FightPage = () => {
         }}
       >
         <FightCardsList
-          attackedCards={attackedCards}
+          reloadableCards={reloadableCards}
           selectedCardId={selectedEnemyCardId}
           event={handleSelectEnemyCardId}
           cards={enemyCards}
@@ -328,7 +308,7 @@ export const FightPage = () => {
           </Typography>
         </Box>
         <FightCardsList
-          attackedCards={attackedCards}
+          reloadableCards={reloadableCards}
           isMyCardList
           selectedCardId={selectedMyCardId}
           event={handleSelectMyCardId}
@@ -341,7 +321,7 @@ export const FightPage = () => {
             onClick={handleAttack}
             disabled={
               !isAttackAvailable ||
-              attackedCards.includes(selectedMyCardId ?? -1)
+              reloadableCards.includes(selectedMyCardId ?? -1)
             }
             fullWidth
           >
@@ -351,7 +331,7 @@ export const FightPage = () => {
                 fontWeight: "700",
                 color:
                   !isAttackAvailable ||
-                  attackedCards.includes(selectedMyCardId ?? -1)
+                  reloadableCards.includes(selectedMyCardId ?? -1)
                     ? colors.secondaryTextColor
                     : "#000",
               }}

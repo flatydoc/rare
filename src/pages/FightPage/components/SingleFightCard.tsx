@@ -1,6 +1,5 @@
 import { Box, Typography } from "@mui/material";
 import { centerContentStyles } from "../../../core/theme/common.style";
-import { getRarityColor } from "../../../core/utils/getRarityColor";
 import { ICard } from "../../../core/types";
 import { colors } from "../../../core/theme/colors";
 import { getCardImage } from "../../../core/utils/getCardImage";
@@ -20,14 +19,14 @@ export const SingleFightCard = ({
   isSelected,
   onClick,
   isMyCard,
-  attackedCards,
+  reloadableCards,
   damageInfo,
 }: {
   card: ICard;
   isSelected?: boolean;
   onClick?: (id: number) => void;
   isMyCard?: boolean;
-  attackedCards: number[];
+  reloadableCards: number[];
   damageInfo: DamageInfo;
 }) => {
   const handleClick = () => {
@@ -38,7 +37,7 @@ export const SingleFightCard = ({
   console.log(isMyCard);
 
   const isDead = card.health <= 0;
-  const isAttacked = attackedCards.includes(card.id);
+  const isReload = reloadableCards.includes(card.id);
 
   return (
     <>
@@ -48,16 +47,14 @@ export const SingleFightCard = ({
           width: "100%",
           borderRadius: "20px",
           boxShadow:
-            isSelected && !isAttacked
-              ? `0 0 5px 1px ${colors.primary}`
-              : "none",
-          backgroundColor: "rgba(60, 60, 60, 0.8)",
+            isSelected && !isReload ? `0 0 5px 1px ${colors.primary}` : "none",
+          //   backgroundColor: "rgba(60, 60, 60, 0.8)",
           position: "relative",
-          pointerEvents: isAttacked || isDead ? "none" : "auto",
-          border: "1px solid #000",
+          pointerEvents: isReload || isDead ? "none" : "auto",
+          //   border: "1px solid #000",
         }}
       >
-        {isAttacked && (
+        {isReload && (
           <Box
             sx={{
               position: "absolute",
@@ -70,6 +67,21 @@ export const SingleFightCard = ({
               zIndex: 1,
             }}
           />
+        )}
+        {damageInfo?.id === card.id && (
+          <Typography
+            sx={{
+              position: "absolute",
+              top: "20px",
+              right: "0px",
+              fontSize: "24px",
+              fontWeight: "600",
+              color: colors.red,
+              animation: "damagePopup 1s ease-out",
+            }}
+          >
+            -{damageInfo.damage}
+          </Typography>
         )}
         {isDead && (
           <Box
@@ -93,7 +105,6 @@ export const SingleFightCard = ({
             width: "100%",
             maxWidth: "240px",
             borderRadius: "20px",
-            position: "relative",
             padding: "10px",
             aspectRatio: "1",
             willChange: "transform, opacity",
@@ -107,7 +118,7 @@ export const SingleFightCard = ({
               height: "100%",
             }}
           />
-          <Box
+          {/* <Box
             sx={{
               position: "absolute",
               zIndex: "-1",
@@ -121,32 +132,8 @@ export const SingleFightCard = ({
               filter: "blur(12px)",
               boxShadow: `0px 0px 20px ${getRarityColor(card.rarity)}99`,
             }}
-          />
+          /> */}
         </Box>
-
-        <Box
-          sx={{
-            position: "relative",
-          }}
-        >
-          {damageInfo?.id === card.id && (
-            <Typography
-              sx={{
-                position: "absolute",
-                top: "-20px",
-                left: "50%",
-                transform: "translateX(-50%)",
-                fontSize: "24px",
-                fontWeight: "600",
-                color: colors.red,
-                animation: "damagePopup 1s ease-out",
-              }}
-            >
-              -{damageInfo.damage}
-            </Typography>
-          )}
-        </Box>
-
         <Box
           sx={{
             display: "flex",
