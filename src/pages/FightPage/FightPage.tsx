@@ -11,6 +11,7 @@ import { MainButton } from "../../components/MainButton";
 import { colors } from "../../core/theme/colors";
 import { useBackBtn } from "../../core/hooks/useBackBtn";
 import { getRandomDamage } from "../../core/utils/getRandomDamage";
+import { useEnemyAttack } from "../../core/hooks/useEnemyAttack";
 
 export const FightPage = () => {
   useBackBtn();
@@ -103,11 +104,10 @@ export const FightPage = () => {
   ]);
 
   const cards = useCardStore((state) => state.cards);
-
+  const [isPlayerTurn, setIsPlayerTurn] = useState(true);
   const [myCards, setMyCards] = useState<ICard[] | number[]>([1, 2, 3]);
   const [isOpenSelectCardPopup, setIsOpenSelectCardPopup] = useState(false);
   const [attackedCards, setAttackedCards] = useState<number[]>([]);
-
   const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(
     null
   );
@@ -179,6 +179,7 @@ export const FightPage = () => {
 
   const handleAttack = () => {
     if (
+      isPlayerTurn &&
       isAttackAvailable &&
       selectedMyCardId !== null &&
       selectedEnemyCardId !== null
@@ -236,6 +237,7 @@ export const FightPage = () => {
             setSelectedMyCardId(null);
 
             if (attackedCards.length + 1 === myCards.length) {
+              setIsPlayerTurn(false); // Передаем ход противнику
               setAttackedCards([]);
             }
           }, 100); // Длительность вибрации
@@ -249,6 +251,18 @@ export const FightPage = () => {
       !myCards.some(
         (myCard) => typeof myCard !== "number" && myCard.id === card.id
       )
+  );
+
+  useEnemyAttack(
+    enemyCards,
+    myCards,
+    setMyCards,
+    attackedCards,
+    setAttackedCards,
+    isFight,
+    isPlayerTurn,
+    setIsPlayerTurn,
+    setDamageInfo
   );
 
   return (

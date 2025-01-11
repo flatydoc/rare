@@ -96,6 +96,7 @@ export const SingleFightCard = ({
             position: "relative",
             padding: "10px",
             aspectRatio: "1",
+            willChange: "transform, opacity",
           }}
         >
           <img
@@ -104,12 +105,12 @@ export const SingleFightCard = ({
               objectFit: "contain",
               width: "100%",
               height: "100%",
-              position: "relative",
             }}
           />
           <Box
             sx={{
               position: "absolute",
+              zIndex: "-1",
               bottom: "10px",
               left: "50%",
               transform: "translateX(-50%)",
