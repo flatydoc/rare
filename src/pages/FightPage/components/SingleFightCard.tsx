@@ -36,7 +36,7 @@ export const SingleFightCard = ({
   };
   console.log(isMyCard);
 
-  const isDead = card.health <= 0;
+  const isDead = card.fightHealth <= 0;
   const isReload = reloadableCards.includes(card.id);
 
   return (
@@ -62,7 +62,7 @@ export const SingleFightCard = ({
               right: "0px",
               width: "100%",
               height: "100%",
-              backdropFilter: `grayscale(1)`,
+              //   backdropFilter: `grayscale(1)`,
               zIndex: 1,
               display: "flex",
               justifyContent: "center",
@@ -173,11 +173,99 @@ export const SingleFightCard = ({
           sx={{
             display: "flex",
             flexDirection: "column",
-            p: "12px 6px",
+            p: "0 6px 12px 6px",
             gap: "12px",
           }}
         >
           <Box
+            sx={{
+              width: "100%",
+              height: "16px",
+              backgroundColor: "rgba(60, 60, 60, 0.5)",
+              borderRadius: "16px",
+              border: "1px solid #000",
+              overflow: "hidden",
+              position: "relative",
+              display: "flex",
+            }}
+          >
+            <Box
+              sx={{
+                width: `${(card.fightHealth / card.health) * 100}%`,
+                height: "100%",
+                backgroundColor: isMyCard ? colors.green : colors.red,
+              }}
+            />
+            {damageInfo?.id === card.id && (
+              <Box
+                sx={{
+                  width: `${(damageInfo.damage / card.health) * 100}%`,
+                  height: "100%",
+                  backgroundColor: "rgb(255, 230, 0)",
+                }}
+              />
+            )}
+            <Box
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                fontSize: "16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "4px",
+              }}
+            >
+              <Typography
+                sx={{
+                  fontWeight: "600",
+                  fontSize: "10px",
+                  color: card.fightHealth === 0 ? colors.red : colors.textColor,
+                  textShadow: `
+                            -1px -1px 0 black,
+                            1px -1px 0 black,
+                            -1px 1px 0 black,
+                            1px 1px 0 black
+                          `,
+                }}
+              >
+                {card.fightHealth}
+              </Typography>
+              <Typography
+                sx={{
+                  fontWeight: "600",
+                  fontSize: "10px",
+                  color: colors.textColor,
+                  textShadow: `
+                           -1px -1px 0 black,
+                           1px -1px 0 black,
+                           -1px 1px 0 black,
+                           1px 1px 0 black
+                         `,
+                }}
+              >
+                /
+              </Typography>
+              <Typography
+                sx={{
+                  fontWeight: "600",
+                  fontSize: "10px",
+                  color: colors.textColor,
+                  textShadow: `
+                            -1px -1px 0 black,
+                            1px -1px 0 black,
+                            -1px 1px 0 black,
+                            1px 1px 0 black
+                          `,
+                }}
+              >
+                {card.health}
+              </Typography>
+            </Box>
+          </Box>
+          {/* <Box
             sx={{
               display: "flex",
               justifyContent: "center",
@@ -199,7 +287,7 @@ export const SingleFightCard = ({
             >
               {elementEmojis[card.element]}
             </Typography>
-          </Box>
+          </Box> */}
           <Box
             sx={{
               display: "flex",
@@ -210,7 +298,6 @@ export const SingleFightCard = ({
             {[
               { icon: damage, value: card.damage + card.bonusDamage },
               { icon: armor, value: card.armor + card.bonusArmor },
-              { icon: hp, value: card.health + card.bonusHealth },
             ].map((stat, index) => (
               <Box
                 key={index}
@@ -230,10 +317,7 @@ export const SingleFightCard = ({
                   sx={{
                     fontSize: "12px",
                     fontWeight: "bold",
-                    color:
-                      stat.value === 0 && stat.icon === hp
-                        ? colors.red
-                        : colors.textColor,
+                    color: colors.textColor,
                   }}
                 >
                   {stat.value.toFixed(0)}

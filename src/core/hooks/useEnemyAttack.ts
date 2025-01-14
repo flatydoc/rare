@@ -5,7 +5,6 @@ import { animateAttack } from "../utils/animateAttack";
 
 export const useEnemyAttack = (
   enemyCards: ICard[],
-  myCards: ICard[],
   setMyCards: React.Dispatch<React.SetStateAction<ICard[]>>,
   reloadableEnemyCards: number[],
   setReloadableEnemyCards: React.Dispatch<React.SetStateAction<number[]>>,
@@ -21,75 +20,109 @@ export const useEnemyAttack = (
       console.log("Enemy's turn starts!");
 
       let attackIndex = 0;
-      const availableEnemyCards = enemyCards.filter(
-        (card) => card.health > 0 && !reloadableEnemyCards.includes(card.id)
-      );
 
       const enemyAttackInterval = setInterval(() => {
-        if (attackIndex < availableEnemyCards.length) {
-          const enemyCard = availableEnemyCards[attackIndex];
+        // Обновляем доступные для атаки карты врага
+        const availableEnemyCards = enemyCards.filter(
+          (card) =>
+            card.fightHealth > 0 && !reloadableEnemyCards.includes(card.id)
+        );
 
-          const validTargets = myCards.filter(
-            (card) => typeof card === "object" && card.health > 0
+        if (availableEnemyCards.length === 0) {
+          clearInterval(enemyAttackInterval);
+          setIsPlayerTurn(true);
+          console.log("Your turn starts!");
+          return;
+        }
+
+        // Получаем список целей (живых карт) из актуального состояния
+        setMyCards((prevMyCards) => {
+          const validTargets = prevMyCards.filter(
+            (card) => card.fightHealth > 0
           );
+
           if (validTargets.length === 0) {
             clearInterval(enemyAttackInterval);
-            setIsPlayerTurn(true); // Если больше нечего атаковать, ход возвращается игроку
-            return;
+            setIsPlayerTurn(true);
+            console.log("No valid targets. Your turn starts!");
+            return prevMyCards; // Возвращаем состояние без изменений
           }
 
-          const targetIndex = Math.floor(Math.random() * validTargets.length);
-          const targetCard = validTargets[targetIndex];
+          if (attackIndex < availableEnemyCards.length) {
+            const enemyCard = availableEnemyCards[attackIndex];
 
-          const attackingCardElement = document.getElementById(
-            `card-${enemyCard.id}`
-          );
-          const targetCardElement = document.getElementById(
-            `card-${targetCard.id}`
-          );
+            // Найти цель с минимальным количеством fightHealth
+            const targetCard = validTargets.reduce((minCard, currentCard) =>
+              currentCard.fightHealth < minCard.fightHealth
+                ? currentCard
+                : minCard
+            );
 
-          if (attackingCardElement && targetCardElement) {
-            animateAttack(attackingCardElement, targetCardElement, () => {
-              const damage = getRandomDamage(enemyCard.damage);
-              setMyCards((prevMyCards) =>
-                prevMyCards.map((card) =>
-                  card.id === targetCard.id
-                    ? {
-                        ...card,
-                        health: Math.max(0, card.health - damage),
-                      }
-                    : card
-                )
-              );
-
-              setDamageInfo({ id: targetCard.id, damage });
+            // Дополнительная проверка перед атакой
+            if (!targetCard || targetCard.fightHealth <= 0) {
               console.log(
-                `Enemy card ${enemyCard.name} attacked your card ${targetCard.name}, causing ${damage} damage.`
+                `Skipping attack on dead or invalid target card ${targetCard?.id}`
               );
-
-              setTimeout(() => setDamageInfo(null), 1000);
-
-              setReloadableEnemyCards((prev) => [...prev, enemyCard.id]);
               attackIndex++;
-            });
+              return prevMyCards;
+            }
+
+            const attackingCardElement = document.getElementById(
+              `card-${enemyCard.id}`
+            );
+            const targetCardElement = document.getElementById(
+              `card-${targetCard.id}`
+            );
+
+            if (attackingCardElement && targetCardElement) {
+              animateAttack(attackingCardElement, targetCardElement, () => {
+                const damage = getRandomDamage(enemyCard.damage);
+                setMyCards((currentMyCards) =>
+                  currentMyCards.map((card) =>
+                    card.id === targetCard.id
+                      ? {
+                          ...card,
+                          fightHealth: Math.max(0, card.fightHealth - damage),
+                        }
+                      : card
+                  )
+                );
+
+                setDamageInfo({ id: targetCard.id, damage });
+                console.log(
+                  `Enemy card ${enemyCard.name} attacked your card ${targetCard.name}, causing ${damage} damage.`
+                );
+
+                setTimeout(() => setDamageInfo(null), 1000);
+
+                setReloadableEnemyCards((prev) => [...prev, enemyCard.id]);
+                attackIndex++;
+              });
+            } else {
+              console.log(
+                `Cannot find elements for enemy card ${enemyCard.id} or target card ${targetCard.id}`
+              );
+              attackIndex++;
+            }
+          } else {
+            clearInterval(enemyAttackInterval);
+            setIsPlayerTurn(true);
+            setReloadableEnemyCards([]);
+            console.log("Your turn starts!");
           }
-        } else {
-          clearInterval(enemyAttackInterval);
-          setIsPlayerTurn(true); // Возвращаем ход игроку
-          setReloadableEnemyCards([]);
-          console.log("Your turn starts!");
-        }
-      }, 2000); // Задержка между атаками врага
+
+          return prevMyCards; // Возвращаем актуальное состояние
+        });
+      }, 2000);
     }
   }, [
     isFight,
     isPlayerTurn,
     reloadableEnemyCards,
     enemyCards,
-    myCards,
     setMyCards,
     setReloadableEnemyCards,
     setIsPlayerTurn,
-    setDamageInfo, // Добавляем в зависимости
+    setDamageInfo,
   ]);
 };

@@ -49,6 +49,7 @@ export const useCardStore = create<CardState>((set, get) => ({
       bonusDamage: 0,
       damageCoef: prototype.damageCoef,
       health: prototype.health,
+      fightHealth: prototype.health,
       bonusHealth: 0,
       healthCoef: prototype.healthCoef,
       armor: prototype.armor,

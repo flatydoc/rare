@@ -37,6 +37,7 @@ export const Root = () => {
     cards: [101, 102],
     cases: [21],
     gems: [4, 5],
+    completedPVE: null,
   };
 
   useEffect(() => {

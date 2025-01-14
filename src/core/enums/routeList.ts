@@ -10,4 +10,5 @@ export enum RouteList {
   Inventory = "inventory",
   Fight = "fight",
   Gems = "gems",
+  PVE = "fight/pve",
 }

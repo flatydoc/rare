@@ -9,6 +9,7 @@ export interface IUser {
   cards: number[];
   cases: number[];
   gems: number[];
+  completedPVE: number | null;
 }
 
 export interface ICase {
@@ -66,6 +67,7 @@ export interface ICard {
   bonusDamage: number;
   damageCoef: number;
   health: number;
+  fightHealth: number;
   bonusHealth: number;
   healthCoef: number;
   armor: number;

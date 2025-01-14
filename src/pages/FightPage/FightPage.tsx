@@ -1,9 +1,8 @@
 import { Box, Typography } from "@mui/material";
 import { centerContentStyles } from "../../core/theme/common.style";
 import { ICard } from "../../core/types";
-import zombie from "../../assets/zombie_level_1.png";
 import { FightCardsList } from "./components/FightCardsList";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Popup } from "../../components/Popup";
 import { SelectCardPopup } from "./components/SelectCardPopup";
 import { useCardStore } from "../../core/store/useCardStore";
@@ -13,101 +12,33 @@ import { useBackBtn } from "../../core/hooks/useBackBtn";
 import { getRandomDamage } from "../../core/utils/getRandomDamage";
 import { useEnemyAttack } from "../../core/hooks/useEnemyAttack";
 import { animateAttack } from "../../core/utils/animateAttack";
+import { useParams } from "react-router-dom";
+import { PVERounds } from "../HomePage/constants";
 
 export const FightPage = () => {
   useBackBtn();
+  const { fightId } = useParams<{ fightId: string }>();
+  const [enemyCards, setEnemyCards] = useState<ICard[]>([]);
 
-  const [enemyCards, setEnemyCards] = useState<ICard[]>([
-    {
-      id: 1071,
-      number: 1,
-      rarity: "common",
-      tier: "B",
-      price: 100,
-      damage: 16,
-      bonusDamage: 0,
-      damageCoef: 1.2,
-      health: 48,
-      bonusHealth: 0,
-      healthCoef: 1.2,
-      armor: 2,
-      bonusArmor: 0,
-      armorCoef: 1.6,
-      exp: 150,
-      level: 1,
-      stars: 0,
-      fraction: "demons",
-      priceCurrency: "inGame",
-      name: "Default Zombie",
-      description: "A basic tueben'",
-      img: zombie,
-      gemIds: [],
-      sockets: 0,
-      element: "simple",
-      class: "fighter",
-    },
-    {
-      id: 1602,
-      number: 1,
-      rarity: "common",
-      tier: "B",
-      price: 100,
-      damage: 16,
-      bonusDamage: 0,
-      damageCoef: 1.2,
-      health: 48,
-      bonusHealth: 0,
-      healthCoef: 1.3,
-      armor: 12,
-      bonusArmor: 0,
-      armorCoef: 1.5,
-      exp: 150,
-      level: 1,
-      stars: 0,
-      fraction: "undead",
-      priceCurrency: "inGame",
-      name: "Default Zombie",
-      description: "A basic tueben'",
-      img: zombie,
-      gemIds: [],
-      sockets: 0,
-      element: "poison",
-      class: "defender",
-    },
-    {
-      id: 3434,
-      number: 1,
-      rarity: "common",
-      tier: "B",
-      price: 100,
-      damage: 16,
-      bonusDamage: 0,
-      damageCoef: 1.2,
-      health: 48,
-      bonusHealth: 0,
-      healthCoef: 1.3,
-      armor: 12,
-      bonusArmor: 0,
-      armorCoef: 1.5,
-      exp: 150,
-      level: 1,
-      stars: 0,
-      fraction: "undead",
-      priceCurrency: "inGame",
-      name: "Default Zombie",
-      description: "A basic tueben'",
-      img: zombie,
-      gemIds: [],
-      sockets: 0,
-      element: "poison",
-      class: "defender",
-    },
-  ]);
+  useEffect(() => {
+    if (fightId) {
+      const round = PVERounds.find(
+        (round) => round.id === parseInt(fightId, 10)
+      );
+      if (round) {
+        setEnemyCards(round.enemyCards);
+      } else {
+        console.error(`Round with id ${fightId} not found`);
+      }
+    }
+  }, [fightId]);
 
   const cards = useCardStore((state) => state.cards);
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
   const [myCards, setMyCards] = useState<ICard[] | number[]>([1, 2, 3]);
   const [isOpenSelectCardPopup, setIsOpenSelectCardPopup] = useState(false);
+  const [isShowResult, setIsShowResult] = useState<boolean>(false);
+  const [isWin, setIsWin] = useState<boolean | null>(false);
   const [reloadableCards, setReloadableCards] = useState<number[]>([]);
   const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(
     null
@@ -197,15 +128,13 @@ export const FightPage = () => {
       );
 
       if (attackingCardElement && targetCardElement) {
-        // Используем функцию animateAttack
         animateAttack(attackingCardElement, targetCardElement, () => {
-          // Обновление состояния врага после завершения анимации
           const updatedEnemyCards = enemyCards.map((card) => {
             if (card.id === selectedEnemyCardId) {
               const damage = getRandomDamage(myCard.damage);
-              const newHealth = Math.max(0, card.health - damage);
+              const newHealth = Math.max(0, card.fightHealth - damage);
               setDamageInfo({ id: selectedEnemyCardId, damage });
-              return { ...card, health: newHealth };
+              return { ...card, fightHealth: newHealth };
             }
             return card;
           });
@@ -218,7 +147,7 @@ export const FightPage = () => {
 
           // Если все карты атаковали, передаем ход противнику
           const aliveMyCards = myCards.filter(
-            (card) => typeof card !== "number" && card.health > 0
+            (card) => typeof card !== "number" && card.fightHealth > 0
           );
 
           if (reloadableCards.length + 1 === aliveMyCards.length) {
@@ -239,7 +168,6 @@ export const FightPage = () => {
 
   useEnemyAttack(
     enemyCards,
-    myCards,
     setMyCards,
     reloadableCards,
     setReloadableCards,
@@ -248,6 +176,23 @@ export const FightPage = () => {
     setIsPlayerTurn,
     setDamageInfo
   );
+
+  // useEffect(() => {
+  //   const allEnemyCardsDead = enemyCards.every(
+  //     (card) => card.fightHealth === 0
+  //   );
+  //   const allMyCardsDead = myCards.every(
+  //     (card) => typeof card !== "number" && card.fightHealth === 0
+  //   );
+
+  //   if (allEnemyCardsDead) {
+  //     setIsShowResult(true);
+  //     setIsWin(true);
+  //   } else if (allMyCardsDead) {
+  //     setIsShowResult(true);
+  //     setIsWin(false);
+  //   }
+  // }, [enemyCards, myCards]);
 
   return (
     <Box
@@ -259,8 +204,32 @@ export const FightPage = () => {
         justifyContent: "space-between",
         flexDirection: "column",
         alignItems: "center",
+        position: "relative",
       }}
     >
+      {isShowResult && (
+        <Box
+          sx={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            position: "absolute",
+            top: "0",
+            left: "0",
+            backgroundColor: isWin === true ? "green" : "red",
+            zIndex: "100",
+          }}
+        >
+          {isWin === true ? (
+            <Typography>Win</Typography>
+          ) : (
+            <Typography>Loss</Typography>
+          )}
+        </Box>
+      )}
+
       <Box
         sx={{
           display: "flex",

@@ -30,7 +30,7 @@ export const router = createBrowserRouter([
             element: <HomePage />,
           },
           {
-            path: RouteList.Fight,
+            path: `${RouteList.PVE}/:fightId`,
             element: <FightPage />,
           },
           {

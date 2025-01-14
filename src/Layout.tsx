@@ -24,7 +24,7 @@ export const Layout = () => {
   const setGems = useGemStore((state) => state.setGems);
   const location = useLocation();
 
-  const isHideNavigation = location.pathname === `/${RouteList.Fight}`;
+  const isHideNavigation = location.pathname.startsWith(`/${RouteList.Fight}/`);
 
   useEffect(() => {
     setCards([
@@ -38,6 +38,7 @@ export const Layout = () => {
         bonusDamage: 0,
         damageCoef: 1.2,
         health: 48,
+        fightHealth: 48,
         bonusHealth: 0,
         healthCoef: 1.2,
         armor: 2,
@@ -66,6 +67,7 @@ export const Layout = () => {
         bonusDamage: 0,
         damageCoef: 1.2,
         health: 48,
+        fightHealth: 48,
         bonusHealth: 0,
         healthCoef: 1.3,
         armor: 12,
@@ -94,6 +96,7 @@ export const Layout = () => {
         bonusDamage: 0,
         damageCoef: 1.2,
         health: 48,
+        fightHealth: 48,
         bonusHealth: 0,
         healthCoef: 1.2,
         armor: 2,
