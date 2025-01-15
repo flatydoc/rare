@@ -8,6 +8,8 @@ import { EnergyProgressBar } from "./EnergyProgressBar";
 import cap from "../../../assets/cap.png";
 import { RouteList } from "../../../core/enums";
 import { useNavigate } from "react-router-dom";
+import { Modal } from "../../../components/ui/Modal";
+import { useState } from "react";
 
 export const UserStats = ({
   energy,
@@ -17,6 +19,8 @@ export const UserStats = ({
   balance: number;
 }) => {
   const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState("");
 
   const userStatsCards = [
     {
@@ -38,6 +42,13 @@ export const UserStats = ({
     },
   ];
 
+  const handleCardClick = (id: number, value: string) => {
+    if (id === 2 || id === 3) {
+      setModalContent(value);
+      setIsModalOpen(true);
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -55,7 +66,15 @@ export const UserStats = ({
 
         return (
           <Box
-            onClick={isCaps ? onClick : undefined}
+            onClick={
+              isCaps
+                ? onClick
+                : () =>
+                    handleCardClick(
+                      id,
+                      `${value}${isEnergy ? ` / ${MAX_ENERGY}` : ""}`
+                    )
+            }
             key={id}
             sx={{
               display: "flex",
@@ -65,7 +84,7 @@ export const UserStats = ({
               minHeight: "24px",
               padding: "12px",
               backgroundColor: "rgba(225, 225, 225, 0.2)",
-              borderRadius: "17px",
+              borderRadius: "20px",
               border: "1px solid rgb(15, 15, 15)",
               minWidth: "100px",
             }}
@@ -115,6 +134,7 @@ export const UserStats = ({
           </Box>
         );
       })}
+      {/* {isModalOpen && <Modal text={modalContent} />} */}
     </Box>
   );
 };

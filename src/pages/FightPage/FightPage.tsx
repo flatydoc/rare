@@ -1,6 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import { centerContentStyles } from "../../core/theme/common.style";
-import { ICard } from "../../core/types";
+import { IFightCard } from "../../core/types";
 import { FightCardsList } from "./components/FightCardsList";
 import { useEffect, useState } from "react";
 import { Popup } from "../../components/Popup";
@@ -12,13 +11,18 @@ import { useBackBtn } from "../../core/hooks/useBackBtn";
 import { getRandomDamage } from "../../core/utils/getRandomDamage";
 import { useEnemyAttack } from "../../core/hooks/useEnemyAttack";
 import { animateAttack } from "../../core/utils/animateAttack";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { PVERounds } from "../HomePage/constants";
+import { useUserStore } from "../../core/store/useUserStore";
+import { centerContentStyles } from "../../core/theme/common.style";
+import { RouteList } from "../../core/enums";
+import { elementEmojis, fractionEmojis } from "../SingleCardPage/constants";
+import { effectEmojis } from "../../core/constants/statusEffects";
 
 export const FightPage = () => {
   useBackBtn();
   const { fightId } = useParams<{ fightId: string }>();
-  const [enemyCards, setEnemyCards] = useState<ICard[]>([]);
+  const [enemyCards, setEnemyCards] = useState<IFightCard[]>([]);
 
   useEffect(() => {
     if (fightId) {
@@ -26,16 +30,36 @@ export const FightPage = () => {
         (round) => round.id === parseInt(fightId, 10)
       );
       if (round) {
-        setEnemyCards(round.enemyCards);
+        const enhancedCards = round.enemyCards.map((card) => ({
+          ...card,
+          fightHealth: card.health,
+          statusEffects: [
+            {
+              id: 1,
+              title: `Effect of ${card.fraction}`,
+              duration: null,
+              icon: fractionEmojis[card.fraction],
+            },
+            {
+              id: 2,
+              title: `Effect of ${card.element}`,
+              duration: null,
+              icon: elementEmojis[card.element],
+            },
+          ],
+        }));
+        setEnemyCards(enhancedCards);
       } else {
         console.error(`Round with id ${fightId} not found`);
       }
     }
-  }, [fightId]);
+  }, []);
 
+  const navigate = useNavigate();
   const cards = useCardStore((state) => state.cards);
+  const [reward, setReward] = useState<number>(0);
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
-  const [myCards, setMyCards] = useState<ICard[] | number[]>([1, 2, 3]);
+  const [myCards, setMyCards] = useState<IFightCard[] | number[]>([1, 2, 3]);
   const [isOpenSelectCardPopup, setIsOpenSelectCardPopup] = useState(false);
   const [isShowResult, setIsShowResult] = useState<boolean>(false);
   const [isWin, setIsWin] = useState<boolean | null>(false);
@@ -80,17 +104,21 @@ export const FightPage = () => {
   };
 
   const handleSelectEnemyCardId = (id: number) => {
-    if (!isFightAvailable || !isFight || !isPlayerTurn) return null;
-    setSelectedEnemyCardId(id);
+    if (!isFightAvailable || !isFight || !isPlayerTurn) return;
+    setSelectedEnemyCardId((prev) => (prev === id ? null : id));
   };
 
   const handleSelectMyCardId = (id: number) => {
-    if (!isFightAvailable || !isFight || !isPlayerTurn) return null;
-    setSelectedMyCardId(id);
+    if (!isFightAvailable || !isFight || !isPlayerTurn) return;
+    setSelectedMyCardId((prev) => (prev === id ? null : id));
   };
 
   const handleSelectCardForInsert = (id: number) => {
     setSelectedCardIdForInsert(id);
+  };
+
+  const handleReturnToHomePage = () => {
+    navigate(`${RouteList.Root}`);
   };
 
   const handleInsertCard = () => {
@@ -100,8 +128,25 @@ export const FightPage = () => {
       );
       if (selectedCard) {
         const newMyCards = [...myCards];
-        newMyCards[selectedSlotIndex] = selectedCard;
-        setMyCards(newMyCards as ICard[]);
+        newMyCards[selectedSlotIndex] = {
+          ...selectedCard,
+          fightHealth: selectedCard.health,
+          statusEffects: [
+            {
+              id: 1,
+              title: `Effect of ${selectedCard.fraction}`,
+              duration: null,
+              icon: fractionEmojis[selectedCard.fraction],
+            },
+            {
+              id: 2,
+              title: `Effect of ${selectedCard.element}`,
+              duration: null,
+              icon: elementEmojis[selectedCard.element],
+            },
+          ],
+        };
+        setMyCards(newMyCards as IFightCard[]);
         setIsOpenSelectCardPopup(false);
         setSelectedSlotIndex(null);
         setSelectedCardIdForInsert(null);
@@ -118,7 +163,7 @@ export const FightPage = () => {
     ) {
       const myCard = myCards.find(
         (card) => typeof card !== "number" && card.id === selectedMyCardId
-      ) as ICard;
+      ) as IFightCard;
 
       const attackingCardElement = document.getElementById(
         `card-${selectedMyCardId}`
@@ -140,19 +185,60 @@ export const FightPage = () => {
           });
 
           setEnemyCards(updatedEnemyCards);
-          setTimeout(() => setDamageInfo(null), 1000);
-          setReloadableCards((prev) => [...prev, selectedMyCardId]);
-          setSelectedEnemyCardId(null);
-          setSelectedMyCardId(null);
 
-          // Если все карты атаковали, передаем ход противнику
-          const aliveMyCards = myCards.filter(
-            (card) => typeof card !== "number" && card.fightHealth > 0
+          const updatedMyCards = myCards.map((card) => {
+            if (typeof card !== "number" && card.id === selectedMyCardId) {
+              return {
+                ...card,
+                statusEffects: [
+                  ...card.statusEffects,
+                  {
+                    id: 3,
+                    title: `Sleep`,
+                    duration: 1,
+                    icon: effectEmojis[3],
+                  },
+                ],
+              };
+            }
+            return card;
+          });
+
+          setMyCards(updatedMyCards as IFightCard[]);
+
+          const isVictory = updatedEnemyCards.every(
+            (card) => card.fightHealth === 0
           );
+          if (isVictory) {
+            setIsWin(true);
+            setIsShowResult(true);
+          } else {
+            setTimeout(() => setDamageInfo(null), 1000);
+            setReloadableCards((prev) => [...prev, selectedMyCardId]);
+            setSelectedEnemyCardId(null);
+            setSelectedMyCardId(null);
 
-          if (reloadableCards.length + 1 === aliveMyCards.length) {
-            setIsPlayerTurn(false);
-            setReloadableCards([]);
+            const aliveMyCards = myCards.filter(
+              (card) => typeof card !== "number" && card.fightHealth > 0
+            );
+
+            if (reloadableCards.length + 1 === aliveMyCards.length) {
+              const cardsWithoutSleepEffect = myCards.map((card) => {
+                if (typeof card !== "number") {
+                  return {
+                    ...card,
+                    statusEffects: card.statusEffects.filter(
+                      (effect) => effect.id !== 3
+                    ),
+                  };
+                }
+                return card;
+              });
+
+              setMyCards(cardsWithoutSleepEffect as IFightCard[]);
+              setIsPlayerTurn(false);
+              setReloadableCards([]);
+            }
           }
         });
       }
@@ -166,6 +252,18 @@ export const FightPage = () => {
       )
   );
 
+  useEffect(() => {
+    if (isWin && fightId) {
+      const round = PVERounds.find(
+        (round) => round.id === parseInt(fightId, 10)
+      );
+      if (round) {
+        setReward(round.reward);
+        useUserStore.getState().updatePVEProgress(round.id, round.reward);
+      }
+    }
+  }, [isWin, fightId]);
+
   useEnemyAttack(
     enemyCards,
     setMyCards,
@@ -174,25 +272,10 @@ export const FightPage = () => {
     isFight,
     isPlayerTurn,
     setIsPlayerTurn,
-    setDamageInfo
+    setDamageInfo,
+    setIsShowResult,
+    setIsWin
   );
-
-  // useEffect(() => {
-  //   const allEnemyCardsDead = enemyCards.every(
-  //     (card) => card.fightHealth === 0
-  //   );
-  //   const allMyCardsDead = myCards.every(
-  //     (card) => typeof card !== "number" && card.fightHealth === 0
-  //   );
-
-  //   if (allEnemyCardsDead) {
-  //     setIsShowResult(true);
-  //     setIsWin(true);
-  //   } else if (allMyCardsDead) {
-  //     setIsShowResult(true);
-  //     setIsWin(false);
-  //   }
-  // }, [enemyCards, myCards]);
 
   return (
     <Box
@@ -218,21 +301,72 @@ export const FightPage = () => {
             position: "absolute",
             top: "0",
             left: "0",
-            backgroundColor: isWin === true ? "green" : "red",
+            backdropFilter: `blur(8px)`,
+            backgroundColor: "rgba(25, 25, 25, 0.5)",
             zIndex: "100",
           }}
         >
           {isWin === true ? (
-            <Typography>Win</Typography>
+            <Box
+              sx={{
+                ...centerContentStyles,
+                flexDirection: "column",
+                gap: "24px",
+                p: "24px",
+                borderRadius: "20px",
+                border: "1px solid #000",
+                backgroundColor: "rgb(60, 60, 60)",
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: "24px",
+                  fontWeight: "700",
+                  color: colors.textColor,
+                }}
+              >
+                Your Win!
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: "24px",
+                  fontWeight: "700",
+                  color: colors.textColor,
+                }}
+              >
+                {`REWARD ${reward}`}
+              </Typography>
+              <MainButton onClick={handleReturnToHomePage}>
+                <Typography
+                  sx={{
+                    fontSize: "16px",
+                    fontWeight: "700",
+                    color: "#000",
+                  }}
+                >
+                  RETURN
+                </Typography>
+              </MainButton>
+            </Box>
           ) : (
-            <Typography>Loss</Typography>
+            <Typography
+              sx={{
+                fontSize: "24px",
+                fontWeight: "700",
+                color: colors.textColor,
+              }}
+            >
+              Your Loss!
+            </Typography>
           )}
         </Box>
       )}
-
       <Box
         sx={{
           display: "flex",
+          gap: "24px",
+          flexDirection: "column",
+          alignItems: "center",
           width: "100%",
           p: "24px 12px 24px 12px",
         }}
@@ -245,41 +379,27 @@ export const FightPage = () => {
           damageInfo={damageInfo}
         />
       </Box>
+      <Typography
+        sx={{
+          fontSize: "18px",
+          fontWeight: "700",
+          color: colors.textColor,
+        }}
+      >
+        {isFight ? (isPlayerTurn ? "YOUR TURN" : "ENEMY'S TURN") : ""}
+      </Typography>
       <Box
         sx={{
-          minHeight: "50%",
           width: "100%",
           backgroundColor: "rgba(60, 60, 60, 0.5)",
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
-          p: "64px 12px 24px 12px",
+          p: "24px 12px 24px 12px",
           display: "flex",
           flexDirection: "column",
-          gap: "48px",
-          position: "relative",
+          gap: "24px",
         }}
       >
-        <Box
-          sx={{
-            ...centerContentStyles,
-            position: "absolute",
-            top: "-40px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            backgroundColor: "rgb(60, 60, 60)",
-            borderRadius: "50%",
-            width: "80px",
-            height: "80px",
-          }}
-        >
-          <Typography
-            sx={{
-              fontSize: "36px",
-            }}
-          >
-            ⚔️
-          </Typography>
-        </Box>
         <FightCardsList
           reloadableCards={reloadableCards}
           isMyCardList

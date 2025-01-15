@@ -31,7 +31,7 @@ export const Root = () => {
     telegramId: 123,
     username: "user",
     balance: 8000,
-    energy: 81,
+    energy: 100,
     exp: 50,
     level: 2,
     cards: [101, 102],

@@ -1,6 +1,7 @@
 import { GemKit, Rarity } from "../types";
 
 export const MAX_ENERGY = 100;
+export const ENERGY_FOR_PVE = 10;
 export const INSERT_GEM_PRICE = 1000;
 export const UPDATE_GEM_PRICE = 1000;
 export const MAX_CARD_LEVEL = 30;

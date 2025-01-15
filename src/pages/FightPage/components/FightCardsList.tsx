@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
-import { ICard } from "../../../core/types";
 import { SingleFightCard } from "./SingleFightCard";
 import { EmptyCardSlot } from "./EmptyCardSlot";
+import { IFightCard } from "../../../core/types";
 
 type DamageInfo = {
   id: number;
@@ -17,7 +17,7 @@ export const FightCardsList = ({
   reloadableCards,
   damageInfo,
 }: {
-  cards: ICard[] | number[];
+  cards: IFightCard[] | number[];
   event: (id: number) => void;
   selectedCardId: number | null;
   isMyCardList?: boolean;

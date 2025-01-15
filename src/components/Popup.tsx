@@ -1,19 +1,28 @@
-import { Box, IconButton, SwipeableDrawer } from "@mui/material";
+import { Box, IconButton, SwipeableDrawer, Typography } from "@mui/material";
 import { colors } from "../core/theme/colors";
 import NavigateBeforeOutlinedIcon from "@mui/icons-material/NavigateBeforeOutlined";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 
 export const Popup = ({
   isShow,
   setIsShow,
   children,
+  eventOnBack,
   eventOnClose,
+  title,
 }: {
   isShow: boolean;
   setIsShow: (isShow: boolean) => void;
   children: React.ReactNode;
+  eventOnBack?: () => void;
   eventOnClose?: () => void;
+  title?: string;
 }) => {
   const DRAWER_BLEEDING = 26;
+
+  const handleBack = () => {
+    if (eventOnBack) eventOnBack();
+  };
 
   const handleClose = () => {
     if (eventOnClose) eventOnClose();
@@ -37,8 +46,8 @@ export const Popup = ({
       sx={{
         "& .MuiDrawer-paper": {
           overflow: "visible",
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
+          borderTopLeftRadius: !title ? 20 : 0,
+          borderTopRightRadius: !title ? 20 : 0,
           display: "flex",
           flexDirection: "column",
           backgroundColor: "rgba(35, 35, 35)",
@@ -62,17 +71,52 @@ export const Popup = ({
           },
         }}
       >
-        <Box
-          className="drawer"
-          sx={{
-            width: 120,
-            height: 4,
-            backgroundColor: "#FFFFFF1A",
-            borderRadius: 3,
-            transition: "background-color 0.3s ease",
-          }}
-        />
+        {!title && (
+          <Box
+            className="drawer"
+            sx={{
+              width: 120,
+              height: 4,
+              backgroundColor: "#FFFFFF1A",
+              borderRadius: 3,
+              transition: "background-color 0.3s ease",
+            }}
+          />
+        )}
       </Box>
+      {title && (
+        <Box
+          sx={{
+            p: "0 16px 18px 16px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "12px",
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: "24px",
+              fontWeight: "600",
+              color: colors.textColor,
+            }}
+          >
+            {title}
+          </Typography>
+          {eventOnClose && (
+            <Box onClick={handleClose}>
+              <IconButton
+                sx={{
+                  color: colors.secondaryTextColor,
+                }}
+              >
+                <CloseRoundedIcon />
+              </IconButton>
+            </Box>
+          )}
+        </Box>
+      )}
+
       <Box
         sx={{
           height: "100%",
@@ -85,10 +129,10 @@ export const Popup = ({
           overflowY: "auto",
         }}
       >
-        {eventOnClose && (
+        {eventOnBack && (
           <Box
             sx={{ position: "absolute", top: "0", left: "16px" }}
-            onClick={handleClose}
+            onClick={handleBack}
           >
             <IconButton
               sx={{
@@ -99,6 +143,7 @@ export const Popup = ({
             </IconButton>
           </Box>
         )}
+
         {children}
       </Box>
     </SwipeableDrawer>

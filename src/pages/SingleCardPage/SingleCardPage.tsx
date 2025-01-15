@@ -875,7 +875,7 @@ export const SingleCardPage = () => {
       <Popup
         isShow={isOpenGemsPopup}
         setIsShow={setIsOpenGemsPopup}
-        eventOnClose={selectedGem ? () => setSelectedGem(null) : undefined}
+        eventOnBack={selectedGem ? () => setSelectedGem(null) : undefined}
       >
         <GemsPopup
           gems={availableGems}

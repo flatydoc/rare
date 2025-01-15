@@ -3,7 +3,7 @@ import { CardClass, Element, Fraction } from "../../core/types";
 export const MAX_GEM_CHAR_VALUE = 100;
 export const MAX_CARD_CHAR_VALUE = 1000;
 
-export const elementEmojis: Record<Element, string | null> = {
+export const elementEmojis: Record<Element, string> = {
   flame: "🔥",
   frost: "❄️",
   shock: "⚡️",

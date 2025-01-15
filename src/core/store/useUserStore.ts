@@ -9,6 +9,7 @@ interface UserState {
   getCaseCountById: (caseId: number) => number;
   addCard: (cardId: number) => void;
   removeCard: (cardId: number) => void;
+  updatePVEProgress: (roundId: number, reward: number) => void;
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
@@ -52,6 +53,19 @@ export const useUserStore = create<UserState>((set, get) => ({
         ? {
             ...state.user,
             cards: state.user.cards.filter((id) => id !== cardId),
+          }
+        : null,
+    })),
+  updatePVEProgress: (roundId: number, reward: number) =>
+    set((state) => ({
+      user: state.user
+        ? {
+            ...state.user,
+            completedPVE:
+              state.user.completedPVE === null
+                ? roundId
+                : Math.max(state.user.completedPVE, roundId),
+            balance: state.user.balance + reward,
           }
         : null,
     })),

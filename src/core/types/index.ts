@@ -67,7 +67,6 @@ export interface ICard {
   bonusDamage: number;
   damageCoef: number;
   health: number;
-  fightHealth: number;
   bonusHealth: number;
   healthCoef: number;
   armor: number;
@@ -85,6 +84,19 @@ export interface ICard {
   sockets: number;
   element: Element;
   class: CardClass;
+}
+
+export interface IFightCard extends ICard {
+  fightHealth: number;
+  statusEffects: IStatusEffect[];
+}
+
+export interface IStatusEffect {
+  id: number;
+  title?: string;
+  text?: string;
+  duration: number | null;
+  icon: string;
 }
 
 export interface ICardPrototype {

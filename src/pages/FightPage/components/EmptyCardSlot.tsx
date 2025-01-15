@@ -20,44 +20,51 @@ export const EmptyCardSlot = ({
     <Box
       sx={{
         width: "100%",
-        borderRadius: "20px",
-        boxShadow: "none",
-        backgroundColor: "rgba(60, 60, 60, 0.5)",
       }}
       onClick={handelClick}
     >
       <Box
         sx={{
           ...centerContentStyles,
-          overflow: "hidden",
           width: "100%",
-          maxWidth: "240px",
-          borderRadius: "20px",
-          padding: "10px",
           aspectRatio: "1",
-          boxShadow: `0 1px 2px 0 inset #d3d3d3`,
-          background: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.8))`,
-          backgroundSize: "cover",
+          maxWidth: "240px",
         }}
       >
         <Box
           sx={{
             ...centerContentStyles,
-            width: "72px",
-            height: "72px",
+            width: "48px",
+            height: "48px",
             borderRadius: "50%",
             backgroundColor: "rgba(60, 60, 60, 0.7)",
             border: `1px dashed ${colors.secondaryTextColor}`,
             cursor: "pointer",
+            position: "relative",
           }}
         >
+          <Box
+            sx={{
+              position: "absolute",
+              zIndex: "-1",
+              bottom: "10px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              width: "50%",
+              height: "10%",
+              borderRadius: "20px",
+              backgroundColor: "rgba(255, 255, 255, 0.5)",
+              filter: "blur(12px)",
+              boxShadow: `0px 0px 20px ${"rgba(255, 255, 255, 0.5)"}`,
+            }}
+          />
           <AddIcon
             sx={{
-              width: "64px",
-              height: "64px",
+              width: "32px",
+              height: "32px",
               color: colors.textColor,
               opacity: 0.4,
-              transition: "opacity 0.3s ease-in-out",
+              transition: "opacity 0.2s ease-in-out",
               "&:hover": {
                 opacity: 1,
               },
@@ -71,7 +78,7 @@ export const EmptyCardSlot = ({
           flexDirection: "column",
           p: "12px 6px",
           gap: "12px",
-          height: "94px",
+          height: "74px",
         }}
       />
     </Box>

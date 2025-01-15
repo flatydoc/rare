@@ -1,14 +1,12 @@
 import { Box, Typography } from "@mui/material";
 import { centerContentStyles } from "../../../core/theme/common.style";
-import { ICard } from "../../../core/types";
+import { IFightCard } from "../../../core/types";
 import { colors } from "../../../core/theme/colors";
 import { getCardImage } from "../../../core/utils/getCardImage";
 import damage from "../../../assets/damage.png";
 import armor from "../../../assets/armor.png";
-import hp from "../../../assets/hp.png";
-import { elementEmojis, fractionEmojis } from "../../SingleCardPage/constants";
-import { getIconByCardClass } from "../../../core/utils/geIconByCardClass";
-
+import { getRarityColor } from "../../../core/utils/getRarityColor";
+import tombstone from "../../../assets/tombstone.png";
 type DamageInfo = {
   id: number;
   damage: number;
@@ -22,7 +20,7 @@ export const SingleFightCard = ({
   reloadableCards,
   damageInfo,
 }: {
-  card: ICard;
+  card: IFightCard;
   isSelected?: boolean;
   onClick?: (id: number) => void;
   isMyCard?: boolean;
@@ -45,25 +43,25 @@ export const SingleFightCard = ({
         onClick={handleClick}
         sx={{
           width: "100%",
-          borderRadius: "20px",
-          boxShadow:
-            isSelected && !isReload ? `0 0 5px 1px ${colors.primary}` : "none",
-          //   backgroundColor: "rgba(60, 60, 60, 0.8)",
           position: "relative",
           pointerEvents: isReload || isDead ? "none" : "auto",
-          //   border: "1px solid #000",
+          transition: "transform 0.3s ease",
+          transform: isSelected
+            ? isMyCard
+              ? "translateY(-40px)"
+              : "translateY(40px)"
+            : "none",
         }}
       >
         {isReload && (
           <Box
             sx={{
               position: "absolute",
-              top: "-100px",
+              top: "0",
               right: "0px",
               width: "100%",
               height: "100%",
-              //   backdropFilter: `grayscale(1)`,
-              zIndex: 1,
+              zIndex: 10,
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
@@ -71,35 +69,49 @@ export const SingleFightCard = ({
           >
             <Box
               sx={{
-                position: "relative",
-                height: "100%",
+                position: "absolute",
+                top: "-100px",
+                right: "0px",
                 width: "100%",
-                overflow: "hidden",
+                height: "100%",
+                zIndex: 1,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
               }}
             >
-              {[...Array(3)].map((_, index) => {
-                const fontSize = 14 + index * 6; // Увеличение разбежки в размерах букв
+              <Box
+                sx={{
+                  position: "relative",
+                  height: "100%",
+                  width: "100%",
+                  overflow: "hidden",
+                }}
+              >
+                {[...Array(3)].map((_, index) => {
+                  const fontSize = 14 + index * 6;
 
-                return (
-                  <Box
-                    key={index}
-                    sx={{
-                      position: "absolute",
-                      fontSize: `${fontSize}px`, // Увеличение разбежки в размере
-                      fontWeight: "bold",
-                      color: "rgba(255, 255, 255, 0.8)",
-                      animation: `floatZ 2s ease-in-out infinite`,
-                      animationDelay: `${0.5 + index * 0.5}s`, // Задержка начала анимации
-                      top: "50%",
-                      left: "50%",
-                      transform: `translate(-50%, -50%)`, // Начальная позиция
-                      opacity: 0, // Начальная прозрачность
-                    }}
-                  >
-                    Z
-                  </Box>
-                );
-              })}
+                  return (
+                    <Box
+                      key={index}
+                      sx={{
+                        position: "absolute",
+                        fontSize: `${fontSize}px`,
+                        fontWeight: "bold",
+                        color: "rgba(255, 255, 255, 0.8)",
+                        animation: `floatZ 2s ease-in-out infinite`,
+                        animationDelay: `${0.5 + index * 0.5}s`,
+                        top: "50%",
+                        left: "50%",
+                        transform: `translate(-50%, -50%)`,
+                        opacity: 0,
+                      }}
+                    >
+                      Z
+                    </Box>
+                  );
+                })}
+              </Box>
             </Box>
           </Box>
         )}
@@ -118,20 +130,6 @@ export const SingleFightCard = ({
             -{damageInfo.damage}
           </Typography>
         )}
-        {isDead && (
-          <Box
-            sx={{
-              position: "absolute",
-              top: "0",
-              left: "0",
-              width: "100%",
-              height: "100%",
-              borderRadius: "20px",
-              zIndex: 1,
-              backgroundColor: "rgba(255, 0, 0, 0.1)",
-            }}
-          />
-        )}
         <Box
           id={`card-${card.id}`}
           sx={{
@@ -139,44 +137,76 @@ export const SingleFightCard = ({
             flexDirection: "column",
             width: "100%",
             maxWidth: "240px",
-            borderRadius: "20px",
             padding: "10px",
             aspectRatio: "1",
             willChange: "transform, opacity",
           }}
         >
           <img
-            src={getCardImage(card.number, card.rarity)}
+            src={isDead ? tombstone : getCardImage(card.number, card.rarity)}
             style={{
               objectFit: "contain",
               width: "100%",
               height: "100%",
+              filter: isReload ? `grayscale(1)` : "none",
             }}
           />
-          {/* <Box
-            sx={{
-              position: "absolute",
-              zIndex: "-1",
-              bottom: "10px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              width: "50%",
-              height: "10%",
-              borderRadius: "20px",
-              backgroundColor: `${getRarityColor(card.rarity)}99`,
-              filter: "blur(12px)",
-              boxShadow: `0px 0px 20px ${getRarityColor(card.rarity)}99`,
-            }}
-          /> */}
         </Box>
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
-            p: "0 6px 12px 6px",
+            p: "6px",
             gap: "12px",
+            position: "relative",
           }}
         >
+          {!isDead && (
+            <Box
+              sx={{
+                position: "absolute",
+                zIndex: "-1",
+                top: "-10px",
+                left: "50%",
+                transform: "translateX(-50%)",
+                width: "50%",
+                height: "10%",
+                borderRadius: "20px",
+                backgroundColor: !isReload
+                  ? `${getRarityColor(card.rarity)}99`
+                  : `${getRarityColor("common")}99`,
+                filter: "blur(12px)",
+                boxShadow: `0px 0px 20px ${
+                  !isReload
+                    ? `${getRarityColor(card.rarity)}99`
+                    : `${getRarityColor("common")}99`
+                }`,
+              }}
+            />
+          )}
+          <Box
+            sx={{
+              position: "absolute",
+              top: "-10px",
+              left: "6px",
+              width: "100%",
+              height: "10px",
+              zIndex: "2",
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+            }}
+          >
+            {card.statusEffects.map((effect) => (
+              <Typography
+                sx={{
+                  fontSize: "10px",
+                }}
+              >
+                {effect.icon}
+              </Typography>
+            ))}
+          </Box>
           <Box
             sx={{
               width: "100%",
@@ -261,7 +291,7 @@ export const SingleFightCard = ({
                           `,
                 }}
               >
-                {card.health}
+                {card.health.toFixed(0)}
               </Typography>
             </Box>
           </Box>

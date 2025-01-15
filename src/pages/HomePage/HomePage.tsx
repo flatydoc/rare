@@ -1,6 +1,6 @@
-import { Box, Typography } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import { Header } from "./components/Header";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Popup } from "../../components/Popup";
 import {
   battleMods,
@@ -19,40 +19,50 @@ import { RouteList } from "../../core/enums";
 import { centerContentStyles } from "../../core/theme/common.style";
 import full_energy from "../../assets/energy-full.png";
 import { SingleCard } from "../CardsPage/components/SingleCard";
+import disabled_pattern from "../../assets/disabled_pattern.png";
+import { ENERGY_FOR_PVE, MAX_ENERGY } from "../../core/constants";
+import { EnergyProgressBar } from "./components/EnergyProgressBar";
+import lock from "../../assets/lock.png";
+import AddRoundedIcon from "@mui/icons-material/AddRounded";
 
 export const HomePage = () => {
   const [isShowEarnPopup, setIsShowEarnPopup] = useState<boolean>(false);
   const [isShowSelectPVEBattlePopup, setIsShowSelectPVEBattlePopup] =
     useState<boolean>(false);
-  const [isShowFightSelectPopup, setIsShowFightSelectPopup] =
+  const [isShowFightModeSelectPopup, setIsShowFightModeSelectPopup] =
     useState<boolean>(false);
   const user = useUserStore((state) => state.user);
   const [claimedRewards, setClaimedRewards] = useState<boolean[]>(
     rewardByLeague.map(() => false)
   );
+  const updateBalance = useUserStore((state) => state.updateBalance);
+  const updateEnergy = useUserStore((state) => state.updateEnergy);
 
   const navigate = useNavigate();
-
-  const handleNav = (id: number) => {
-    navigate(`/${RouteList.PVE}/${id}`);
-  };
 
   if (!user) {
     return <div>Loading...</div>;
   }
 
-  const handldeSelectBattle = () => {
+  const handleOpenSelectBattlePopup = (energy: number) => {
+    if (user.energy < energy) return;
     setIsShowSelectPVEBattlePopup(true);
-    setIsShowFightSelectPopup(false);
+    setIsShowFightModeSelectPopup(false);
   };
+
+  const handleStartFight = (id: number) => {
+    if (user.energy < ENERGY_FOR_PVE) return;
+    updateEnergy(ENERGY_FOR_PVE);
+    navigate(`/${RouteList.PVE}/${id}`);
+  };
+
+  const progress = (Number(user.energy) / MAX_ENERGY) * 100;
 
   const handleClaimReward = (
     rewardType: RewardType,
     rewardValue?: number,
     index?: number
   ) => {
-    const { updateBalance } = useUserStore.getState();
-
     if (rewardType === "inGame" && rewardValue) {
       updateBalance(user.balance + rewardValue);
     }
@@ -69,6 +79,27 @@ export const HomePage = () => {
   const currentLeagueIndex = rewardByLeague.findIndex(
     (reward) => reward.league === getLeagueByLevel(user.level)
   );
+
+  const isRoundAccessible = (roundId: number): boolean => {
+    return roundId === (user.completedPVE ?? 0) + 1;
+  };
+
+  const isRoundCompleted = (roundId: number): boolean => {
+    return roundId <= (user.completedPVE ?? 0);
+  };
+
+  // const refs = useRef<Record<number, HTMLDivElement | null>>({});
+  // useEffect(() => {
+  //   if (isShowSelectPVEBattlePopup) {
+  //     const accessibleRoundId = (user.completedPVE ?? 0) + 1;
+  //     if (refs.current[accessibleRoundId]) {
+  //       refs.current[accessibleRoundId].scrollIntoView({
+  //         behavior: "smooth",
+  //         block: "center",
+  //       });
+  //     }
+  //   }
+  // }, [isShowSelectPVEBattlePopup, user.completedPVE]);
 
   return (
     <Box
@@ -164,7 +195,7 @@ export const HomePage = () => {
         </Box>
       </Box>
       <Box>
-        <MainButton onClick={() => setIsShowFightSelectPopup(true)}>
+        <MainButton onClick={() => setIsShowFightModeSelectPopup(true)}>
           <Typography
             sx={{
               fontSize: "14px",
@@ -232,7 +263,7 @@ export const HomePage = () => {
                       minHeight: "72px",
                       p: "16px",
                       backgroundColor: "rgba(225, 225, 225, 0.2)",
-                      borderRadius: "17px",
+                      borderRadius: "20px",
                       border: "1px solid rgb(15, 15, 15)",
                       width: "100%",
                     }}
@@ -317,8 +348,8 @@ export const HomePage = () => {
         </Box>
       </Popup>
       <Popup
-        isShow={isShowFightSelectPopup}
-        setIsShow={setIsShowFightSelectPopup}
+        isShow={isShowFightModeSelectPopup}
+        setIsShow={setIsShowFightModeSelectPopup}
       >
         <Box
           sx={{
@@ -346,8 +377,72 @@ export const HomePage = () => {
               color: colors.secondaryTextColor,
             }}
           >
-            Collect rewards according to your league
+            Select battle mode
           </Typography>
+
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              width: "fit-content",
+              padding: "12px",
+              backgroundColor: "rgba(225, 225, 225, 0.2)",
+              borderRadius: "20px",
+              border: "1px solid rgb(15, 15, 15)",
+              margin: "0 auto",
+            }}
+          >
+            <img src={full_energy} height={24} />
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                gap: "4px",
+                alignItems: "center",
+                width: "100px",
+              }}
+            >
+              <Typography
+                sx={{
+                  color: colors.textColor,
+                  fontSize: "12px",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                {user.energy}
+                <span
+                  style={{
+                    color: colors.secondaryTextColor,
+                    fontSize: "10px",
+                  }}
+                >
+                  /{MAX_ENERGY}
+                </span>
+              </Typography>
+              <EnergyProgressBar progress={progress} />
+            </Box>
+
+            <IconButton
+              sx={{
+                backgroundColor: "rgba(225, 225, 225, 0.2)",
+                color: colors.textColor,
+                width: "24px",
+                height: "24px",
+                "&:hover": {
+                  backgroundColor: "rgba(225, 225, 225, 0.2)", // Остается красным при наведении
+                },
+                "&:focus": {
+                  backgroundColor: "rgba(225, 225, 225, 0.2)", // Остается красным при фокусе
+                },
+              }}
+            >
+              <AddRoundedIcon />
+            </IconButton>
+          </Box>
 
           <Box
             sx={{
@@ -358,7 +453,11 @@ export const HomePage = () => {
           >
             {battleMods.map((mode) => (
               <Box
-                onClick={mode.isAvailable ? handldeSelectBattle : undefined}
+                onClick={
+                  mode.isAvailable
+                    ? () => handleOpenSelectBattlePopup(mode.energy)
+                    : undefined
+                }
                 sx={{
                   ...centerContentStyles,
                   position: "relative",
@@ -368,6 +467,7 @@ export const HomePage = () => {
                   borderRadius: "20px",
                   padding: "16px",
                   backgroundColor: "rgba(60, 60, 60, 0.8)",
+                  overflow: "hidden",
                 }}
               >
                 {!mode.isAvailable && (
@@ -378,10 +478,27 @@ export const HomePage = () => {
                       left: "0",
                       height: "100%",
                       width: "100%",
+                      overflow: "hidden",
                       backdropFilter: "blur(1px)",
+                      backgroundImage: `url(${disabled_pattern})`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor: "rgba(0, 0, 0, 0.5)",
                     }}
-                  />
+                  >
+                    <Typography
+                      sx={{
+                        fontSize: "18px",
+                        fontWeight: "600",
+                        color: colors.secondaryTextColor,
+                      }}
+                    >
+                      Cooming soon
+                    </Typography>
+                  </Box>
                 )}
+
                 <Box
                   sx={{
                     width: "100%",
@@ -405,7 +522,8 @@ export const HomePage = () => {
                       padding: "4px 8px",
                       gap: "2px",
                       borderRadius: "20px",
-                      backgroundColor: colors.green,
+                      backgroundColor:
+                        user.energy < mode.energy ? colors.red : colors.green,
                     }}
                   >
                     <Typography
@@ -437,6 +555,8 @@ export const HomePage = () => {
       <Popup
         isShow={isShowSelectPVEBattlePopup}
         setIsShow={setIsShowSelectPVEBattlePopup}
+        title="Challenge the bot and earn"
+        eventOnClose={() => setIsShowSelectPVEBattlePopup(false)}
       >
         <Box
           sx={{
@@ -446,63 +566,110 @@ export const HomePage = () => {
             gap: "16px",
           }}
         >
-          {PVERounds.map((round) => (
-            <Box
-              onClick={() => handleNav(round.id)}
-              sx={{
-                width: "100%",
-                padding: "16px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "rgba(60, 60, 60, 0.8)",
-                borderRadius: "20px",
-                gap: "20px",
-              }}
-            >
+          {PVERounds.map((round) => {
+            const accessible = isRoundAccessible(round.id);
+            const completed = isRoundCompleted(round.id);
+            const isAvailable = accessible && !completed;
+            return (
               <Box
+                // ref={(el: HTMLDivElement | null) =>
+                //   (refs.current[round.id] = el)
+                // }
+                key={round.id}
+                onClick={() => isAvailable && handleStartFight(round.id)}
                 sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
                   width: "100%",
+                  padding: "16px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "rgba(60, 60, 60, 0.8)",
+                  borderRadius: "20px",
+                  gap: "20px",
+                  position: "relative",
+                  pointerEvents: isAvailable ? "auto" : "none",
+                  overflow: "hidden",
                 }}
               >
-                <Typography
+                {!isAvailable && (
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: "0",
+                      left: "0",
+                      height: "100%",
+                      width: "100%",
+                      overflow: "hidden",
+                      backdropFilter: "blur(1px)",
+                      backgroundImage: !completed
+                        ? `url(${disabled_pattern})`
+                        : "none",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor: "rgba(0, 0, 0, 0.5)",
+                      zIndex: "100",
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontSize: "18px",
+                        fontWeight: "600",
+                        color: completed
+                          ? colors.green
+                          : colors.secondaryTextColor,
+                      }}
+                    >
+                      {completed && "Completed"}
+                    </Typography>
+                    {!completed && <img src={lock} width={64} />}
+                    <img />
+                  </Box>
+                )}
+                <Box
                   sx={{
-                    fontSize: "16px",
-                    fontWeight: "600",
-                    color: colors.textColor,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    width: "100%",
                   }}
                 >
-                  {round.name}
-                </Typography>
-                <Typography
-                  sx={{
-                    fontSize: "16px",
-                    fontWeight: "600",
-                    color: colors.textColor,
-                  }}
-                >
-                  {round.reward}
-                </Typography>
-              </Box>
+                  <Typography
+                    sx={{
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      color: colors.textColor,
+                    }}
+                  >
+                    {round.name}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      color: colors.textColor,
+                    }}
+                  >
+                    {round.reward}
+                  </Typography>
+                </Box>
 
-              <Box
-                sx={{
-                  width: "100%",
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "center",
-                }}
-              >
-                {round.enemyCards.map((card) => (
-                  <SingleCard card={card} />
-                ))}
+                <Box
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    gap: "12px",
+                    alignItems: "center",
+                  }}
+                >
+                  {round.enemyCards.map((card) => (
+                    <SingleCard key={card.id} card={card} />
+                  ))}
+                </Box>
               </Box>
-            </Box>
-          ))}
+            );
+          })}
         </Box>
       </Popup>
     </Box>
