@@ -19,6 +19,9 @@ import { RouteList } from "../../core/enums";
 import { createStatusEffect } from "../../core/utils/createStatusEffects";
 import { StatusEffectId } from "../../core/enums/statusEffects";
 import { generateDefaultStatusEffects } from "./utils/generateDefaultStatusEffects";
+import { getFractionMultiplier } from "./utils/getFractionMultiplier";
+import { canApplyStatusEffect } from "./utils/canApplyStatusEffect";
+import { getElementalDamageReduction } from "./utils/getElementalDamageReduction";
 
 export const FightPage = () => {
   useBackBtn();
@@ -66,6 +69,7 @@ export const FightPage = () => {
   const [damageInfo, setDamageInfo] = useState<{
     id: number;
     damage: number;
+    isCrit?: boolean;
   } | null>(null);
 
   const [selectedCardIdForInsert, setSelectedCardIdForInsert] = useState<
@@ -158,14 +162,43 @@ export const FightPage = () => {
         animateAttack(attackingCardElement, targetCardElement, () => {
           const updatedEnemyCards = enemyCards.map((card) => {
             if (card.id === selectedEnemyCardId) {
-              const rawDamage = getRandomDamage(myCard.damage);
-              const damageAfterArmor = Math.max(0, rawDamage - card.armor);
+              let rawDamage = getRandomDamage(myCard.damage);
+
+              // Учет шанса критического урона для фракции "орки"
+              let isCrit = false;
+              if (myCard.fraction === "orcs" && Math.random() <= 0.3) {
+                rawDamage *= 1.5;
+                isCrit = true;
+              }
+
+              // Учет фракционных модификаторов
+              const damageMultiplier = getFractionMultiplier(
+                myCard.fraction,
+                card.fraction
+              );
+              const adjustedDamage = rawDamage * damageMultiplier;
+
+              // Учет уменьшения урона от элементов
+              const elementalReduction = getElementalDamageReduction(
+                card.fraction,
+                myCard.element || "simple"
+              );
+              const damageAfterElementReduction =
+                adjustedDamage * (1 - elementalReduction);
+
+              // Учет брони цели
+              const damageAfterArmor = Math.max(
+                0,
+                damageAfterElementReduction - card.armor
+              );
               const newHealth = Math.max(
                 0,
                 card.fightHealth - damageAfterArmor
               );
-              setDamageInfo({ id: card.id, damage: damageAfterArmor });
 
+              setDamageInfo({ id: card.id, damage: damageAfterArmor, isCrit });
+
+              // Проверка и применение статус-эффекта
               if (myCard.element && myCard.element !== "simple") {
                 const effectKey =
                   myCard.element.charAt(0).toUpperCase() +
@@ -173,29 +206,34 @@ export const FightPage = () => {
                 const effectId =
                   StatusEffectId[effectKey as keyof typeof StatusEffectId];
 
-                const existingEffectIndex = card.statusEffects.findIndex(
-                  (effect) => effect.id === effectId
-                );
-
-                if (existingEffectIndex !== -1) {
-                  const updatedEffects = card.statusEffects.map(
-                    (effect, index) =>
-                      index === existingEffectIndex
-                        ? { ...effect, duration: effect.duration + 2 }
-                        : effect
+                // Проверка на возможность применения эффекта
+                if (canApplyStatusEffect(card.fraction, effectId)) {
+                  const existingEffectIndex = card.statusEffects.findIndex(
+                    (effect) => effect.id === effectId
                   );
-                  return {
-                    ...card,
-                    fightHealth: newHealth,
-                    statusEffects: updatedEffects,
-                  };
-                } else {
-                  const newStatusEffect = createStatusEffect(effectId, 2);
-                  return {
-                    ...card,
-                    fightHealth: newHealth,
-                    statusEffects: [...card.statusEffects, newStatusEffect],
-                  };
+
+                  if (existingEffectIndex !== -1) {
+                    // Увеличение продолжительности существующего эффекта
+                    const updatedEffects = card.statusEffects.map(
+                      (effect, index) =>
+                        index === existingEffectIndex
+                          ? { ...effect, duration: effect.duration + 2 }
+                          : effect
+                    );
+                    return {
+                      ...card,
+                      fightHealth: newHealth,
+                      statusEffects: updatedEffects,
+                    };
+                  } else {
+                    // Добавление нового статус-эффекта
+                    const newStatusEffect = createStatusEffect(effectId, 2);
+                    return {
+                      ...card,
+                      fightHealth: newHealth,
+                      statusEffects: [...card.statusEffects, newStatusEffect],
+                    };
+                  }
                 }
               }
 
@@ -278,12 +316,10 @@ export const FightPage = () => {
         });
       };
 
-      // Обновляем статус-эффекты у врагов
       setEnemyCards((prevEnemyCards) =>
         updateStatusEffectsForCards(prevEnemyCards)
       );
 
-      // Обновляем статус-эффекты у моих карт
       setMyCards(
         (prevMyCards) =>
           updateStatusEffectsForCards(

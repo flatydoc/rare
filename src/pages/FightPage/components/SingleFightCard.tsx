@@ -7,9 +7,11 @@ import damage from "../../../assets/damage.png";
 import armor from "../../../assets/armor.png";
 import { getRarityColor } from "../../../core/utils/getRarityColor";
 import tombstone from "../../../assets/tombstone.png";
+
 type DamageInfo = {
   id: number;
   damage: number;
+  isCrit?: boolean;
 } | null;
 
 export const SingleFightCard = ({
@@ -116,19 +118,36 @@ export const SingleFightCard = ({
           </Box>
         )}
         {damageInfo?.id === card.id && (
-          <Typography
+          <Box
             sx={{
+              ...centerContentStyles,
+              gap: "4px",
               position: "absolute",
               top: "20px",
               right: "0px",
-              fontSize: "24px",
-              fontWeight: "600",
-              color: colors.red,
               animation: "damagePopup 1s ease-out",
             }}
           >
-            -{damageInfo.damage}
-          </Typography>
+            <Typography
+              sx={{
+                fontSize: "24px",
+                fontWeight: "600",
+                color: colors.red,
+              }}
+            >
+              -{damageInfo.damage.toFixed(0)}
+            </Typography>
+            {damageInfo.isCrit && (
+              <Typography
+                sx={{
+                  fontSize: "24px",
+                  fontWeight: "600",
+                }}
+              >
+                💥
+              </Typography>
+            )}
+          </Box>
         )}
         <Box
           id={`card-${card.id}`}
@@ -238,7 +257,9 @@ export const SingleFightCard = ({
                 sx={{
                   width: `${(damageInfo.damage / card.health) * 100}%`,
                   height: "100%",
-                  backgroundColor: "rgb(255, 230, 0)",
+                  backgroundColor: damageInfo?.isCrit
+                    ? "rgb(255, 230, 0)"
+                    : "rgba(225, 225, 225, 0.7)",
                 }}
               />
             )}

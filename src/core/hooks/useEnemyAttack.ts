@@ -4,6 +4,9 @@ import { getRandomDamage } from "../utils/getRandomDamage";
 import { animateAttack } from "../utils/animateAttack";
 import { createStatusEffect } from "../utils/createStatusEffects";
 import { StatusEffectId } from "../enums/statusEffects";
+import { getFractionMultiplier } from "../../pages/FightPage/utils/getFractionMultiplier";
+import { canApplyStatusEffect } from "../../pages/FightPage/utils/canApplyStatusEffect";
+import { getElementalDamageReduction } from "../../pages/FightPage/utils/getElementalDamageReduction";
 
 export const useEnemyAttack = (
   enemyCards: IFightCard[],
@@ -14,7 +17,11 @@ export const useEnemyAttack = (
   isPlayerTurn: boolean,
   setIsPlayerTurn: React.Dispatch<React.SetStateAction<boolean>>,
   setDamageInfo: React.Dispatch<
-    React.SetStateAction<{ id: number; damage: number } | null>
+    React.SetStateAction<{
+      id: number;
+      damage: number;
+      isCrit?: boolean;
+    } | null>
   >,
   setIsShowResult: React.Dispatch<React.SetStateAction<boolean>>,
   setIsWin: React.Dispatch<React.SetStateAction<boolean | null>>,
@@ -72,11 +79,33 @@ export const useEnemyAttack = (
 
             if (attackingCardElement && targetCardElement) {
               animateAttack(attackingCardElement, targetCardElement, () => {
-                // Расчёт урона с учётом брони цели
-                const rawDamage = getRandomDamage(enemyCard.damage);
+                // Получение модификатора фракции через функцию
+                const fractionModifier = getFractionMultiplier(
+                  enemyCard.fraction,
+                  targetCard.fraction
+                );
+
+                // Учет уменьшения урона от элементов
+                const elementalReduction = getElementalDamageReduction(
+                  targetCard.fraction,
+                  enemyCard.element || "simple"
+                );
+
+                // Расчёт урона с учётом всех модификаторов
+                let rawDamage = getRandomDamage(enemyCard.damage);
+
+                // Учет критического урона для фракции "орки"
+                let isCrit = false;
+                if (enemyCard.fraction === "orcs" && Math.random() <= 0.3) {
+                  rawDamage *= 1.5;
+                  isCrit = true;
+                }
+
+                const modifiedDamage =
+                  rawDamage * fractionModifier * (1 - elementalReduction);
                 const damageAfterArmor = Math.max(
                   0,
-                  rawDamage - targetCard.armor
+                  modifiedDamage - targetCard.armor
                 );
                 const newHealth = Math.max(
                   0,
@@ -96,21 +125,26 @@ export const useEnemyAttack = (
                           effectKey as keyof typeof StatusEffectId
                         ];
 
-                      const existingEffectIndex = newStatusEffects.findIndex(
-                        (effect) => effect.id === effectId
-                      );
-
-                      if (existingEffectIndex !== -1) {
-                        // Увеличение `duration` существующего эффекта
-                        newStatusEffects = newStatusEffects.map(
-                          (effect, index) =>
-                            index === existingEffectIndex
-                              ? { ...effect, duration: effect.duration + 2 }
-                              : effect
+                      // Проверка иммунитета цели к статус-эффекту
+                      if (canApplyStatusEffect(card.fraction, effectId)) {
+                        const existingEffectIndex = newStatusEffects.findIndex(
+                          (effect) => effect.id === effectId
                         );
-                      } else {
-                        // Добавление нового эффекта
-                        newStatusEffects.push(createStatusEffect(effectId, 2));
+
+                        if (existingEffectIndex !== -1) {
+                          // Увеличение `duration` существующего эффекта
+                          newStatusEffects = newStatusEffects.map(
+                            (effect, index) =>
+                              index === existingEffectIndex
+                                ? { ...effect, duration: effect.duration + 2 }
+                                : effect
+                          );
+                        } else {
+                          // Добавление нового эффекта
+                          newStatusEffects.push(
+                            createStatusEffect(effectId, 2)
+                          );
+                        }
                       }
                     }
 
@@ -128,6 +162,7 @@ export const useEnemyAttack = (
                 setDamageInfo({
                   id: targetCard.id,
                   damage: damageAfterArmor,
+                  isCrit,
                 });
 
                 setTimeout(() => setDamageInfo(null), 1000);
