@@ -1,6 +1,8 @@
 import { Box, IconButton, Typography } from "@mui/material";
 import { Header } from "./components/Header";
-import { useEffect, useRef, useState } from "react";
+// import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
+
 import { Popup } from "../../components/Popup";
 import {
   battleMods,

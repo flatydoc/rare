@@ -14,6 +14,7 @@ export const Modal = ({
   isOpen?: boolean;
   setIsOpen?: (a: boolean) => void;
 }) => {
+  console.log(title, icon, isOpen, setIsOpen);
   return (
     <Box
       sx={{

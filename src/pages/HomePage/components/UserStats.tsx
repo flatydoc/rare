@@ -8,7 +8,7 @@ import { EnergyProgressBar } from "./EnergyProgressBar";
 import cap from "../../../assets/cap.png";
 import { RouteList } from "../../../core/enums";
 import { useNavigate } from "react-router-dom";
-import { Modal } from "../../../components/ui/Modal";
+// import { Modal } from "../../../components/ui/Modal";
 import { useState } from "react";
 
 export const UserStats = ({
@@ -21,6 +21,8 @@ export const UserStats = ({
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState("");
+
+  console.log(isModalOpen, modalContent);
 
   const userStatsCards = [
     {

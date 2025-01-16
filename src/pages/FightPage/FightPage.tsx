@@ -352,7 +352,7 @@ export const FightPage = () => {
 
   useEnemyAttack(
     enemyCards,
-    setMyCards,
+    setMyCards as React.Dispatch<React.SetStateAction<IFightCard[]>>,
     reloadableCards,
     setReloadableCards,
     isFight,
