@@ -9,7 +9,7 @@ export const generateDefaultStatusEffects = (
     {
       id: 1,
       title: `Effect of ${fraction}`,
-      duration: null,
+      duration: 60,
       icon: fractionEmojis[fraction],
     },
   ];
@@ -18,7 +18,7 @@ export const generateDefaultStatusEffects = (
     effects.push({
       id: 2,
       title: `Effect of ${element}`,
-      duration: null,
+      duration: 60,
       icon: elementEmojis[element],
     });
   }

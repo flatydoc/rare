@@ -18,7 +18,8 @@ export const useEnemyAttack = (
   >,
   setIsShowResult: React.Dispatch<React.SetStateAction<boolean>>,
   setIsWin: React.Dispatch<React.SetStateAction<boolean | null>>,
-  setEnemyCards: React.Dispatch<React.SetStateAction<IFightCard[]>>
+  setEnemyCards: React.Dispatch<React.SetStateAction<IFightCard[]>>,
+  setRound: React.Dispatch<React.SetStateAction<number>>
 ) => {
   useEffect(() => {
     if (isFight && !isPlayerTurn && reloadableEnemyCards.length === 0) {
@@ -33,6 +34,7 @@ export const useEnemyAttack = (
         if (availableEnemyCards.length === 0) {
           clearInterval(enemyAttackInterval);
           setIsPlayerTurn(true);
+          setRound((prev) => ++prev);
           return;
         }
 
@@ -86,7 +88,20 @@ export const useEnemyAttack = (
                           effectKey as keyof typeof StatusEffectId
                         ];
 
-                      if (effectId) {
+                      const existingEffectIndex = newStatusEffects.findIndex(
+                        (effect) => effect.id === effectId
+                      );
+
+                      if (existingEffectIndex !== -1) {
+                        // Увеличение `duration` существующего эффекта
+                        newStatusEffects = newStatusEffects.map(
+                          (effect, index) =>
+                            index === existingEffectIndex
+                              ? { ...effect, duration: effect.duration + 2 }
+                              : effect
+                        );
+                      } else {
+                        // Добавление нового эффекта
                         newStatusEffects.push(createStatusEffect(effectId, 2));
                       }
                     }
@@ -115,6 +130,7 @@ export const useEnemyAttack = (
           } else {
             clearInterval(enemyAttackInterval);
             setIsPlayerTurn(true);
+            setRound((prev) => ++prev);
             setReloadableEnemyCards([]);
 
             setEnemyCards((prevEnemyCards) =>
@@ -147,5 +163,6 @@ export const useEnemyAttack = (
     setEnemyCards,
     setIsShowResult,
     setIsWin,
+    setRound,
   ]);
 };

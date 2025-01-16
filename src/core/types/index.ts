@@ -95,7 +95,7 @@ export interface IStatusEffect {
   id: number;
   title?: string;
   text?: string;
-  duration: number | null;
+  duration: number;
   icon: string;
 }
 

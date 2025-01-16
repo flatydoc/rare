@@ -268,7 +268,7 @@ export const SingleFightCard = ({
                           `,
                 }}
               >
-                {card.fightHealth}
+                {card.fightHealth.toFixed(0)}
               </Typography>
               <Typography
                 sx={{

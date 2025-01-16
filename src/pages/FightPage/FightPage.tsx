@@ -58,6 +58,7 @@ export const FightPage = () => {
   const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(
     null
   );
+  const [round, setRound] = useState<number>(1);
   const [selectedEnemyCardId, setSelectedEnemyCardId] = useState<number | null>(
     null
   );
@@ -164,23 +165,41 @@ export const FightPage = () => {
                 const effectKey =
                   myCard.element.charAt(0).toUpperCase() +
                   myCard.element.slice(1).toLowerCase();
-
                 const effectId =
                   StatusEffectId[effectKey as keyof typeof StatusEffectId];
-                const newStatusEffect = createStatusEffect(effectId, 2);
-                return {
-                  ...card,
-                  fightHealth: newHealth,
-                  statusEffects: [...card.statusEffects, newStatusEffect],
-                };
+
+                const existingEffectIndex = card.statusEffects.findIndex(
+                  (effect) => effect.id === effectId
+                );
+
+                if (existingEffectIndex !== -1) {
+                  const updatedEffects = card.statusEffects.map(
+                    (effect, index) =>
+                      index === existingEffectIndex
+                        ? { ...effect, duration: effect.duration + 2 }
+                        : effect
+                  );
+                  return {
+                    ...card,
+                    fightHealth: newHealth,
+                    statusEffects: updatedEffects,
+                  };
+                } else {
+                  const newStatusEffect = createStatusEffect(effectId, 2);
+                  return {
+                    ...card,
+                    fightHealth: newHealth,
+                    statusEffects: [...card.statusEffects, newStatusEffect],
+                  };
+                }
               }
 
               return { ...card, fightHealth: newHealth };
             }
             return card;
           });
+
           setEnemyCards(updatedEnemyCards);
-          console.log(updatedEnemyCards);
 
           const updatedMyCards = myCards.map((card) => {
             if (typeof card !== "number" && card.id === selectedMyCardId) {
@@ -236,6 +255,43 @@ export const FightPage = () => {
     }
   };
 
+  useEffect(() => {
+    if (round !== 1) {
+      const updateStatusEffectsForCards = (cards: IFightCard[]) => {
+        return cards.map((card) => {
+          const updatedEffects = card.statusEffects
+            .map((effect) => ({
+              ...effect,
+              duration: effect.duration - 1,
+            }))
+            .filter((effect) => effect.duration > 0);
+
+          return {
+            ...card,
+            statusEffects: updatedEffects,
+          };
+        });
+      };
+
+      // Обновляем статус-эффекты у врагов
+      setEnemyCards((prevEnemyCards) =>
+        updateStatusEffectsForCards(prevEnemyCards)
+      );
+
+      // Обновляем статус-эффекты у моих карт
+      setMyCards(
+        (prevMyCards) =>
+          updateStatusEffectsForCards(
+            prevMyCards.filter(
+              (card) => typeof card !== "number"
+            ) as IFightCard[]
+          ) as IFightCard[]
+      );
+    }
+  }, [round]);
+
+  console.log(enemyCards);
+
   const cardsForInsert = cards.filter(
     (card) =>
       !myCards.some(
@@ -266,7 +322,8 @@ export const FightPage = () => {
     setDamageInfo,
     setIsShowResult,
     setIsWin,
-    setEnemyCards
+    setEnemyCards,
+    setRound
   );
 
   return (
@@ -371,15 +428,32 @@ export const FightPage = () => {
           damageInfo={damageInfo}
         />
       </Box>
-      <Typography
+      <Box
         sx={{
-          fontSize: "18px",
-          fontWeight: "700",
-          color: colors.textColor,
+          ...centerContentStyles,
+          flexDirection: "column",
+          gap: "12px",
         }}
       >
-        {isFight ? (isPlayerTurn ? "YOUR TURN" : "ENEMY'S TURN") : ""}
-      </Typography>
+        <Typography
+          sx={{
+            fontSize: "18px",
+            fontWeight: "700",
+            color: colors.textColor,
+          }}
+        >
+          {isFight ? `Round: ${round}` : ""}
+        </Typography>
+        <Typography
+          sx={{
+            fontSize: "18px",
+            fontWeight: "700",
+            color: colors.textColor,
+          }}
+        >
+          {isFight ? (isPlayerTurn ? "YOUR TURN" : "ENEMY'S TURN") : ""}
+        </Typography>
+      </Box>
       <Box
         sx={{
           width: "100%",
