@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { IFightCard } from "../types";
 import { getRandomDamage } from "../utils/getRandomDamage";
 import { animateAttack } from "../utils/animateAttack";
+import { createStatusEffect } from "../utils/createStatusEffects";
+import { StatusEffectId } from "../enums/statusEffects";
 
 export const useEnemyAttack = (
   enemyCards: IFightCard[],
@@ -15,12 +17,13 @@ export const useEnemyAttack = (
     React.SetStateAction<{ id: number; damage: number } | null>
   >,
   setIsShowResult: React.Dispatch<React.SetStateAction<boolean>>,
-  setIsWin: React.Dispatch<React.SetStateAction<boolean | null>>
+  setIsWin: React.Dispatch<React.SetStateAction<boolean | null>>,
+  setEnemyCards: React.Dispatch<React.SetStateAction<IFightCard[]>>
 ) => {
   useEffect(() => {
     if (isFight && !isPlayerTurn && reloadableEnemyCards.length === 0) {
       let attackIndex = 0;
-
+      const attackedEnemyCardIds: number[] = [];
       const enemyAttackInterval = setInterval(() => {
         const availableEnemyCards = enemyCards.filter(
           (card) =>
@@ -47,7 +50,6 @@ export const useEnemyAttack = (
 
           if (attackIndex < availableEnemyCards.length) {
             const enemyCard = availableEnemyCards[attackIndex];
-
             const targetCard = validTargets.reduce((minCard, currentCard) =>
               currentCard.fightHealth < minCard.fightHealth
                 ? currentCard
@@ -69,20 +71,42 @@ export const useEnemyAttack = (
             if (attackingCardElement && targetCardElement) {
               animateAttack(attackingCardElement, targetCardElement, () => {
                 const damage = getRandomDamage(enemyCard.damage);
-                setMyCards((currentMyCards) =>
-                  currentMyCards.map((card) =>
-                    card.id === targetCard.id
-                      ? {
-                          ...card,
-                          fightHealth: Math.max(0, card.fightHealth - damage),
-                        }
-                      : card
-                  )
-                );
+                const newHealth = Math.max(0, targetCard.fightHealth - damage);
 
+                const updatedMyCards = prevMyCards.map((card) => {
+                  if (card.id === targetCard.id) {
+                    let newStatusEffects = [...card.statusEffects];
+
+                    if (enemyCard.element && enemyCard.element !== "simple") {
+                      const effectKey =
+                        enemyCard.element.charAt(0).toUpperCase() +
+                        enemyCard.element.slice(1).toLowerCase();
+                      const effectId =
+                        StatusEffectId[
+                          effectKey as keyof typeof StatusEffectId
+                        ];
+
+                      if (effectId) {
+                        newStatusEffects.push(createStatusEffect(effectId, 2));
+                      }
+                    }
+
+                    return {
+                      ...card,
+                      fightHealth: newHealth,
+                      statusEffects: newStatusEffects,
+                    };
+                  }
+                  return card;
+                });
+
+                setMyCards(updatedMyCards);
                 setDamageInfo({ id: targetCard.id, damage });
+
                 setTimeout(() => setDamageInfo(null), 1000);
+
                 setReloadableEnemyCards((prev) => [...prev, enemyCard.id]);
+                attackedEnemyCardIds.push(enemyCard.id);
                 attackIndex++;
               });
             } else {
@@ -92,6 +116,19 @@ export const useEnemyAttack = (
             clearInterval(enemyAttackInterval);
             setIsPlayerTurn(true);
             setReloadableEnemyCards([]);
+
+            setEnemyCards((prevEnemyCards) =>
+              prevEnemyCards.map((card) =>
+                attackedEnemyCardIds.includes(card.id)
+                  ? {
+                      ...card,
+                      statusEffects: card.statusEffects.filter(
+                        (effect) => effect.id !== StatusEffectId.Sleep
+                      ),
+                    }
+                  : card
+              )
+            );
           }
 
           return prevMyCards;
@@ -107,6 +144,7 @@ export const useEnemyAttack = (
     setReloadableEnemyCards,
     setIsPlayerTurn,
     setDamageInfo,
+    setEnemyCards,
     setIsShowResult,
     setIsWin,
   ]);

@@ -9,6 +9,7 @@ import pattern from "../../../assets/pattern.png";
 import { rarityByTier } from "../../../core/utils/rarityByTier";
 import { darkenColor } from "../../../core/utils/darkenColor";
 import { calculateTotalPower } from "../../../core/utils/calculateTotalPower";
+import { elementEmojis } from "../../SingleCardPage/constants";
 export const SingleCard = ({
   card,
   isSelected,
@@ -157,7 +158,7 @@ export const SingleCard = ({
                 style={{
                   position: "relative",
                   top: "2px",
-                  left: "-2px", // немного наложить на первую букву
+                  left: "-2px",
                   zIndex: 1,
                 }}
               >
@@ -184,6 +185,26 @@ export const SingleCard = ({
           )}
         </Typography>
       </Box>
+      {card.element !== "simple" && (
+        <Typography
+          sx={{
+            position: "absolute",
+            top: "32px",
+            right: "8px",
+            fontSize: "14px",
+            fontWeight: "600",
+            color: colors.primary,
+            textShadow: `
+                      -1px -1px 0 black,
+                      1px -1px 0 black,
+                      -1px 1px 0 black,
+                      1px 1px 0 black
+                    `,
+          }}
+        >
+          {elementEmojis[card.element]}
+        </Typography>
+      )}
       <Box
         sx={{
           position: "absolute",

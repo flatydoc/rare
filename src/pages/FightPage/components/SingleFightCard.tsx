@@ -199,8 +199,15 @@ export const SingleFightCard = ({
           >
             {card.statusEffects.map((effect) => (
               <Typography
+                key={effect.id}
                 sx={{
                   fontSize: "10px",
+                  textShadow: `
+                  -1px -1px 0 black,
+                  1px -1px 0 black,
+                  -1px 1px 0 black,
+                  1px 1px 0 black
+                `,
                 }}
               >
                 {effect.icon}
@@ -295,29 +302,6 @@ export const SingleFightCard = ({
               </Typography>
             </Box>
           </Box>
-          {/* <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              gap: "12px",
-            }}
-          >
-            <Typography
-              sx={{
-                fontSize: "24px",
-              }}
-            >
-              {fractionEmojis[card.fraction]}
-            </Typography>
-            <img width={24} height={24} src={getIconByCardClass(card.class)} />
-            <Typography
-              sx={{
-                fontSize: "24px",
-              }}
-            >
-              {elementEmojis[card.element]}
-            </Typography>
-          </Box> */}
           <Box
             sx={{
               display: "flex",

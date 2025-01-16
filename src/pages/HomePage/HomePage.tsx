@@ -433,10 +433,10 @@ export const HomePage = () => {
                 width: "24px",
                 height: "24px",
                 "&:hover": {
-                  backgroundColor: "rgba(225, 225, 225, 0.2)", // Остается красным при наведении
+                  backgroundColor: "rgba(225, 225, 225, 0.2)",
                 },
                 "&:focus": {
-                  backgroundColor: "rgba(225, 225, 225, 0.2)", // Остается красным при фокусе
+                  backgroundColor: "rgba(225, 225, 225, 0.2)",
                 },
               }}
             >

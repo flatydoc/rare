@@ -6,6 +6,8 @@ import { Ambient } from "../../../components/ui/Ambient";
 import pattern from "../../../assets/pattern.png";
 import { rarityByTier } from "../../../core/utils/rarityByTier";
 import { darkenColor } from "../../../core/utils/darkenColor";
+import { colors } from "../../../core/theme/colors";
+import { elementEmojis } from "../../SingleCardPage/constants";
 
 export const CaseCardsList = ({
   caseCards,
@@ -168,6 +170,26 @@ export const CaseCardsList = ({
                   )}
                 </Typography>
               </Box>
+              {card.element !== "simple" && (
+                <Typography
+                  sx={{
+                    position: "absolute",
+                    top: "32px",
+                    right: "8px",
+                    fontSize: "14px",
+                    fontWeight: "600",
+                    color: colors.primary,
+                    textShadow: `
+                      -1px -1px 0 black,
+                      1px -1px 0 black,
+                      -1px 1px 0 black,
+                      1px 1px 0 black
+                    `,
+                  }}
+                >
+                  {elementEmojis[card.element]}
+                </Typography>
+              )}
               <Typography
                 sx={{
                   position: "absolute",

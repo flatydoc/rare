@@ -16,8 +16,9 @@ import { PVERounds } from "../HomePage/constants";
 import { useUserStore } from "../../core/store/useUserStore";
 import { centerContentStyles } from "../../core/theme/common.style";
 import { RouteList } from "../../core/enums";
-import { elementEmojis, fractionEmojis } from "../SingleCardPage/constants";
-import { effectEmojis } from "../../core/constants/statusEffects";
+import { createStatusEffect } from "../../core/utils/createStatusEffects";
+import { StatusEffectId } from "../../core/enums/statusEffects";
+import { generateDefaultStatusEffects } from "./utils/generateDefaultStatusEffects";
 
 export const FightPage = () => {
   useBackBtn();
@@ -33,20 +34,10 @@ export const FightPage = () => {
         const enhancedCards = round.enemyCards.map((card) => ({
           ...card,
           fightHealth: card.health,
-          statusEffects: [
-            {
-              id: 1,
-              title: `Effect of ${card.fraction}`,
-              duration: null,
-              icon: fractionEmojis[card.fraction],
-            },
-            {
-              id: 2,
-              title: `Effect of ${card.element}`,
-              duration: null,
-              icon: elementEmojis[card.element],
-            },
-          ],
+          statusEffects: generateDefaultStatusEffects(
+            card.fraction,
+            card.element
+          ),
         }));
         setEnemyCards(enhancedCards);
       } else {
@@ -131,20 +122,10 @@ export const FightPage = () => {
         newMyCards[selectedSlotIndex] = {
           ...selectedCard,
           fightHealth: selectedCard.health,
-          statusEffects: [
-            {
-              id: 1,
-              title: `Effect of ${selectedCard.fraction}`,
-              duration: null,
-              icon: fractionEmojis[selectedCard.fraction],
-            },
-            {
-              id: 2,
-              title: `Effect of ${selectedCard.element}`,
-              duration: null,
-              icon: elementEmojis[selectedCard.element],
-            },
-          ],
+          statusEffects: generateDefaultStatusEffects(
+            selectedCard.fraction,
+            selectedCard.element
+          ),
         };
         setMyCards(newMyCards as IFightCard[]);
         setIsOpenSelectCardPopup(false);
@@ -178,13 +159,28 @@ export const FightPage = () => {
             if (card.id === selectedEnemyCardId) {
               const damage = getRandomDamage(myCard.damage);
               const newHealth = Math.max(0, card.fightHealth - damage);
-              setDamageInfo({ id: selectedEnemyCardId, damage });
+
+              if (myCard.element && myCard.element !== "simple") {
+                const effectKey =
+                  myCard.element.charAt(0).toUpperCase() +
+                  myCard.element.slice(1).toLowerCase();
+
+                const effectId =
+                  StatusEffectId[effectKey as keyof typeof StatusEffectId];
+                const newStatusEffect = createStatusEffect(effectId, 2);
+                return {
+                  ...card,
+                  fightHealth: newHealth,
+                  statusEffects: [...card.statusEffects, newStatusEffect],
+                };
+              }
+
               return { ...card, fightHealth: newHealth };
             }
             return card;
           });
-
           setEnemyCards(updatedEnemyCards);
+          console.log(updatedEnemyCards);
 
           const updatedMyCards = myCards.map((card) => {
             if (typeof card !== "number" && card.id === selectedMyCardId) {
@@ -192,12 +188,7 @@ export const FightPage = () => {
                 ...card,
                 statusEffects: [
                   ...card.statusEffects,
-                  {
-                    id: 3,
-                    title: `Sleep`,
-                    duration: 1,
-                    icon: effectEmojis[3],
-                  },
+                  createStatusEffect(StatusEffectId.Sleep, 1),
                 ],
               };
             }
@@ -228,7 +219,7 @@ export const FightPage = () => {
                   return {
                     ...card,
                     statusEffects: card.statusEffects.filter(
-                      (effect) => effect.id !== 3
+                      (effect) => effect.id !== StatusEffectId.Sleep
                     ),
                   };
                 }
@@ -274,7 +265,8 @@ export const FightPage = () => {
     setIsPlayerTurn,
     setDamageInfo,
     setIsShowResult,
-    setIsWin
+    setIsWin,
+    setEnemyCards
   );
 
   return (
