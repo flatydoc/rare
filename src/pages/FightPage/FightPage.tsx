@@ -158,8 +158,13 @@ export const FightPage = () => {
         animateAttack(attackingCardElement, targetCardElement, () => {
           const updatedEnemyCards = enemyCards.map((card) => {
             if (card.id === selectedEnemyCardId) {
-              const damage = getRandomDamage(myCard.damage);
-              const newHealth = Math.max(0, card.fightHealth - damage);
+              const rawDamage = getRandomDamage(myCard.damage);
+              const damageAfterArmor = Math.max(0, rawDamage - card.armor);
+              const newHealth = Math.max(
+                0,
+                card.fightHealth - damageAfterArmor
+              );
+              setDamageInfo({ id: card.id, damage: damageAfterArmor });
 
               if (myCard.element && myCard.element !== "simple") {
                 const effectKey =
@@ -289,8 +294,6 @@ export const FightPage = () => {
       );
     }
   }, [round]);
-
-  console.log(enemyCards);
 
   const cardsForInsert = cards.filter(
     (card) =>

@@ -72,8 +72,16 @@ export const useEnemyAttack = (
 
             if (attackingCardElement && targetCardElement) {
               animateAttack(attackingCardElement, targetCardElement, () => {
-                const damage = getRandomDamage(enemyCard.damage);
-                const newHealth = Math.max(0, targetCard.fightHealth - damage);
+                // Расчёт урона с учётом брони цели
+                const rawDamage = getRandomDamage(enemyCard.damage);
+                const damageAfterArmor = Math.max(
+                  0,
+                  rawDamage - targetCard.armor
+                );
+                const newHealth = Math.max(
+                  0,
+                  targetCard.fightHealth - damageAfterArmor
+                );
 
                 const updatedMyCards = prevMyCards.map((card) => {
                   if (card.id === targetCard.id) {
@@ -116,7 +124,11 @@ export const useEnemyAttack = (
                 });
 
                 setMyCards(updatedMyCards);
-                setDamageInfo({ id: targetCard.id, damage });
+
+                setDamageInfo({
+                  id: targetCard.id,
+                  damage: damageAfterArmor,
+                });
 
                 setTimeout(() => setDamageInfo(null), 1000);
 
