@@ -14,6 +14,11 @@ type DamageInfo = {
   isCrit?: boolean;
 } | null;
 
+type HealInfo = {
+  id: number;
+  heal: number;
+} | null;
+
 export const SingleFightCard = ({
   card,
   isSelected,
@@ -21,6 +26,7 @@ export const SingleFightCard = ({
   isMyCard,
   reloadableCards,
   damageInfo,
+  healInfo,
 }: {
   card: IFightCard;
   isSelected?: boolean;
@@ -28,6 +34,7 @@ export const SingleFightCard = ({
   isMyCard?: boolean;
   reloadableCards: number[];
   damageInfo: DamageInfo;
+  healInfo: HealInfo;
 }) => {
   const handleClick = () => {
     if (onClick) {
@@ -131,12 +138,15 @@ export const SingleFightCard = ({
               sx={{
                 fontSize: "24px",
                 fontWeight: "600",
-                color: colors.red,
+                color:
+                  damageInfo?.damage > 1
+                    ? colors.red
+                    : "rgba(225, 225, 225, 0.7)",
               }}
             >
-              -{damageInfo.damage.toFixed(0)}
+              {damageInfo?.damage < 1 ? 0 : `-${damageInfo.damage.toFixed(0)}`}
             </Typography>
-            {damageInfo.isCrit && (
+            {damageInfo.isCrit && damageInfo?.damage > 0 && (
               <Typography
                 sx={{
                   fontSize: "24px",
@@ -146,6 +156,28 @@ export const SingleFightCard = ({
                 💥
               </Typography>
             )}
+          </Box>
+        )}
+        {healInfo?.id === card.id && (
+          <Box
+            sx={{
+              ...centerContentStyles,
+              gap: "4px",
+              position: "absolute",
+              top: "20px",
+              right: "0px",
+              animation: "damagePopup 1s ease-out",
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize: "24px",
+                fontWeight: "600",
+                color: colors.green,
+              }}
+            >
+              +{healInfo.heal.toFixed(0)}
+            </Typography>
           </Box>
         )}
         <Box

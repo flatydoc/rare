@@ -4,6 +4,7 @@ import { animateAttack } from "../utils/animateAttack";
 import { removeSleepEffectsFromCards } from "../../pages/FightPage/utils/removeSleepEffectsFromCards";
 import { updateCardState } from "../../pages/FightPage/utils/updateCardState";
 import { applySleepEffectToCard } from "../../pages/FightPage/utils/applySleepEffectToCard";
+import { restoreOrcCardHealth } from "../../pages/FightPage/utils/restoreDemonsCardHealth";
 
 export const useEnemyAttack = (
   enemyCards: IFightCard[],
@@ -18,6 +19,12 @@ export const useEnemyAttack = (
       id: number;
       damage: number;
       isCrit?: boolean;
+    } | null>
+  >,
+  setHealInfo: React.Dispatch<
+    React.SetStateAction<{
+      id: number;
+      heal: number;
     } | null>
   >,
   setIsShowResult: React.Dispatch<React.SetStateAction<boolean>>,
@@ -81,24 +88,32 @@ export const useEnemyAttack = (
 
             if (attackingCardElement && targetCardElement) {
               animateAttack(attackingCardElement, targetCardElement, () => {
-                const updatedMyCards = prevMyCards.map((card) =>
-                  card.id === targetCard.id
-                    ? updateCardState(card, enemyCard, setDamageInfo)
-                    : card
+                const { updatedCard: updatedTargetCard, damage } =
+                  updateCardState(targetCard, enemyCard, setDamageInfo);
+
+                const updatedEnemyCard = restoreOrcCardHealth(
+                  enemyCard,
+                  damage,
+                  setHealInfo
                 );
 
-                setMyCards(updatedMyCards);
+                const updatedEnemyCardWithSleep =
+                  applySleepEffectToCard(updatedEnemyCard);
+
+                setMyCards((prevMyCards) =>
+                  prevMyCards.map((card) =>
+                    card.id === targetCard.id ? updatedTargetCard : card
+                  )
+                );
 
                 setEnemyCards((prevEnemyCards) =>
                   prevEnemyCards.map((card) =>
-                    card.id === enemyCard.id
-                      ? applySleepEffectToCard(card)
-                      : card
+                    card.id === enemyCard.id ? updatedEnemyCardWithSleep : card
                   )
                 );
 
                 setTimeout(() => setDamageInfo(null), 1000);
-
+                setTimeout(() => setHealInfo(null), 1000);
                 setReloadableEnemyCards((prev) => [...prev, enemyCard.id]);
                 attackIndex++;
               });

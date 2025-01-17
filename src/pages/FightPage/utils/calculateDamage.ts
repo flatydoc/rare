@@ -10,7 +10,6 @@ export const calculateDamage = (
   let rawDamage = getRandomDamage(attacker.damage);
   let isCrit = false;
 
-  // Учет критического урона для "орков"
   if (attacker.fraction === "orcs" && Math.random() <= 0.3) {
     rawDamage *= 1.5;
     isCrit = true;

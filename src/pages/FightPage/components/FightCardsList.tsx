@@ -6,6 +6,12 @@ import { IFightCard } from "../../../core/types";
 type DamageInfo = {
   id: number;
   damage: number;
+  isCrit?: boolean;
+} | null;
+
+type HealInfo = {
+  id: number;
+  heal: number;
 } | null;
 
 export const FightCardsList = ({
@@ -16,6 +22,7 @@ export const FightCardsList = ({
   onEmptySlotClick,
   reloadableCards,
   damageInfo,
+  healInfo,
 }: {
   cards: IFightCard[] | number[];
   event: (id: number) => void;
@@ -24,6 +31,7 @@ export const FightCardsList = ({
   onEmptySlotClick?: (index: number) => void;
   reloadableCards: number[];
   damageInfo: DamageInfo;
+  healInfo: HealInfo;
 }) => {
   return (
     <Box
@@ -46,6 +54,7 @@ export const FightCardsList = ({
             isMyCard={isMyCardList}
             reloadableCards={reloadableCards}
             damageInfo={damageInfo}
+            healInfo={healInfo}
           />
         )
       )}

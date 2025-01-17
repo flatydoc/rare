@@ -26,7 +26,7 @@ export const descriptionByFraction: Record<Fraction, string> = {
   undead:
     "• Gains #+30%# attack for each allied hero killed. \n• Immune to poison and frost effects. \n• Takes #70%# less damage from darkness attacks.",
   demons:
-    "• #+20%# against the #Alliance# fraction. \n• #15%# lifesteal on attack. \n• Immune to flame effects.",
+    "• #+20%# against the #Alliance# fraction. \n• #20%# lifesteal on attack. \n• Immune to flame effects.",
   elves:
     "• #20%# chance to evade attacks. \n• #25%# chance to ignore armor when attacking. \n• Takes #50%# less damage from earth attacks.",
   orcs: "• Gains #+30%# damage when the hero’s health is below #50%#. \n• #30%# chance to deal #150%# critical damage on attack.",

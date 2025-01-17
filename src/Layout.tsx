@@ -3,6 +3,7 @@ import { Box } from "@mui/material";
 import { Navigation } from "./components/Navigation/Navigation";
 import { useCardStore } from "./core/store/useCardStore";
 import zombie from "./assets/zombie_level_1.png";
+import demon from "./assets/demon.png";
 import { useGemStore } from "./core/store/useGemStore";
 import gem1 from "./assets/gem1.png";
 import gem2 from "./assets/gem2.png";
@@ -16,7 +17,7 @@ import gold from "./assets/gold.webp";
 import silver from "./assets/silver.webp";
 import { RouteList } from "./core/enums";
 import { useEffect } from "react";
-
+import baba from "./assets/baba.png";
 export const Layout = () => {
   const setCards = useCardStore((state) => state.setCards);
   const setAllCards = useAllCardsStore((state) => state.setCards);
@@ -30,7 +31,7 @@ export const Layout = () => {
     setCards([
       {
         id: 101,
-        number: 1,
+        number: 2,
         rarity: "common",
         tier: "SS",
         price: 100,
@@ -46,11 +47,11 @@ export const Layout = () => {
         exp: 150,
         level: 1,
         stars: 0,
-        fraction: "orcs",
+        fraction: "alliance",
         priceCurrency: "inGame",
         name: "Default Zombie",
         description: "A basic tueben'",
-        img: zombie,
+        img: demon,
         gemIds: [],
         sockets: 0,
         element: "simple",
@@ -58,7 +59,7 @@ export const Layout = () => {
       },
       {
         id: 102,
-        number: 1,
+        number: 3,
         rarity: "common",
         tier: "A+",
         price: 100,
@@ -76,17 +77,17 @@ export const Layout = () => {
         stars: 0,
         fraction: "orcs",
         priceCurrency: "inGame",
-        name: "Default Zombie",
+        name: "Baba",
         description: "A basic tueben'",
-        img: zombie,
+        img: baba,
         gemIds: [],
         sockets: 0,
-        element: "flame",
+        element: "simple",
         class: "defender",
       },
       {
         id: 103,
-        number: 1,
+        number: 4,
         rarity: "common",
         tier: "S+",
         price: 100,
@@ -102,14 +103,14 @@ export const Layout = () => {
         exp: 150,
         level: 1,
         stars: 0,
-        fraction: "orcs",
+        fraction: "alliance",
         priceCurrency: "inGame",
-        name: "Default Zombie",
+        name: "Ded",
         description: "A basic tueben'",
         img: zombie,
         gemIds: [],
         sockets: 0,
-        element: "poison",
+        element: "holy",
         class: "support",
       },
     ]);

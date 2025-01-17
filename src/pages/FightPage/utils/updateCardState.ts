@@ -13,9 +13,11 @@ export const updateCardState = (
       isCrit?: boolean;
     } | null>
   >
-): IFightCard => {
+): { updatedCard: IFightCard; damage: number } => {
   const { damage, isCrit } = calculateDamage(attackingCard, targetCard);
+
   const updatedHealthCard = updateCardHealth(targetCard, damage);
+
   const updatedStatusEffects = applyStatusEffects(
     updatedHealthCard,
     attackingCard
@@ -24,7 +26,10 @@ export const updateCardState = (
   setDamageInfo({ id: targetCard.id, damage, isCrit });
 
   return {
-    ...updatedHealthCard,
-    statusEffects: updatedStatusEffects,
+    updatedCard: {
+      ...updatedHealthCard,
+      statusEffects: updatedStatusEffects,
+    },
+    damage,
   };
 };

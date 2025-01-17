@@ -9,19 +9,18 @@ import { MainButton } from "../../components/MainButton";
 import { colors } from "../../core/theme/colors";
 import { useBackBtn } from "../../core/hooks/useBackBtn";
 import { useEnemyAttack } from "../../core/hooks/useEnemyAttack";
-import { animateAttack } from "../../core/utils/animateAttack";
 import { useNavigate, useParams } from "react-router-dom";
 import { PVERounds } from "../HomePage/constants";
 import { useUserStore } from "../../core/store/useUserStore";
 import { centerContentStyles } from "../../core/theme/common.style";
 import { RouteList } from "../../core/enums";
-
 import { generateDefaultStatusEffects } from "./utils/generateDefaultStatusEffects";
-
 import { updateCardState } from "./utils/updateCardState";
 import { applySleepEffectToCard } from "./utils/applySleepEffectToCard";
 import { checkVictoryCondition } from "./utils/checkVictoryCondition";
 import { removeSleepEffectsFromCards } from "./utils/removeSleepEffectsFromCards";
+import { restoreOrcCardHealth } from "./utils/restoreDemonsCardHealth";
+import { animateAttack } from "../../core/utils/animateAttack";
 
 export const FightPage = () => {
   useBackBtn();
@@ -70,6 +69,11 @@ export const FightPage = () => {
     id: number;
     damage: number;
     isCrit?: boolean;
+  } | null>(null);
+
+  const [healInfo, setHealInfo] = useState<{
+    id: number;
+    heal: number;
   } | null>(null);
 
   const [selectedCardIdForInsert, setSelectedCardIdForInsert] = useState<
@@ -160,20 +164,28 @@ export const FightPage = () => {
 
       if (attackingCardElement && targetCardElement) {
         animateAttack(attackingCardElement, targetCardElement, () => {
-          const updatedEnemyCards = enemyCards.map((card) =>
-            card.id === selectedEnemyCardId
-              ? updateCardState(card, myCard, setDamageInfo)
-              : card
+          const { updatedCard: updatedEnemyCard, damage } = updateCardState(
+            enemyCards.find((card) => card.id === selectedEnemyCardId)!,
+            myCard,
+            setDamageInfo
           );
 
+          const updatedMyCard = restoreOrcCardHealth(
+            myCard,
+            damage,
+            setHealInfo
+          );
+
+          const updatedEnemyCards = enemyCards.map((card) =>
+            card.id === selectedEnemyCardId ? updatedEnemyCard : card
+          );
           setEnemyCards(updatedEnemyCards);
 
           const updatedMyCards = myCards.map((card) =>
             typeof card !== "number" && card.id === selectedMyCardId
-              ? applySleepEffectToCard(card)
+              ? applySleepEffectToCard(updatedMyCard)
               : card
           );
-
           setMyCards(updatedMyCards as IFightCard[]);
 
           if (
@@ -183,6 +195,7 @@ export const FightPage = () => {
           }
 
           setTimeout(() => setDamageInfo(null), 1000);
+          setTimeout(() => setHealInfo(null), 1000);
           setReloadableCards((prev) => [...prev, selectedMyCardId]);
           setSelectedEnemyCardId(null);
           setSelectedMyCardId(null);
@@ -262,6 +275,7 @@ export const FightPage = () => {
     isPlayerTurn,
     setIsPlayerTurn,
     setDamageInfo,
+    setHealInfo,
     setIsShowResult,
     setIsWin,
     setEnemyCards,
@@ -368,6 +382,7 @@ export const FightPage = () => {
           event={handleSelectEnemyCardId}
           cards={enemyCards}
           damageInfo={damageInfo}
+          healInfo={healInfo}
         />
       </Box>
       <Box
@@ -416,6 +431,7 @@ export const FightPage = () => {
           cards={myCards}
           onEmptySlotClick={handleEmptySlotClick}
           damageInfo={damageInfo}
+          healInfo={healInfo}
         />
         {isFight ? (
           <MainButton
