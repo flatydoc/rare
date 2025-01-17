@@ -34,7 +34,6 @@ export const SingleFightCard = ({
       onClick(card.id);
     }
   };
-  console.log(isMyCard);
 
   const isDead = card.fightHealth <= 0;
   const isReload = reloadableCards.includes(card.id);

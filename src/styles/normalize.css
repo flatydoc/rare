@@ -32,6 +32,19 @@
   line-height: 1;
 }
 
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body,
+button,
+a,
+div {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
 :focus,
 :active {
   outline: none;
