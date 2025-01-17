@@ -155,7 +155,7 @@ export const SingleFightCard = ({
             flexDirection: "column",
             width: "100%",
             maxWidth: "240px",
-            padding: "10px",
+            p: "10px 10px 0 10px",
             aspectRatio: "1",
             willChange: "transform, opacity",
           }}
@@ -174,7 +174,7 @@ export const SingleFightCard = ({
           sx={{
             display: "flex",
             flexDirection: "column",
-            p: "6px",
+            p: "0 6px 6px 6px",
             gap: "12px",
             position: "relative",
           }}
@@ -204,122 +204,128 @@ export const SingleFightCard = ({
           )}
           <Box
             sx={{
-              position: "absolute",
-              top: "-10px",
-              left: "6px",
-              width: "100%",
-              height: "10px",
-              zIndex: "2",
-              display: "flex",
-              alignItems: "center",
+              ...centerContentStyles,
               gap: "4px",
+              flexDirection: "column",
+              width: "100%",
             }}
           >
-            {card.statusEffects.map((effect) => (
-              <Typography
-                key={effect.id}
-                sx={{
-                  fontSize: "10px",
-                  textShadow: `
+            <Box
+              sx={{
+                width: "100%",
+                height: "10px",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+              }}
+            >
+              {card.statusEffects.map((effect) => (
+                <Typography
+                  key={effect.id}
+                  sx={{
+                    fontSize: "10px",
+                    textShadow: `
                   -1px -1px 0 black,
                   1px -1px 0 black,
                   -1px 1px 0 black,
                   1px 1px 0 black
                 `,
-                }}
-              >
-                {effect.icon}
-              </Typography>
-            ))}
-          </Box>
-          <Box
-            sx={{
-              width: "100%",
-              height: "16px",
-              backgroundColor: "rgba(60, 60, 60, 0.5)",
-              borderRadius: "16px",
-              border: "1px solid #000",
-              overflow: "hidden",
-              position: "relative",
-              display: "flex",
-            }}
-          >
+                  }}
+                >
+                  {effect.icon}
+                </Typography>
+              ))}
+            </Box>
             <Box
               sx={{
-                width: `${(card.fightHealth / card.health) * 100}%`,
-                height: "100%",
-                backgroundColor: isMyCard ? colors.green : colors.red,
-              }}
-            />
-            {damageInfo?.id === card.id && (
-              <Box
-                sx={{
-                  width: `${(damageInfo.damage / card.health) * 100}%`,
-                  height: "100%",
-                  backgroundColor: damageInfo?.isCrit
-                    ? "rgb(255, 230, 0)"
-                    : "rgba(225, 225, 225, 0.7)",
-                }}
-              />
-            )}
-            <Box
-              sx={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                fontSize: "16px",
+                width: "100%",
+                height: "16px",
+                backgroundColor: "rgba(60, 60, 60, 0.5)",
+                borderRadius: "16px",
+                border: "1px solid #000",
+                overflow: "hidden",
+                position: "relative",
                 display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "4px",
               }}
             >
-              <Typography
+              <Box
                 sx={{
-                  fontWeight: "600",
-                  fontSize: "10px",
-                  color: card.fightHealth === 0 ? colors.red : colors.textColor,
-                  textShadow: `
+                  width: `${(card.fightHealth / card.health) * 100}%`,
+                  height: "100%",
+                  backgroundColor: isMyCard ? colors.green : colors.red,
+                }}
+              />
+              {damageInfo?.id === card.id && (
+                <Box
+                  sx={{
+                    width: `${(damageInfo.damage / card.health) * 100}%`,
+                    height: "100%",
+                    backgroundColor: damageInfo?.isCrit
+                      ? "rgb(255, 230, 0)"
+                      : "rgba(225, 225, 225, 0.7)",
+                  }}
+                />
+              )}
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  fontSize: "16px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "4px",
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontWeight: "600",
+                    fontSize: "10px",
+                    color:
+                      card.fightHealth === 0 ? colors.red : colors.textColor,
+                    textShadow: `
                             -1px -1px 0 black,
                             1px -1px 0 black,
                             -1px 1px 0 black,
                             1px 1px 0 black
                           `,
-                }}
-              >
-                {card.fightHealth.toFixed(0)}
-              </Typography>
-              <Typography
-                sx={{
-                  fontWeight: "600",
-                  fontSize: "10px",
-                  color: colors.textColor,
-                  textShadow: `
+                  }}
+                >
+                  {card.fightHealth.toFixed(0)}
+                </Typography>
+                <Typography
+                  sx={{
+                    fontWeight: "600",
+                    fontSize: "10px",
+                    color: colors.textColor,
+                    textShadow: `
                            -1px -1px 0 black,
                            1px -1px 0 black,
                            -1px 1px 0 black,
                            1px 1px 0 black
                          `,
-                }}
-              >
-                /
-              </Typography>
-              <Typography
-                sx={{
-                  fontWeight: "600",
-                  fontSize: "10px",
-                  color: colors.textColor,
-                  textShadow: `
+                  }}
+                >
+                  /
+                </Typography>
+                <Typography
+                  sx={{
+                    fontWeight: "600",
+                    fontSize: "10px",
+                    color: colors.textColor,
+                    textShadow: `
                             -1px -1px 0 black,
                             1px -1px 0 black,
                             -1px 1px 0 black,
                             1px 1px 0 black
                           `,
-                }}
-              >
-                {card.health.toFixed(0)}
-              </Typography>
+                  }}
+                >
+                  {card.health.toFixed(0)}
+                </Typography>
+              </Box>
             </Box>
           </Box>
           <Box
