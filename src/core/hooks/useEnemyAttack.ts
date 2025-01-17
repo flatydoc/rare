@@ -1,12 +1,9 @@
 import { useEffect } from "react";
 import { IFightCard } from "../types";
-import { getRandomDamage } from "../utils/getRandomDamage";
 import { animateAttack } from "../utils/animateAttack";
-import { createStatusEffect } from "../utils/createStatusEffects";
-import { StatusEffectId } from "../enums/statusEffects";
-import { getFractionMultiplier } from "../../pages/FightPage/utils/getFractionMultiplier";
-import { canApplyStatusEffect } from "../../pages/FightPage/utils/canApplyStatusEffect";
-import { getElementalDamageReduction } from "../../pages/FightPage/utils/getElementalDamageReduction";
+import { removeSleepEffectsFromCards } from "../../pages/FightPage/utils/removeSleepEffectsFromCards";
+import { updateCardState } from "../../pages/FightPage/utils/updateCardState";
+import { applySleepEffectToCard } from "../../pages/FightPage/utils/applySleepEffectToCard";
 
 export const useEnemyAttack = (
   enemyCards: IFightCard[],
@@ -31,7 +28,7 @@ export const useEnemyAttack = (
   useEffect(() => {
     if (isFight && !isPlayerTurn && reloadableEnemyCards.length === 0) {
       let attackIndex = 0;
-      const attackedEnemyCardIds: number[] = [];
+
       const enemyAttackInterval = setInterval(() => {
         const availableEnemyCards = enemyCards.filter(
           (card) =>
@@ -40,8 +37,13 @@ export const useEnemyAttack = (
 
         if (availableEnemyCards.length === 0) {
           clearInterval(enemyAttackInterval);
+
+          setEnemyCards((prevEnemyCards) =>
+            removeSleepEffectsFromCards(prevEnemyCards)
+          );
+
           setIsPlayerTurn(true);
-          setRound((prev) => ++prev);
+          setRound((prev) => prev + 1);
           return;
         }
 
@@ -79,96 +81,25 @@ export const useEnemyAttack = (
 
             if (attackingCardElement && targetCardElement) {
               animateAttack(attackingCardElement, targetCardElement, () => {
-                // Получение модификатора фракции через функцию
-                const fractionModifier = getFractionMultiplier(
-                  enemyCard.fraction,
-                  targetCard.fraction
+                const updatedMyCards = prevMyCards.map((card) =>
+                  card.id === targetCard.id
+                    ? updateCardState(card, enemyCard, setDamageInfo)
+                    : card
                 );
-
-                // Учет уменьшения урона от элементов
-                const elementalReduction = getElementalDamageReduction(
-                  targetCard.fraction,
-                  enemyCard.element || "simple"
-                );
-
-                // Расчёт урона с учётом всех модификаторов
-                let rawDamage = getRandomDamage(enemyCard.damage);
-
-                // Учет критического урона для фракции "орки"
-                let isCrit = false;
-                if (enemyCard.fraction === "orcs" && Math.random() <= 0.3) {
-                  rawDamage *= 1.5;
-                  isCrit = true;
-                }
-
-                const modifiedDamage =
-                  rawDamage * fractionModifier * (1 - elementalReduction);
-                const damageAfterArmor = Math.max(
-                  0,
-                  modifiedDamage - targetCard.armor
-                );
-                const newHealth = Math.max(
-                  0,
-                  targetCard.fightHealth - damageAfterArmor
-                );
-
-                const updatedMyCards = prevMyCards.map((card) => {
-                  if (card.id === targetCard.id) {
-                    let newStatusEffects = [...card.statusEffects];
-
-                    if (enemyCard.element && enemyCard.element !== "simple") {
-                      const effectKey =
-                        enemyCard.element.charAt(0).toUpperCase() +
-                        enemyCard.element.slice(1).toLowerCase();
-                      const effectId =
-                        StatusEffectId[
-                          effectKey as keyof typeof StatusEffectId
-                        ];
-
-                      // Проверка иммунитета цели к статус-эффекту
-                      if (canApplyStatusEffect(card.fraction, effectId)) {
-                        const existingEffectIndex = newStatusEffects.findIndex(
-                          (effect) => effect.id === effectId
-                        );
-
-                        if (existingEffectIndex !== -1) {
-                          // Увеличение `duration` существующего эффекта
-                          newStatusEffects = newStatusEffects.map(
-                            (effect, index) =>
-                              index === existingEffectIndex
-                                ? { ...effect, duration: effect.duration + 2 }
-                                : effect
-                          );
-                        } else {
-                          // Добавление нового эффекта
-                          newStatusEffects.push(
-                            createStatusEffect(effectId, 2)
-                          );
-                        }
-                      }
-                    }
-
-                    return {
-                      ...card,
-                      fightHealth: newHealth,
-                      statusEffects: newStatusEffects,
-                    };
-                  }
-                  return card;
-                });
 
                 setMyCards(updatedMyCards);
 
-                setDamageInfo({
-                  id: targetCard.id,
-                  damage: damageAfterArmor,
-                  isCrit,
-                });
+                setEnemyCards((prevEnemyCards) =>
+                  prevEnemyCards.map((card) =>
+                    card.id === enemyCard.id
+                      ? applySleepEffectToCard(card)
+                      : card
+                  )
+                );
 
                 setTimeout(() => setDamageInfo(null), 1000);
 
                 setReloadableEnemyCards((prev) => [...prev, enemyCard.id]);
-                attackedEnemyCardIds.push(enemyCard.id);
                 attackIndex++;
               });
             } else {
@@ -176,22 +107,13 @@ export const useEnemyAttack = (
             }
           } else {
             clearInterval(enemyAttackInterval);
-            setIsPlayerTurn(true);
-            setRound((prev) => ++prev);
-            setReloadableEnemyCards([]);
-
             setEnemyCards((prevEnemyCards) =>
-              prevEnemyCards.map((card) =>
-                attackedEnemyCardIds.includes(card.id)
-                  ? {
-                      ...card,
-                      statusEffects: card.statusEffects.filter(
-                        (effect) => effect.id !== StatusEffectId.Sleep
-                      ),
-                    }
-                  : card
-              )
+              removeSleepEffectsFromCards(prevEnemyCards)
             );
+
+            setIsPlayerTurn(true);
+            setRound((prev) => prev + 1);
+            setReloadableEnemyCards([]);
           }
 
           return prevMyCards;

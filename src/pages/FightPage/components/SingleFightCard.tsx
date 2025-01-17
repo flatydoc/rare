@@ -94,7 +94,7 @@ export const SingleFightCard = ({
 
                   return (
                     <Box
-                      key={index}
+                      key={`z-effect-${index}`}
                       sx={{
                         position: "absolute",
                         fontSize: `${fontSize}px`,
@@ -340,7 +340,7 @@ export const SingleFightCard = ({
               { icon: armor, value: card.armor + card.bonusArmor },
             ].map((stat, index) => (
               <Box
-                key={index}
+                key={`stat-${index}`}
                 sx={{
                   display: "flex",
                   alignItems: "center",

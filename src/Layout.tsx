@@ -53,7 +53,7 @@ export const Layout = () => {
         img: zombie,
         gemIds: [],
         sockets: 0,
-        element: "earth",
+        element: "simple",
         class: "fighter",
       },
       {
@@ -81,7 +81,7 @@ export const Layout = () => {
         img: zombie,
         gemIds: [],
         sockets: 0,
-        element: "darkness",
+        element: "flame",
         class: "defender",
       },
       {
@@ -109,7 +109,7 @@ export const Layout = () => {
         img: zombie,
         gemIds: [],
         sockets: 0,
-        element: "holy",
+        element: "poison",
         class: "support",
       },
     ]);
