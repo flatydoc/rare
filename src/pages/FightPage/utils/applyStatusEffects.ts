@@ -7,16 +7,23 @@ export const applyStatusEffects = (
   target: IFightCard,
   attacker: IFightCard
 ): IStatusEffect[] => {
-  if (!attacker.element || attacker.element === "simple")
+  if (
+    !attacker.element ||
+    attacker.element === "simple" ||
+    attacker.element === "holy" ||
+    attacker.element === "shock"
+  ) {
     return target.statusEffects;
+  }
 
   const effectKey =
     attacker.element.charAt(0).toUpperCase() +
     attacker.element.slice(1).toLowerCase();
   const effectId = StatusEffectId[effectKey as keyof typeof StatusEffectId];
 
-  if (!canApplyStatusEffect(target.fraction, effectId))
+  if (!canApplyStatusEffect(target.fraction, effectId)) {
     return target.statusEffects;
+  }
 
   const existingEffectIndex = target.statusEffects.findIndex(
     (effect) => effect.id === effectId
@@ -29,6 +36,6 @@ export const applyStatusEffects = (
         : effect
     );
   } else {
-    return [...target.statusEffects, createStatusEffect(effectId, 2)];
+    return [...target.statusEffects, createStatusEffect(effectId)];
   }
 };

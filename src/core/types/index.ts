@@ -88,6 +88,8 @@ export interface ICard {
 
 export interface IFightCard extends ICard {
   fightHealth: number;
+  fightDamage: number;
+  fightArmor: number;
   statusEffects: IStatusEffect[];
 }
 

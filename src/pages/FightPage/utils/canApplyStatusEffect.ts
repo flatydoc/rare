@@ -3,10 +3,10 @@ import { Fraction } from "../../../core/types";
 
 export const immunityByFraction: Record<Fraction, StatusEffectId[]> = {
   alliance: [],
-  undead: [StatusEffectId.Poison], // Нежить невосприимчива к яду
-  demons: [StatusEffectId.Flame], // Демоны невосприимчивы к пламени
-  elves: [], // Нет иммунитетов
-  orcs: [], // Нет иммунитетов
+  undead: [StatusEffectId.Poison],
+  demons: [StatusEffectId.Flame],
+  elves: [],
+  orcs: [],
 };
 
 export const canApplyStatusEffect = (

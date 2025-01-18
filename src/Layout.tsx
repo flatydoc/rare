@@ -18,6 +18,8 @@ import silver from "./assets/silver.webp";
 import { RouteList } from "./core/enums";
 import { useEffect } from "react";
 import baba from "./assets/baba.png";
+import ded from "./assets/ded.png";
+
 export const Layout = () => {
   const setCards = useCardStore((state) => state.setCards);
   const setAllCards = useAllCardsStore((state) => state.setCards);
@@ -47,14 +49,14 @@ export const Layout = () => {
         exp: 150,
         level: 1,
         stars: 0,
-        fraction: "alliance",
+        fraction: "orcs",
         priceCurrency: "inGame",
         name: "Default Zombie",
         description: "A basic tueben'",
         img: demon,
         gemIds: [],
         sockets: 0,
-        element: "simple",
+        element: "darkness",
         class: "fighter",
       },
       {
@@ -82,7 +84,7 @@ export const Layout = () => {
         img: baba,
         gemIds: [],
         sockets: 0,
-        element: "simple",
+        element: "frost",
         class: "defender",
       },
       {
@@ -91,7 +93,7 @@ export const Layout = () => {
         rarity: "common",
         tier: "S+",
         price: 100,
-        damage: 10,
+        damage: 20,
         bonusDamage: 0,
         damageCoef: 1.2,
         health: 100,
@@ -103,14 +105,14 @@ export const Layout = () => {
         exp: 150,
         level: 1,
         stars: 0,
-        fraction: "alliance",
+        fraction: "orcs",
         priceCurrency: "inGame",
         name: "Ded",
         description: "A basic tueben'",
-        img: zombie,
+        img: ded,
         gemIds: [],
         sockets: 0,
-        element: "holy",
+        element: "flame",
         class: "support",
       },
     ]);
@@ -270,10 +272,10 @@ export const Layout = () => {
         priceCurrency: "inGame",
         name: "Sapphire of Health",
         description: "A sapphire that boosts health.",
-        tooltipTitle: "• #+10# health \n• #-20# armor",
-        damageModifier: 15,
-        armorModifier: -20,
-        healthModifier: 10,
+        tooltipTitle: "• #+20# health \n• #+10# armor \n• #-20# damage",
+        damageModifier: -20,
+        armorModifier: 10,
+        healthModifier: 20,
         gradeModifier: 0,
         removable: true,
         img: gem2,

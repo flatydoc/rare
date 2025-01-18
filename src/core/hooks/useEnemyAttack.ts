@@ -4,7 +4,7 @@ import { animateAttack } from "../utils/animateAttack";
 import { removeSleepEffectsFromCards } from "../../pages/FightPage/utils/removeSleepEffectsFromCards";
 import { updateCardState } from "../../pages/FightPage/utils/updateCardState";
 import { applySleepEffectToCard } from "../../pages/FightPage/utils/applySleepEffectToCard";
-import { restoreOrcCardHealth } from "../../pages/FightPage/utils/restoreDemonsCardHealth";
+import { restoreCardHealth } from "../../pages/FightPage/utils/restoreCardHealth";
 
 export const useEnemyAttack = (
   enemyCards: IFightCard[],
@@ -19,6 +19,7 @@ export const useEnemyAttack = (
       id: number;
       damage: number;
       isCrit?: boolean;
+      isMiss?: boolean;
     } | null>
   >,
   setHealInfo: React.Dispatch<
@@ -91,7 +92,7 @@ export const useEnemyAttack = (
                 const { updatedCard: updatedTargetCard, damage } =
                   updateCardState(targetCard, enemyCard, setDamageInfo);
 
-                const updatedEnemyCard = restoreOrcCardHealth(
+                const updatedEnemyCard = restoreCardHealth(
                   enemyCard,
                   damage,
                   setHealInfo

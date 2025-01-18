@@ -6,6 +6,6 @@ export const applySleepEffectToCard = (card: IFightCard): IFightCard => ({
   ...card,
   statusEffects: [
     ...card.statusEffects,
-    createStatusEffect(StatusEffectId.Sleep, 1),
+    createStatusEffect(StatusEffectId.Sleep),
   ],
 });

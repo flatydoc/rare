@@ -7,7 +7,7 @@ export const getElementalDamageReduction = (
 ): number => {
   const reductions: Record<Fraction, Record<Element, number>> = {
     alliance: {
-      holy: 0.8, // 80% меньше урона
+      holy: 0.8,
       frost: 0,
       flame: 0,
       shock: 0,
@@ -17,12 +17,12 @@ export const getElementalDamageReduction = (
       poison: 0,
     },
     undead: {
-      darkness: 0.7, // 70% меньше урона
+      darkness: 0.7,
       frost: 0,
       flame: 0,
       shock: 0,
       earth: 0,
-      holy: 0,
+      holy: -0.5,
       simple: 0,
       poison: 0,
     },
@@ -37,7 +37,7 @@ export const getElementalDamageReduction = (
       poison: 0,
     },
     elves: {
-      earth: 0.5, // 50% меньше урона
+      earth: 0.5,
       frost: 0,
       flame: 0,
       shock: 0,

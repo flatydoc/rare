@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import { IFightCard } from "../../core/types";
 import { FightCardsList } from "./components/FightCardsList";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Popup } from "../../components/Popup";
 import { SelectCardPopup } from "./components/SelectCardPopup";
 import { useCardStore } from "../../core/store/useCardStore";
@@ -19,8 +19,9 @@ import { updateCardState } from "./utils/updateCardState";
 import { applySleepEffectToCard } from "./utils/applySleepEffectToCard";
 import { checkVictoryCondition } from "./utils/checkVictoryCondition";
 import { removeSleepEffectsFromCards } from "./utils/removeSleepEffectsFromCards";
-import { restoreOrcCardHealth } from "./utils/restoreDemonsCardHealth";
+import { restoreCardHealth } from "./utils/restoreCardHealth";
 import { animateAttack } from "../../core/utils/animateAttack";
+import { StatusEffectId } from "../../core/enums/statusEffects";
 
 export const FightPage = () => {
   useBackBtn();
@@ -35,7 +36,9 @@ export const FightPage = () => {
       if (round) {
         const enhancedCards = round.enemyCards.map((card) => ({
           ...card,
-          fightHealth: card.health,
+          fightHealth: card.health + card.bonusHealth,
+          fightArmor: card.armor + card.bonusArmor,
+          fightDamage: card.damage + card.bonusDamage,
           statusEffects: generateDefaultStatusEffects(
             card.fraction,
             card.element
@@ -69,6 +72,7 @@ export const FightPage = () => {
     id: number;
     damage: number;
     isCrit?: boolean;
+    isMiss?: boolean;
   } | null>(null);
 
   const [healInfo, setHealInfo] = useState<{
@@ -130,7 +134,9 @@ export const FightPage = () => {
         const newMyCards = [...myCards];
         newMyCards[selectedSlotIndex] = {
           ...selectedCard,
-          fightHealth: selectedCard.health,
+          fightHealth: selectedCard.health + selectedCard.bonusHealth,
+          fightArmor: selectedCard.armor + selectedCard.bonusArmor,
+          fightDamage: selectedCard.damage + selectedCard.bonusDamage,
           statusEffects: generateDefaultStatusEffects(
             selectedCard.fraction,
             selectedCard.element
@@ -170,11 +176,7 @@ export const FightPage = () => {
             setDamageInfo
           );
 
-          const updatedMyCard = restoreOrcCardHealth(
-            myCard,
-            damage,
-            setHealInfo
-          );
+          const updatedMyCard = restoreCardHealth(myCard, damage, setHealInfo);
 
           const updatedEnemyCards = enemyCards.map((card) =>
             card.id === selectedEnemyCardId ? updatedEnemyCard : card

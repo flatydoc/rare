@@ -7,11 +7,15 @@ import damage from "../../../assets/damage.png";
 import armor from "../../../assets/armor.png";
 import { getRarityColor } from "../../../core/utils/getRarityColor";
 import tombstone from "../../../assets/tombstone.png";
+import { StatusEffectId } from "../../../core/enums/statusEffects";
+import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
+import { getRangeValue } from "../../../core/utils/getRangeValue";
 
 type DamageInfo = {
   id: number;
   damage: number;
   isCrit?: boolean;
+  isMiss?: boolean;
 } | null;
 
 type HealInfo = {
@@ -144,7 +148,11 @@ export const SingleFightCard = ({
                     : "rgba(225, 225, 225, 0.7)",
               }}
             >
-              {damageInfo?.damage < 1 ? 0 : `-${damageInfo.damage.toFixed(0)}`}
+              {damageInfo.isMiss
+                ? "Miss"
+                : damageInfo?.damage < 1
+                ? "Blocked"
+                : `-${damageInfo.damage.toFixed(0)}`}
             </Typography>
             {damageInfo.isCrit && damageInfo?.damage > 0 && (
               <Typography
@@ -220,7 +228,7 @@ export const SingleFightCard = ({
                 left: "50%",
                 transform: "translateX(-50%)",
                 width: "50%",
-                height: "10%",
+                height: "20%",
                 borderRadius: "20px",
                 backgroundColor: !isReload
                   ? `${getRarityColor(card.rarity)}99`
@@ -363,20 +371,35 @@ export const SingleFightCard = ({
           <Box
             sx={{
               display: "flex",
+              flexDirection: "column",
               justifyContent: "center",
               gap: "12px",
             }}
           >
             {[
-              { icon: damage, value: card.damage + card.bonusDamage },
-              { icon: armor, value: card.armor + card.bonusArmor },
+              {
+                icon: damage,
+                isDamage: true,
+                value: card.fightDamage,
+                affectedBy: "frost",
+                isStatReduced: card.statusEffects.some(
+                  (effect) => effect.id === StatusEffectId.Frost
+                ),
+              },
+              {
+                icon: armor,
+                value: card.fightArmor,
+                affectedBy: "flame",
+                isStatReduced: card.statusEffects.some(
+                  (effect) => effect.id === StatusEffectId.Flame
+                ),
+              },
             ].map((stat, index) => (
               <Box
                 key={`stat-${index}`}
                 sx={{
                   display: "flex",
                   alignItems: "center",
-                  flexDirection: "column",
                   gap: "6px",
                 }}
               >
@@ -389,10 +412,26 @@ export const SingleFightCard = ({
                   sx={{
                     fontSize: "12px",
                     fontWeight: "bold",
-                    color: colors.textColor,
+                    color: stat.isStatReduced
+                      ? "rgb(190, 0, 0)"
+                      : colors.textColor,
+                    display: "flex",
+                    alignItems: "center",
                   }}
                 >
-                  {stat.value.toFixed(0)}
+                  {stat.isDamage
+                    ? getRangeValue(stat.value)
+                    : stat.value.toFixed(0)}
+                  {stat.isStatReduced && (
+                    <KeyboardArrowDownRoundedIcon
+                      sx={{
+                        fontSize: "inherit",
+                        verticalAlign: "middle",
+                        color: "rgb(190, 0, 0)",
+                        marginLeft: "4px",
+                      }}
+                    />
+                  )}
                 </Typography>
               </Box>
             ))}

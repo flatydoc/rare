@@ -159,7 +159,7 @@ export const CardStat = ({
                     <KeyboardArrowUpRoundedIcon
                       sx={{
                         fontSize: "inherit",
-                        verticalAlign: "middle",
+                        verticalAlign: "inherit",
                         color: "rgb(0, 190, 0)",
                       }}
                     />
