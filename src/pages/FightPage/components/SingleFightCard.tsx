@@ -154,7 +154,7 @@ export const SingleFightCard = ({
                 ? "Blocked"
                 : `-${damageInfo.damage.toFixed(0)}`}
             </Typography>
-            {damageInfo.isCrit && damageInfo?.damage > 0 && (
+            {damageInfo.isCrit && damageInfo?.damage >= 1 && (
               <Typography
                 sx={{
                   fontSize: "24px",

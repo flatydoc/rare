@@ -3,7 +3,7 @@ import { Fraction } from "../../../core/types";
 
 export const immunityByFraction: Record<Fraction, StatusEffectId[]> = {
   alliance: [],
-  undead: [StatusEffectId.Poison],
+  undead: [StatusEffectId.Poison, StatusEffectId.Frost],
   demons: [StatusEffectId.Flame],
   elves: [],
   orcs: [],

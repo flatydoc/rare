@@ -1,19 +1,19 @@
 import { StatusEffectId } from "../../../core/enums/statusEffects";
-import { IFightCard, IStatusEffect } from "../../../core/types";
+import { IFightCard } from "../../../core/types";
 import { createStatusEffect } from "../../../core/utils/createStatusEffects";
 import { canApplyStatusEffect } from "./canApplyStatusEffect";
 
 export const applyStatusEffects = (
   target: IFightCard,
   attacker: IFightCard
-): IStatusEffect[] => {
+): IFightCard => {
   if (
     !attacker.element ||
     attacker.element === "simple" ||
     attacker.element === "holy" ||
     attacker.element === "shock"
   ) {
-    return target.statusEffects;
+    return target;
   }
 
   const effectKey =
@@ -22,20 +22,47 @@ export const applyStatusEffects = (
   const effectId = StatusEffectId[effectKey as keyof typeof StatusEffectId];
 
   if (!canApplyStatusEffect(target.fraction, effectId)) {
-    return target.statusEffects;
+    return target;
   }
 
-  const existingEffectIndex = target.statusEffects.findIndex(
+  const updatedStatusEffects = [...target.statusEffects];
+  const existingEffectIndex = updatedStatusEffects.findIndex(
     (effect) => effect.id === effectId
   );
 
+  // Если эффект уже существует, продлеваем его
   if (existingEffectIndex !== -1) {
-    return target.statusEffects.map((effect, index) =>
-      index === existingEffectIndex
-        ? { ...effect, duration: effect.duration + 1 }
-        : effect
-    );
-  } else {
-    return [...target.statusEffects, createStatusEffect(effectId)];
+    updatedStatusEffects[existingEffectIndex] = {
+      ...updatedStatusEffects[existingEffectIndex],
+      duration: updatedStatusEffects[existingEffectIndex].duration + 1,
+    };
+
+    // Возвращаем цель без изменения характеристик
+    return {
+      ...target,
+      statusEffects: updatedStatusEffects,
+    };
   }
+
+  // Если эффекта нет, создаём новый
+  updatedStatusEffects.push(createStatusEffect(effectId));
+
+  // Если элемент — "flame", уменьшаем броню цели на 30%
+  const updatedFightArmor =
+    attacker.element === "flame"
+      ? Math.floor(target.fightArmor * 0.7)
+      : target.fightArmor;
+
+  // Если элемент — "frost", уменьшаем урон цели на 30%
+  const updatedFightDamage =
+    attacker.element === "frost"
+      ? Math.floor(target.fightDamage * 0.7)
+      : target.fightDamage;
+
+  return {
+    ...target,
+    fightArmor: updatedFightArmor,
+    fightDamage: updatedFightDamage,
+    statusEffects: updatedStatusEffects,
+  };
 };

@@ -24,18 +24,12 @@ export const updateCardState = (
 
   const updatedHealthCard = updateCardHealth(targetCard, damage);
 
-  const updatedStatusEffects = applyStatusEffects(
-    updatedHealthCard,
-    attackingCard
-  );
+  const updatedCard = applyStatusEffects(updatedHealthCard, attackingCard);
 
   setDamageInfo({ id: targetCard.id, damage, isCrit });
 
   return {
-    updatedCard: {
-      ...updatedHealthCard,
-      statusEffects: updatedStatusEffects,
-    },
+    updatedCard,
     damage,
   };
 };

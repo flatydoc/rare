@@ -22,6 +22,7 @@ import { removeSleepEffectsFromCards } from "./utils/removeSleepEffectsFromCards
 import { restoreCardHealth } from "./utils/restoreCardHealth";
 import { animateAttack } from "../../core/utils/animateAttack";
 import { StatusEffectId } from "../../core/enums/statusEffects";
+import { removeExpiredEffects } from "./utils/removeExpiredEffects";
 
 export const FightPage = () => {
   useBackBtn();
@@ -227,10 +228,12 @@ export const FightPage = () => {
             }))
             .filter((effect) => effect.duration > 0);
 
-          return {
+          const updatedCard = {
             ...card,
             statusEffects: updatedEffects,
           };
+
+          return removeExpiredEffects(updatedCard);
         });
       };
 
