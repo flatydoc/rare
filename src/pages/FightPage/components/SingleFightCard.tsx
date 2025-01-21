@@ -16,7 +16,7 @@ type DamageInfo = {
   damage: number;
   isCrit?: boolean;
   isMiss?: boolean;
-} | null;
+}[];
 
 type HealInfo = {
   id: number;
@@ -48,6 +48,7 @@ export const SingleFightCard = ({
 
   const isDead = card.fightHealth <= 0;
   const isReload = reloadableCards.includes(card.id);
+  const currentDamageInfo = damageInfo.find((info) => info.id === card.id);
 
   return (
     <>
@@ -127,7 +128,7 @@ export const SingleFightCard = ({
             </Box>
           </Box>
         )}
-        {damageInfo?.id === card.id && (
+        {currentDamageInfo && (
           <Box
             sx={{
               ...centerContentStyles,
@@ -143,18 +144,18 @@ export const SingleFightCard = ({
                 fontSize: "24px",
                 fontWeight: "600",
                 color:
-                  damageInfo?.damage > 1
+                  currentDamageInfo.damage > 1
                     ? colors.red
                     : "rgba(225, 225, 225, 0.7)",
               }}
             >
-              {damageInfo.isMiss
+              {currentDamageInfo.isMiss
                 ? "Miss"
-                : damageInfo?.damage < 1
+                : currentDamageInfo.damage < 1
                 ? "Blocked"
-                : `-${damageInfo.damage.toFixed(0)}`}
+                : `-${currentDamageInfo.damage.toFixed(0)}`}
             </Typography>
-            {damageInfo.isCrit && damageInfo?.damage >= 1 && (
+            {currentDamageInfo.isCrit && currentDamageInfo.damage >= 1 && (
               <Typography
                 sx={{
                   fontSize: "24px",
@@ -295,12 +296,12 @@ export const SingleFightCard = ({
                   backgroundColor: isMyCard ? colors.green : colors.red,
                 }}
               />
-              {damageInfo?.id === card.id && (
+              {currentDamageInfo?.damage && (
                 <Box
                   sx={{
-                    width: `${(damageInfo.damage / card.health) * 100}%`,
+                    width: `${(currentDamageInfo.damage / card.health) * 100}%`,
                     height: "100%",
-                    backgroundColor: damageInfo?.isCrit
+                    backgroundColor: currentDamageInfo.isCrit
                       ? "rgb(255, 230, 0)"
                       : "rgba(225, 225, 225, 0.7)",
                   }}

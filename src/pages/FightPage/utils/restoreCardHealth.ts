@@ -1,3 +1,4 @@
+import { StatusEffectId } from "../../../core/enums/statusEffects";
 import { IFightCard } from "../../../core/types";
 
 export const restoreCardHealth = (
@@ -10,6 +11,14 @@ export const restoreCardHealth = (
     } | null>
   >
 ): IFightCard => {
+  const hasDarknessEffect = card.statusEffects.some(
+    (effect) => effect.id === StatusEffectId.Darkness
+  );
+
+  if (hasDarknessEffect) {
+    return card;
+  }
+
   let healAmount = 0;
 
   if (card.fraction === "demons") {

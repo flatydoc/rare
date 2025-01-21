@@ -15,12 +15,14 @@ export const useEnemyAttack = (
   isPlayerTurn: boolean,
   setIsPlayerTurn: React.Dispatch<React.SetStateAction<boolean>>,
   setDamageInfo: React.Dispatch<
-    React.SetStateAction<{
-      id: number;
-      damage: number;
-      isCrit?: boolean;
-      isMiss?: boolean;
-    } | null>
+    React.SetStateAction<
+      {
+        id: number;
+        damage: number;
+        isCrit?: boolean;
+        isMiss?: boolean;
+      }[]
+    >
   >,
   setHealInfo: React.Dispatch<
     React.SetStateAction<{
@@ -113,7 +115,7 @@ export const useEnemyAttack = (
                   )
                 );
 
-                setTimeout(() => setDamageInfo(null), 1000);
+                setTimeout(() => setDamageInfo([]), 1000);
                 setTimeout(() => setHealInfo(null), 1000);
                 setReloadableEnemyCards((prev) => [...prev, enemyCard.id]);
                 attackIndex++;

@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import { IFightCard } from "../../core/types";
 import { FightCardsList } from "./components/FightCardsList";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Popup } from "../../components/Popup";
 import { SelectCardPopup } from "./components/SelectCardPopup";
 import { useCardStore } from "../../core/store/useCardStore";
@@ -21,7 +21,6 @@ import { checkVictoryCondition } from "./utils/checkVictoryCondition";
 import { removeSleepEffectsFromCards } from "./utils/removeSleepEffectsFromCards";
 import { restoreCardHealth } from "./utils/restoreCardHealth";
 import { animateAttack } from "../../core/utils/animateAttack";
-import { StatusEffectId } from "../../core/enums/statusEffects";
 import { removeExpiredEffects } from "./utils/removeExpiredEffects";
 
 export const FightPage = () => {
@@ -69,12 +68,14 @@ export const FightPage = () => {
     null
   );
   const [selectedMyCardId, setSelectedMyCardId] = useState<number | null>(null);
-  const [damageInfo, setDamageInfo] = useState<{
-    id: number;
-    damage: number;
-    isCrit?: boolean;
-    isMiss?: boolean;
-  } | null>(null);
+  const [damageInfo, setDamageInfo] = useState<
+    {
+      id: number;
+      damage: number;
+      isCrit?: boolean;
+      isMiss?: boolean;
+    }[]
+  >([]);
 
   const [healInfo, setHealInfo] = useState<{
     id: number;
@@ -197,7 +198,7 @@ export const FightPage = () => {
             return;
           }
 
-          setTimeout(() => setDamageInfo(null), 1000);
+          setTimeout(() => setDamageInfo([]), 1000);
           setTimeout(() => setHealInfo(null), 1000);
           setReloadableCards((prev) => [...prev, selectedMyCardId]);
           setSelectedEnemyCardId(null);

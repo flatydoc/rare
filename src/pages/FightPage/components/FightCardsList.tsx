@@ -7,7 +7,8 @@ type DamageInfo = {
   id: number;
   damage: number;
   isCrit?: boolean;
-} | null;
+  isMiss?: boolean;
+}[];
 
 type HealInfo = {
   id: number;
