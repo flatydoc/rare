@@ -78,7 +78,7 @@ export const EmptyCardSlot = ({
           flexDirection: "column",
           p: "12px 6px",
           gap: "12px",
-          height: "82px",
+          height: "92px",
         }}
       />
     </Box>

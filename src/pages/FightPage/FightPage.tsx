@@ -63,7 +63,7 @@ export const FightPage = () => {
   const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(
     null
   );
-  const [round, setRound] = useState<number>(1);
+  const [round, setRound] = useState<number>(0);
   const [selectedEnemyCardId, setSelectedEnemyCardId] = useState<number | null>(
     null
   );
@@ -90,6 +90,7 @@ export const FightPage = () => {
   const handleFight = () => {
     if (areAllCardsValid()) {
       setIsFight(true);
+      setRound(1);
     }
   };
 
@@ -208,7 +209,13 @@ export const FightPage = () => {
             (card) => typeof card !== "number" && card.fightHealth > 0
           );
 
-          if (reloadableCards.length + 1 === aliveMyCards.length) {
+          if (aliveMyCards.length === 0) {
+            setIsWin(false);
+            setIsShowResult(true);
+            return;
+          }
+
+          if (reloadableCards.length + 1 >= aliveMyCards.length) {
             setMyCards(removeSleepEffectsFromCards(myCards as IFightCard[]));
             setIsPlayerTurn(false);
             setReloadableCards([]);
@@ -219,7 +226,7 @@ export const FightPage = () => {
   };
 
   useEffect(() => {
-    if (round !== 1) {
+    if (round) {
       const updateStatusEffectsForCards = (cards: IFightCard[]) => {
         return cards.map((card) => {
           const updatedEffects = card.statusEffects

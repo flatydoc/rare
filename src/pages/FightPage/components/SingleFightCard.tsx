@@ -7,9 +7,9 @@ import damage from "../../../assets/damage.png";
 import armor from "../../../assets/armor.png";
 import { getRarityColor } from "../../../core/utils/getRarityColor";
 import tombstone from "../../../assets/tombstone.png";
-import { StatusEffectId } from "../../../core/enums/statusEffects";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import { getRangeValue } from "../../../core/utils/getRangeValue";
+import { StatusEffectId } from "../../../core/enums/statusEffects";
 
 type DamageInfo = {
   id: number;
@@ -231,14 +231,15 @@ export const SingleFightCard = ({
                 width: "50%",
                 height: "20%",
                 borderRadius: "20px",
-                backgroundColor: !isReload
-                  ? `${getRarityColor(card.rarity)}99`
-                  : `${getRarityColor("common")}99`,
+
+                backgroundColor: isReload
+                  ? `${getRarityColor("common")}99`
+                  : `${getRarityColor(card.rarity)}99`,
                 filter: "blur(12px)",
                 boxShadow: `0px 0px 20px ${
-                  !isReload
-                    ? `${getRarityColor(card.rarity)}99`
-                    : `${getRarityColor("common")}99`
+                  isReload
+                    ? `${getRarityColor("common")}99`
+                    : `${getRarityColor(card.rarity)}99`
                 }`,
               }}
             />
@@ -260,22 +261,23 @@ export const SingleFightCard = ({
                 gap: "4px",
               }}
             >
-              {card.statusEffects.map((effect) => (
-                <Typography
-                  key={effect.id}
-                  sx={{
-                    fontSize: "10px",
-                    textShadow: `
-                  -1px -1px 0 black,
-                  1px -1px 0 black,
-                  -1px 1px 0 black,
-                  1px 1px 0 black
-                `,
-                  }}
-                >
-                  {effect.icon}
-                </Typography>
-              ))}
+              {!isDead &&
+                card.statusEffects.map((effect) => (
+                  <Typography
+                    key={effect.id}
+                    sx={{
+                      fontSize: "10px",
+                      textShadow: `
+                    -1px -1px 0 black,
+                    1px -1px 0 black,
+                    -1px 1px 0 black,
+                    1px 1px 0 black
+                  `,
+                    }}
+                  >
+                    {effect.icon}
+                  </Typography>
+                ))}
             </Box>
             <Box
               sx={{
@@ -369,74 +371,72 @@ export const SingleFightCard = ({
               </Box>
             </Box>
           </Box>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              gap: "12px",
-            }}
-          >
-            {[
-              {
-                icon: damage,
-                isDamage: true,
-                value: card.fightDamage,
-                affectedBy: "frost",
-                isStatReduced: card.statusEffects.some(
-                  (effect) => effect.id === StatusEffectId.Frost
-                ),
-              },
-              {
-                icon: armor,
-                value: card.fightArmor,
-                affectedBy: "flame",
-                isStatReduced: card.statusEffects.some(
-                  (effect) => effect.id === StatusEffectId.Flame
-                ),
-              },
-            ].map((stat, index) => (
-              <Box
-                key={`stat-${index}`}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                }}
-              >
-                <img
-                  src={stat.icon}
-                  alt="modifier icon"
-                  style={{ width: "16px", height: "16px" }}
-                />
-                <Typography
+          {!isDead && (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                gap: "12px",
+              }}
+            >
+              {[
+                {
+                  icon: damage,
+                  isDamage: true,
+                  value: card.fightDamage,
+                  affectedBy: "frost",
+                  isStatReduced: card.fightDamage < card.damage,
+                },
+                {
+                  icon: armor,
+                  value: card.fightArmor,
+                  affectedBy: "flame",
+                  isStatReduced: card.fightArmor < card.armor,
+                },
+              ].map((stat, index) => (
+                <Box
+                  key={`stat-${index}`}
                   sx={{
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    color: stat.isStatReduced
-                      ? "rgb(190, 0, 0)"
-                      : colors.textColor,
                     display: "flex",
                     alignItems: "center",
+                    gap: "6px",
                   }}
                 >
-                  {stat.isDamage
-                    ? getRangeValue(stat.value)
-                    : stat.value.toFixed(0)}
-                  {stat.isStatReduced && (
-                    <KeyboardArrowDownRoundedIcon
-                      sx={{
-                        fontSize: "inherit",
-                        verticalAlign: "middle",
-                        color: "rgb(190, 0, 0)",
-                        marginLeft: "4px",
-                      }}
-                    />
-                  )}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
+                  <img
+                    src={stat.icon}
+                    alt="modifier icon"
+                    style={{ width: "16px", height: "16px" }}
+                  />
+                  <Typography
+                    sx={{
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                      color: stat.isStatReduced
+                        ? "rgb(190, 0, 0)"
+                        : colors.textColor,
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    {stat.isDamage
+                      ? getRangeValue(stat.value)
+                      : stat.value.toFixed(0)}
+                    {stat.isStatReduced && (
+                      <KeyboardArrowDownRoundedIcon
+                        sx={{
+                          fontSize: "inherit",
+                          verticalAlign: "middle",
+                          color: "rgb(190, 0, 0)",
+                          marginLeft: "4px",
+                        }}
+                      />
+                    )}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          )}
         </Box>
       </Box>
     </>
