@@ -1,10 +1,11 @@
 import { useEffect } from "react";
-import { IFightCard } from "../types";
+import { DamageInfo, HealInfo, IFightCard } from "../types";
 import { removeSleepEffectsFromCards } from "../utils/removeSleepEffectsFromCards";
 import { animateAttack } from "../utils/animateAttack";
 import { updateCardState } from "../utils/updateCardState";
 import { restoreCardHealth } from "../utils/restoreCardHealth";
 import { applySleepEffectToCard } from "../utils/applySleepEffectToCard";
+import { sortTargetsByPriority } from "../utils/sortTargetsByPriority";
 
 export const useEnemyAttack = (
   enemyCards: IFightCard[],
@@ -14,22 +15,8 @@ export const useEnemyAttack = (
   isFight: boolean,
   isPlayerTurn: boolean,
   setIsPlayerTurn: React.Dispatch<React.SetStateAction<boolean>>,
-  setDamageInfo: React.Dispatch<
-    React.SetStateAction<
-      {
-        id: number;
-        damage: number;
-        isCrit?: boolean;
-        isMiss?: boolean;
-      }[]
-    >
-  >,
-  setHealInfo: React.Dispatch<
-    React.SetStateAction<{
-      id: number;
-      heal: number;
-    } | null>
-  >,
+  setDamageInfo: React.Dispatch<React.SetStateAction<DamageInfo>>,
+  setHealInfo: React.Dispatch<React.SetStateAction<HealInfo>>,
   setIsShowResult: React.Dispatch<React.SetStateAction<boolean>>,
   setIsWin: React.Dispatch<React.SetStateAction<boolean | null>>,
   setEnemyCards: React.Dispatch<React.SetStateAction<IFightCard[]>>,
@@ -71,11 +58,8 @@ export const useEnemyAttack = (
 
           if (attackIndex < availableEnemyCards.length) {
             const enemyCard = availableEnemyCards[attackIndex];
-            const targetCard = validTargets.reduce((minCard, currentCard) =>
-              currentCard.fightHealth < minCard.fightHealth
-                ? currentCard
-                : minCard
-            );
+            const sortedTargets = sortTargetsByPriority(validTargets);
+            const targetCard = sortedTargets[0];
 
             if (!targetCard || targetCard.fightHealth <= 0) {
               attackIndex++;
@@ -91,8 +75,12 @@ export const useEnemyAttack = (
 
             if (attackingCardElement && targetCardElement) {
               animateAttack(attackingCardElement, targetCardElement, () => {
-                const { updatedCard: updatedTargetCard, damage } =
-                  updateCardState(targetCard, enemyCard, setDamageInfo);
+                const { updatedCards, damage } = updateCardState(
+                  prevMyCards,
+                  targetCard.id,
+                  enemyCard,
+                  setDamageInfo
+                );
 
                 const updatedEnemyCard = restoreCardHealth(
                   enemyCard,
@@ -103,11 +91,7 @@ export const useEnemyAttack = (
                 const updatedEnemyCardWithSleep =
                   applySleepEffectToCard(updatedEnemyCard);
 
-                setMyCards((prevMyCards) =>
-                  prevMyCards.map((card) =>
-                    card.id === targetCard.id ? updatedTargetCard : card
-                  )
-                );
+                setMyCards(updatedCards);
 
                 setEnemyCards((prevEnemyCards) =>
                   prevEnemyCards.map((card) =>
@@ -128,7 +112,6 @@ export const useEnemyAttack = (
             setEnemyCards((prevEnemyCards) =>
               removeSleepEffectsFromCards(prevEnemyCards)
             );
-
             setIsPlayerTurn(true);
             setRound((prev) => prev + 1);
             setReloadableEnemyCards([]);

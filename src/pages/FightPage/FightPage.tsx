@@ -146,78 +146,68 @@ export const FightPage = () => {
 
   const handleAttack = () => {
     if (
-      isPlayerTurn &&
-      isAttackAvailable &&
-      selectedMyCardId !== null &&
-      selectedEnemyCardId !== null
+      !isPlayerTurn ||
+      !isAttackAvailable ||
+      selectedMyCardId === null ||
+      selectedEnemyCardId === null
     ) {
-      const myCard = findCardById(myCards as IFightCard[], selectedMyCardId);
-      const enemyCard = findCardById(enemyCards, selectedEnemyCardId);
-
-      if (myCard && enemyCard) {
-        const attackingElement = document.getElementById(`card-${myCard.id}`);
-        const targetElement = document.getElementById(`card-${enemyCard.id}`);
-
-        if (attackingElement && targetElement) {
-          animateAttack(attackingElement, targetElement, () => {
-            const { updatedCard: updatedEnemyCard, damage } = updateCardState(
-              enemyCard,
-              myCard,
-              setDamageInfo
-            );
-
-            const updatedMyCard = restoreCardHealth(
-              myCard,
-              damage,
-              setHealInfo
-            );
-
-            const updatedEnemyCards = updateCardInArray(
-              enemyCards,
-              updatedEnemyCard
-            );
-            setEnemyCards(updatedEnemyCards);
-
-            setMyCards((prev) =>
-              updateCardInArray(
-                prev as IFightCard[],
-                applySleepEffectToCard(updatedMyCard)
-              )
-            );
-
-            if (
-              checkVictoryCondition(
-                updatedEnemyCards,
-                setIsWin,
-                setIsShowResult
-              )
-            ) {
-              return;
-            }
-
-            setTimeout(() => setDamageInfo([]), 1000);
-            setTimeout(() => setHealInfo(null), 1000);
-
-            const updatedReloadableCards = [...reloadableCards, myCard.id];
-            setReloadableCards(updatedReloadableCards);
-            setSelectedEnemyCardId(null);
-            setSelectedMyCardId(null);
-
-            const aliveCards = filterAliveCards(myCards as IFightCard[]);
-
-            if (
-              aliveCards.every((card) =>
-                updatedReloadableCards.includes(card.id)
-              )
-            ) {
-              setMyCards(removeSleepEffectsFromCards(myCards as IFightCard[]));
-              setIsPlayerTurn(false);
-              setReloadableCards([]);
-            }
-          });
-        }
-      }
+      return;
     }
+
+    const myCard = findCardById(myCards as IFightCard[], selectedMyCardId);
+    const enemyCard = findCardById(enemyCards, selectedEnemyCardId);
+
+    if (!myCard || !enemyCard) {
+      return;
+    }
+
+    const attackingElement = document.getElementById(`card-${myCard.id}`);
+    const targetElement = document.getElementById(`card-${enemyCard.id}`);
+
+    if (!attackingElement || !targetElement) {
+      return;
+    }
+
+    animateAttack(attackingElement, targetElement, () => {
+      const { updatedCards: updatedEnemyCards, damage } = updateCardState(
+        enemyCards,
+        selectedEnemyCardId,
+        myCard,
+        setDamageInfo
+      );
+
+      const updatedMyCard = restoreCardHealth(myCard, damage, setHealInfo);
+      const updatedReloadableCards = [...reloadableCards, myCard.id];
+
+      setEnemyCards(updatedEnemyCards);
+      setMyCards((prev) =>
+        updateCardInArray(
+          prev as IFightCard[],
+          applySleepEffectToCard(updatedMyCard)
+        )
+      );
+      setReloadableCards(updatedReloadableCards);
+      setSelectedEnemyCardId(null);
+      setSelectedMyCardId(null);
+
+      if (checkVictoryCondition(updatedEnemyCards, setIsWin, setIsShowResult)) {
+        return;
+      }
+
+      setTimeout(() => setDamageInfo([]), 1000);
+      setTimeout(() => setHealInfo(null), 1000);
+
+      const aliveCards = filterAliveCards(myCards as IFightCard[]);
+      const allReloaded = aliveCards.every((card) =>
+        updatedReloadableCards.includes(card.id)
+      );
+
+      if (allReloaded) {
+        setMyCards(removeSleepEffectsFromCards(myCards as IFightCard[]));
+        setIsPlayerTurn(false);
+        setReloadableCards([]);
+      }
+    });
   };
 
   useEffect(() => {
