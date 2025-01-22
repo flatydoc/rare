@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { IFightCard } from "../types";
+import { removeSleepEffectsFromCards } from "../utils/removeSleepEffectsFromCards";
 import { animateAttack } from "../utils/animateAttack";
-import { removeSleepEffectsFromCards } from "../../pages/FightPage/utils/removeSleepEffectsFromCards";
-import { updateCardState } from "../../pages/FightPage/utils/updateCardState";
-import { applySleepEffectToCard } from "../../pages/FightPage/utils/applySleepEffectToCard";
-import { restoreCardHealth } from "../../pages/FightPage/utils/restoreCardHealth";
+import { updateCardState } from "../utils/updateCardState";
+import { restoreCardHealth } from "../utils/restoreCardHealth";
+import { applySleepEffectToCard } from "../utils/applySleepEffectToCard";
 
 export const useEnemyAttack = (
   enemyCards: IFightCard[],

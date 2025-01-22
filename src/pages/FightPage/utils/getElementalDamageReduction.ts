@@ -1,5 +1,4 @@
-import { Fraction } from "../../../core/types";
-import { Element } from "../../../core/types";
+import { Element, Fraction } from "../../../core/types";
 
 export const getElementalDamageReduction = (
   targetFraction: Fraction,

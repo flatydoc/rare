@@ -1,6 +1,6 @@
-import { StatusEffectId } from "../../../core/enums/statusEffects";
-import { IFightCard } from "../../../core/types";
-import { createStatusEffect } from "../../../core/utils/createStatusEffects";
+import { StatusEffectId } from "../enums";
+import { IFightCard } from "../types";
+import { createStatusEffect } from "./createStatusEffects";
 
 export const applySleepEffectToCard = (card: IFightCard): IFightCard => ({
   ...card,

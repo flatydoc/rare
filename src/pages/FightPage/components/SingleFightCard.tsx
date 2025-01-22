@@ -1,6 +1,5 @@
 import { Box, Typography } from "@mui/material";
 import { centerContentStyles } from "../../../core/theme/common.style";
-import { IFightCard } from "../../../core/types";
 import { colors } from "../../../core/theme/colors";
 import { getCardImage } from "../../../core/utils/getCardImage";
 import damage from "../../../assets/damage.png";
@@ -9,19 +8,7 @@ import { getRarityColor } from "../../../core/utils/getRarityColor";
 import tombstone from "../../../assets/tombstone.png";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import { getRangeValue } from "../../../core/utils/getRangeValue";
-import { StatusEffectId } from "../../../core/enums/statusEffects";
-
-type DamageInfo = {
-  id: number;
-  damage: number;
-  isCrit?: boolean;
-  isMiss?: boolean;
-}[];
-
-type HealInfo = {
-  id: number;
-  heal: number;
-} | null;
+import { DamageInfo, HealInfo, IFightCard } from "../types";
 
 export const SingleFightCard = ({
   card,
@@ -144,7 +131,7 @@ export const SingleFightCard = ({
                 fontSize: "24px",
                 fontWeight: "600",
                 color:
-                  currentDamageInfo.damage > 1
+                  currentDamageInfo.damage >= 1
                     ? colors.red
                     : "rgba(225, 225, 225, 0.7)",
               }}
@@ -155,7 +142,7 @@ export const SingleFightCard = ({
                 ? "Blocked"
                 : `-${currentDamageInfo.damage.toFixed(0)}`}
             </Typography>
-            {currentDamageInfo.isCrit && currentDamageInfo.damage >= 1 && (
+            {currentDamageInfo.isCrit && currentDamageInfo.damage > 0 && (
               <Typography
                 sx={{
                   fontSize: "24px",
@@ -298,7 +285,7 @@ export const SingleFightCard = ({
                   backgroundColor: isMyCard ? colors.green : colors.red,
                 }}
               />
-              {currentDamageInfo?.damage && (
+              {typeof currentDamageInfo?.damage === "number" && (
                 <Box
                   sx={{
                     width: `${(currentDamageInfo.damage / card.health) * 100}%`,

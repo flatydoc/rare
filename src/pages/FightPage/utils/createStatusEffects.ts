@@ -1,4 +1,4 @@
-import { StatusEffectId } from "../enums/statusEffects";
+import { StatusEffectId } from "../enums";
 import { IStatusEffect } from "../types";
 
 export const effectEmojis: Record<StatusEffectId, string> = {

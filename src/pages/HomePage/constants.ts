@@ -88,7 +88,7 @@ export const PVERounds: Array<{
         health: 100,
         bonusHealth: 0,
         healthCoef: 1.2,
-        armor: 5,
+        armor: 50,
         bonusArmor: 0,
         armorCoef: 1.6,
         exp: 150,

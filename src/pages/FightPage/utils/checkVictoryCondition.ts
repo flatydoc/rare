@@ -1,4 +1,4 @@
-import { IFightCard } from "../../../core/types";
+import { IFightCard } from "../types";
 
 export const checkVictoryCondition = (
   enemyCards: IFightCard[],

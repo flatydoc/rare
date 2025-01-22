@@ -86,21 +86,6 @@ export interface ICard {
   class: CardClass;
 }
 
-export interface IFightCard extends ICard {
-  fightHealth: number;
-  fightDamage: number;
-  fightArmor: number;
-  statusEffects: IStatusEffect[];
-}
-
-export interface IStatusEffect {
-  id: number;
-  title?: string;
-  text?: string;
-  duration: number;
-  icon: string;
-}
-
 export interface ICardPrototype {
   id: number;
   rarity: Rarity;

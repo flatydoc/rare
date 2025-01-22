@@ -1,5 +1,5 @@
-import { StatusEffectId } from "../../../core/enums/statusEffects";
-import { IFightCard } from "../../../core/types";
+import { StatusEffectId } from "../enums";
+import { IFightCard } from "../types";
 
 export const removeExpiredEffects = (card: IFightCard): IFightCard => {
   const hasFrostEffect = card.statusEffects.some(

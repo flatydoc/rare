@@ -1,19 +1,7 @@
 import { Box } from "@mui/material";
 import { SingleFightCard } from "./SingleFightCard";
 import { EmptyCardSlot } from "./EmptyCardSlot";
-import { IFightCard } from "../../../core/types";
-
-type DamageInfo = {
-  id: number;
-  damage: number;
-  isCrit?: boolean;
-  isMiss?: boolean;
-}[];
-
-type HealInfo = {
-  id: number;
-  heal: number;
-} | null;
+import { DamageInfo, HealInfo, IFightCard } from "../types";
 
 export const FightCardsList = ({
   cards,

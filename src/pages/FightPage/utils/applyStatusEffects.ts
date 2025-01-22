@@ -1,7 +1,7 @@
-import { StatusEffectId } from "../../../core/enums/statusEffects";
-import { IFightCard } from "../../../core/types";
-import { createStatusEffect } from "../../../core/utils/createStatusEffects";
+import { StatusEffectId } from "../enums";
+import { IFightCard } from "../types";
 import { canApplyStatusEffect } from "./canApplyStatusEffect";
+import { createStatusEffect } from "./createStatusEffects";
 
 export const applyStatusEffects = (
   target: IFightCard,

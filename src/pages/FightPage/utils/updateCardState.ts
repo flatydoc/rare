@@ -1,4 +1,4 @@
-import { IFightCard } from "../../../core/types";
+import { IFightCard } from "../types";
 import { applyStatusEffects } from "./applyStatusEffects";
 import { calculateDamage } from "./calculateDamage";
 import { updateCardHealth } from "./updateCardHealth";

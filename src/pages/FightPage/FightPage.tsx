@@ -1,5 +1,4 @@
 import { Box, Typography } from "@mui/material";
-import { IFightCard } from "../../core/types";
 import { FightCardsList } from "./components/FightCardsList";
 import { useEffect, useState } from "react";
 import { Popup } from "../../components/Popup";
@@ -8,7 +7,6 @@ import { useCardStore } from "../../core/store/useCardStore";
 import { MainButton } from "../../components/MainButton";
 import { colors } from "../../core/theme/colors";
 import { useBackBtn } from "../../core/hooks/useBackBtn";
-import { useEnemyAttack } from "../../core/hooks/useEnemyAttack";
 import { useNavigate, useParams } from "react-router-dom";
 import { PVERounds } from "../HomePage/constants";
 import { useUserStore } from "../../core/store/useUserStore";
@@ -20,8 +18,11 @@ import { applySleepEffectToCard } from "./utils/applySleepEffectToCard";
 import { checkVictoryCondition } from "./utils/checkVictoryCondition";
 import { removeSleepEffectsFromCards } from "./utils/removeSleepEffectsFromCards";
 import { restoreCardHealth } from "./utils/restoreCardHealth";
-import { animateAttack } from "../../core/utils/animateAttack";
 import { removeExpiredEffects } from "./utils/removeExpiredEffects";
+import { filterAliveCards, findCardById, updateCardInArray } from "./helpers";
+import { DamageInfo, HealInfo, IFightCard } from "./types";
+import { useEnemyAttack } from "./hooks/useEnemyAttack";
+import { animateAttack } from "./utils/animateAttack";
 
 export const FightPage = () => {
   useBackBtn();
@@ -68,23 +69,13 @@ export const FightPage = () => {
     null
   );
   const [selectedMyCardId, setSelectedMyCardId] = useState<number | null>(null);
-  const [damageInfo, setDamageInfo] = useState<
-    {
-      id: number;
-      damage: number;
-      isCrit?: boolean;
-      isMiss?: boolean;
-    }[]
-  >([]);
-
-  const [healInfo, setHealInfo] = useState<{
-    id: number;
-    heal: number;
-  } | null>(null);
+  const [damageInfo, setDamageInfo] = useState<DamageInfo>([]);
+  const [healInfo, setHealInfo] = useState<HealInfo>(null);
 
   const [selectedCardIdForInsert, setSelectedCardIdForInsert] = useState<
     number | null
   >(null);
+
   const [isFight, setIsFight] = useState(false);
 
   const handleFight = () => {
@@ -160,67 +151,71 @@ export const FightPage = () => {
       selectedMyCardId !== null &&
       selectedEnemyCardId !== null
     ) {
-      const myCard = myCards.find(
-        (card) => typeof card !== "number" && card.id === selectedMyCardId
-      ) as IFightCard;
+      const myCard = findCardById(myCards as IFightCard[], selectedMyCardId);
+      const enemyCard = findCardById(enemyCards, selectedEnemyCardId);
 
-      const attackingCardElement = document.getElementById(
-        `card-${selectedMyCardId}`
-      );
-      const targetCardElement = document.getElementById(
-        `card-${selectedEnemyCardId}`
-      );
+      if (myCard && enemyCard) {
+        const attackingElement = document.getElementById(`card-${myCard.id}`);
+        const targetElement = document.getElementById(`card-${enemyCard.id}`);
 
-      if (attackingCardElement && targetCardElement) {
-        animateAttack(attackingCardElement, targetCardElement, () => {
-          const { updatedCard: updatedEnemyCard, damage } = updateCardState(
-            enemyCards.find((card) => card.id === selectedEnemyCardId)!,
-            myCard,
-            setDamageInfo
-          );
+        if (attackingElement && targetElement) {
+          animateAttack(attackingElement, targetElement, () => {
+            const { updatedCard: updatedEnemyCard, damage } = updateCardState(
+              enemyCard,
+              myCard,
+              setDamageInfo
+            );
 
-          const updatedMyCard = restoreCardHealth(myCard, damage, setHealInfo);
+            const updatedMyCard = restoreCardHealth(
+              myCard,
+              damage,
+              setHealInfo
+            );
 
-          const updatedEnemyCards = enemyCards.map((card) =>
-            card.id === selectedEnemyCardId ? updatedEnemyCard : card
-          );
-          setEnemyCards(updatedEnemyCards);
+            const updatedEnemyCards = updateCardInArray(
+              enemyCards,
+              updatedEnemyCard
+            );
+            setEnemyCards(updatedEnemyCards);
 
-          const updatedMyCards = myCards.map((card) =>
-            typeof card !== "number" && card.id === selectedMyCardId
-              ? applySleepEffectToCard(updatedMyCard)
-              : card
-          );
-          setMyCards(updatedMyCards as IFightCard[]);
+            setMyCards((prev) =>
+              updateCardInArray(
+                prev as IFightCard[],
+                applySleepEffectToCard(updatedMyCard)
+              )
+            );
 
-          if (
-            checkVictoryCondition(updatedEnemyCards, setIsWin, setIsShowResult)
-          ) {
-            return;
-          }
+            if (
+              checkVictoryCondition(
+                updatedEnemyCards,
+                setIsWin,
+                setIsShowResult
+              )
+            ) {
+              return;
+            }
 
-          setTimeout(() => setDamageInfo([]), 1000);
-          setTimeout(() => setHealInfo(null), 1000);
-          setReloadableCards((prev) => [...prev, selectedMyCardId]);
-          setSelectedEnemyCardId(null);
-          setSelectedMyCardId(null);
+            setTimeout(() => setDamageInfo([]), 1000);
+            setTimeout(() => setHealInfo(null), 1000);
 
-          const aliveMyCards = myCards.filter(
-            (card) => typeof card !== "number" && card.fightHealth > 0
-          );
+            const updatedReloadableCards = [...reloadableCards, myCard.id];
+            setReloadableCards(updatedReloadableCards);
+            setSelectedEnemyCardId(null);
+            setSelectedMyCardId(null);
 
-          if (aliveMyCards.length === 0) {
-            setIsWin(false);
-            setIsShowResult(true);
-            return;
-          }
+            const aliveCards = filterAliveCards(myCards as IFightCard[]);
 
-          if (reloadableCards.length + 1 >= aliveMyCards.length) {
-            setMyCards(removeSleepEffectsFromCards(myCards as IFightCard[]));
-            setIsPlayerTurn(false);
-            setReloadableCards([]);
-          }
-        });
+            if (
+              aliveCards.every((card) =>
+                updatedReloadableCards.includes(card.id)
+              )
+            ) {
+              setMyCards(removeSleepEffectsFromCards(myCards as IFightCard[]));
+              setIsPlayerTurn(false);
+              setReloadableCards([]);
+            }
+          });
+        }
       }
     }
   };

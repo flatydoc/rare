@@ -1,7 +1,7 @@
-import { IFightCard } from "../../../core/types";
-import { getRandomDamage } from "../../../core/utils/getRandomDamage";
+import { IFightCard } from "../types";
 import { getElementalDamageReduction } from "./getElementalDamageReduction";
 import { getFractionMultiplier } from "./getFractionMultiplier";
+import { getRandomDamage } from "./getRandomDamage";
 
 export const calculateDamage = (
   attacker: IFightCard,

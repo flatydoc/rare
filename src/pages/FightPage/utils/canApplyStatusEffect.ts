@@ -1,5 +1,5 @@
-import { StatusEffectId } from "../../../core/enums/statusEffects";
 import { Fraction } from "../../../core/types";
+import { StatusEffectId } from "../enums";
 
 export const immunityByFraction: Record<Fraction, StatusEffectId[]> = {
   alliance: [],

@@ -1,5 +1,6 @@
-import { Element, Fraction, IStatusEffect } from "../../../core/types";
+import { Element, Fraction } from "../../../core/types";
 import { elementEmojis, fractionEmojis } from "../../SingleCardPage/constants";
+import { IStatusEffect } from "../types";
 
 export const generateDefaultStatusEffects = (
   fraction: Fraction,
